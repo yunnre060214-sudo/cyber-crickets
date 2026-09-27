@@ -18,6 +18,9 @@ export class Match {
     this.flags = new Set();
     this.timeline = [];
     this.nextSnapshot = 1;
+    // Full-fidelity match log for Markdown export / external AI analysis.
+    this.decisionLog = [];
+    this.eventLog = [];
     this.rng = createRng(deriveSeed(this.seed, 'world'));
     this.width = WIDTH;
     this.height = HEIGHT;
@@ -103,6 +106,9 @@ export class Match {
       this.flags.add('f');
       news.push({banner: '终局超频：全体翻色成功率提升', log: '终局超频开始，最后冲刺。'});
     }
+    for (const item of news) this.eventLog.push({
+      time: this.time, type: 'major', banner: item.banner, message: item.log
+    });
     return news;
   }
 
@@ -207,11 +213,48 @@ export class Match {
       }
       team.thinkMs = performance.now() - start;
       team.nextDecision = this.time + .085;
-      if (move) proposals.push({id: team.id, move});
+      if (move) {
+        const [fromX, fromY] = xy(move.from), [toX, toY] = xy(move.to);
+        const decision = {
+          seq: this.decisionLog.length + 1,
+          time: this.time,
+          teamId: team.id,
+          strategy: team.strategy,
+          share: view.share,
+          localPressure: view.localPressure,
+          optionCount: options.length,
+          thought: team.agent.thought || '',
+          from: {index: move.from, x: fromX, y: fromY},
+          to: {index: move.to, x: toX, y: toY},
+          target: {
+            owner: move.owner,
+            enemy: !!move.enemy,
+            terrain: move.terrain,
+            resource: move.resource,
+            ownNeighbors: move.ownN,
+            enemyNeighbors: move.enemyN,
+            distOwnCore: move.distOwnCore,
+            distRivalCore: move.distRivalCore,
+            nearestResourceDist: move.nearestResourceDist,
+            resourcePull: move.resourcePull,
+            enemyPressure: move.enemyPressure
+          },
+          thinkMs: team.thinkMs,
+          result: null
+        };
+        this.decisionLog.push(decision);
+        proposals.push({id: team.id, move, decision});
+      }
     }
     const results = resolveActions(this, proposals, () => this.rng.next(), this.flags.has('f'));
     for (const result of results) {
       const team = this.teams[result.id];
+      const proposal = proposals.find(item => item.id === result.id && item.move === result.move);
+      if (proposal?.decision) proposal.decision.result = {
+        success: !!result.success,
+        previousOwner: result.previousOwner ?? -1,
+        reward: result.reward ?? 0
+      };
       team.lastMove = result.move;
       if (result.success && result.previousOwner >= 0) team.captures++;
       team.agent.onResult(result);
