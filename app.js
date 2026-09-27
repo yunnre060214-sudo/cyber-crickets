@@ -140,11 +140,11 @@ function renderLiveChart() {
   const current={time:match.time,teams:match.teams.map(team=>({id:team.id,score:team.score}))};
   const data=snapshots.at(-1)?.time===match.time?snapshots:[...snapshots,current];
 
-  // Y 轴上限随比赛时长配置变化，但在一局内部保持固定。
-  // 60 / 90 / 120 秒分别使用 300 / 450 / 600 VP，避免短局曲线被压在底部，
-  // 同时保持历史点在比赛进行过程中不会因动态缩放而移动。
-  const yAxisMaxByDuration={60:300,90:450,120:600};
-  const maxVP=yAxisMaxByDuration[match.duration] ?? match.duration*5;
+  // Y 轴按实际对局量级标定：参考 120 秒完整局约 300 VP 的上沿。
+  // 播放速度只影响现实观看速度，不改变模拟时间和 VP 产出，因此不参与坐标轴计算。
+  // 一局内部保持固定坐标，历史点不会因为后续得分而移动。
+  const yAxisMaxByDuration={60:150,90:225,120:300};
+  const maxVP=yAxisMaxByDuration[match.duration] ?? match.duration*2.5;
   const x=time=>left+(width-left-right)*(time/match.duration);
   const y=value=>top+(height-top-bottom)*(1-Math.min(value,maxVP)/maxVP);
   const ticks=[0,.25,.5,.75,1];
