@@ -78,3 +78,19 @@ test('timeline records deterministic one-second snapshots and the final state', 
   assert.ok(a.timeline.length >= 4);
   assert.equal(a.timeline.at(-1).teams.length, 4);
 });
+
+
+test('decision and major-event logs preserve AI-analysis context', () => {
+  const match = new Match({...config, duration: 3});
+  while (!match.finished) match.step(.035);
+  assert.ok(match.decisionLog.length > 0);
+  const decision = match.decisionLog[0];
+  assert.equal(decision.seq, 1);
+  assert.equal(typeof decision.thought, 'string');
+  assert.ok(Number.isFinite(decision.time));
+  assert.ok(Number.isInteger(decision.from.x));
+  assert.ok(Number.isInteger(decision.to.y));
+  assert.ok(decision.target && Number.isFinite(decision.target.enemyPressure));
+  assert.ok(decision.result && typeof decision.result.success === 'boolean');
+  assert.ok(match.eventLog.some(event => event.type === 'major'));
+});
