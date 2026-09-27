@@ -1,0 +1,96 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {Match} from '../match.js';
+
+const config = {
+  seed: '20260927',
+  rotation: 2,
+  duration: 60,
+  strategies: ['aco', 'mcts', 'qlearn', 'voronoi']
+};
+
+function outcome(match) {
+  return {
+    owner: Array.from(match.owner),
+    terrain: Array.from(match.terrain),
+    resources: Array.from(match.resources),
+    teams: match.teams.map(a => ({
+      score: a.score, territory: a.territory, resources: a.resources,
+      captures: a.captures, lastMove: a.lastMove?.to
+    }))
+  };
+}
+
+test('same seed, agents, rotation and steps replay exactly, without global randomness', () => {
+  const oldRandom = Math.random;
+  Math.random = () => { throw new Error('global random used during a match'); };
+  try {
+    const a = new Match(config), b = new Match(config);
+    for (let tick = 0; tick < 400; tick++) { a.step(.035); b.step(.035); }
+    assert.deepEqual(outcome(a), outcome(b));
+    assert.ok(a.teams.some(team => team.score > 0));
+  } finally {
+    Math.random = oldRandom;
+  }
+});
+
+test('rotating spawn slots keeps the generated terrain and resources fixed', () => {
+  const a = new Match({...config, rotation: 0});
+  const b = new Match({...config, rotation: 1});
+  assert.deepEqual(Array.from(a.terrain), Array.from(b.terrain));
+  assert.deepEqual(Array.from(a.resources), Array.from(b.resources));
+  assert.equal(a.owner[5 + 5 * 64], 0);
+  assert.equal(b.owner[5 + 5 * 64], 3);
+});
+
+test('a full match accumulates only VP from control and ends at the selected duration', () => {
+  const match = new Match({...config, duration: 1});
+  for (let i = 0; i < 40; i++) match.step(.035);
+  assert.equal(match.time, 1);
+  assert.equal(match.finished, true);
+  const oldScores = match.teams.map(a => a.score);
+  match.step(.035);
+  assert.deepEqual(match.teams.map(a => a.score), oldScores);
+});
+
+test('duel seats use opposite sides and keep the same map and entrant random streams after swapping', () => {
+  const left = new Match({seed: 'duel', duration: 60,
+    strategies: ['random', 'greedy'], agentKeys: ['entry-a', 'entry-b']});
+  const right = new Match({seed: 'duel', duration: 60,
+    strategies: ['greedy', 'random'], agentKeys: ['entry-b', 'entry-a']});
+  assert.equal(left.owner[32 * 64 + 5], 0);
+  assert.equal(left.owner[32 * 64 + 58], 1);
+  assert.equal(right.owner[32 * 64 + 5], 0);
+  assert.deepEqual(Array.from(left.terrain), Array.from(right.terrain));
+  assert.deepEqual(Array.from(left.resources), Array.from(right.resources));
+  assert.equal(left.teams[0].agent.rng.next(), right.teams[1].agent.rng.next());
+});
+
+
+test('timeline records deterministic one-second snapshots and the final state', () => {
+  const a = new Match({...config, duration: 3});
+  const b = new Match({...config, duration: 3});
+  while (!a.finished) a.step(.035);
+  while (!b.finished) b.step(.035);
+  assert.deepEqual(a.timeline, b.timeline);
+  assert.equal(a.timeline[0].time, 0);
+  assert.equal(a.timeline.at(-1).time, 3);
+  assert.ok(a.timeline.length >= 4);
+  assert.equal(a.timeline.at(-1).teams.length, 4);
+});
+
+
+test('decision and major-event logs preserve AI-analysis context', () => {
+  const match = new Match({...config, duration: 3});
+  while (!match.finished) match.step(.035);
+  assert.ok(match.decisionLog.length > 0);
+  const decision = match.decisionLog[0];
+  assert.equal(decision.seq, 1);
+  assert.equal(typeof decision.thought, 'string');
+  assert.ok(Number.isFinite(decision.time));
+  assert.ok(Number.isInteger(decision.from.x));
+  assert.ok(Number.isInteger(decision.to.y));
+  assert.ok(decision.target && Number.isFinite(decision.target.enemyPressure));
+  assert.ok(decision.result && typeof decision.result.success === 'boolean');
+  assert.ok(match.eventLog.some(event => event.type === 'major'));
+});
