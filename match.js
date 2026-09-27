@@ -16,6 +16,8 @@ export class Match {
     this.time = 0;
     this.finished = false;
     this.flags = new Set();
+    this.timeline = [];
+    this.nextSnapshot = 1;
     this.rng = createRng(deriveSeed(this.seed, 'world'));
     this.width = WIDTH;
     this.height = HEIGHT;
@@ -39,6 +41,18 @@ export class Match {
     this.seedCores();
     this.addResources(26, false);
     this.stats();
+    this.recordSnapshot();
+  }
+
+  recordSnapshot() {
+    this.timeline.push({
+      time: this.time,
+      resourceTotal: this.resourceTotal,
+      teams: this.teams.map(team => ({
+        id: team.id, score: team.score, territory: team.territory,
+        resources: team.resources, captures: team.captures
+      }))
+    });
   }
 
   seedCores() {
@@ -206,7 +220,12 @@ export class Match {
     for (const team of this.teams) {
       team.score += elapsed * vpRate(team.territory, CELL_COUNT, team.resources, this.resourceTotal);
     }
+    while (this.time + 1e-9 >= this.nextSnapshot && this.nextSnapshot <= this.duration) {
+      this.recordSnapshot();
+      this.nextSnapshot++;
+    }
     if (this.time >= this.duration) {
+      if (this.timeline.at(-1)?.time !== this.time) this.recordSnapshot();
       this.finished = true;
       for (const team of this.teams) team.agent.endMatch?.();
     }

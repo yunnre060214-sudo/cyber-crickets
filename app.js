@@ -11,6 +11,7 @@ const el = {
   speed: $('#speed'), cfg: $('#teamConfig'), score: $('#scoreboard'),
   feed: $('#feed'), banner: $('#eventBanner'), dialog: $('#resultDialog'),
   title: $('#winnerTitle'), summary: $('#winnerSummary'), results: $('#resultList'),
+  insights: $('#resultInsights'), charts: $('#resultCharts'),
   again: $('#againBtn'), close: $('#closeResultBtn'), overlay: $('#overlayToggle'),
   seed: $('#seedInput'), rotation: $('#rotation'), newSeed: $('#newSeedBtn')
 };
@@ -160,6 +161,79 @@ function log(message) {
   while (el.feed.children.length > 30) el.feed.lastChild.remove();
 }
 
+function averageMetrics(teamId) {
+  const samples = match.timeline.length || 1;
+  let territory = 0, resource = 0;
+  for (const point of match.timeline) {
+    const team = point.teams.find(item => item.id === teamId);
+    territory += team.territory / CELL_COUNT;
+    resource += point.resourceTotal ? team.resources / point.resourceTotal : 0;
+  }
+  return {territory: territory / samples, resource: resource / samples};
+}
+
+function leadChanges() {
+  let previous = null, changes = 0;
+  for (const point of match.timeline) {
+    const leader = [...point.teams].sort((a, b) => b.score - a.score)[0]?.id;
+    if (previous != null && leader !== previous) changes++;
+    previous = leader;
+  }
+  return changes;
+}
+
+function chartSvg(metric, label, formatter) {
+  const width = 520, height = 150, padX = 12, padY = 14;
+  const series = match.teams.map(team => match.timeline.map(point => {
+    const sample = point.teams.find(item => item.id === team.id);
+    return metric(sample, point);
+  }));
+  const max = Math.max(1e-6, ...series.flat());
+  const points = values => values.map((value, i) => {
+    const x = padX + (width - padX * 2) * (values.length <= 1 ? 0 : i / (values.length - 1));
+    const y = height - padY - (height - padY * 2) * value / max;
+    return x.toFixed(1) + ',' + y.toFixed(1);
+  }).join(' ');
+  const lines = series.map((values, id) =>
+    '<polyline points="' + points(values) + '" fill="none" stroke="' + COLORS[id] +
+    '" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>'
+  ).join('');
+  const endLabels = series.map((values, id) =>
+    '<span><i style="background:' + COLORS[id] + '"></i>' + TEAM_NAMES[id] + ' ' +
+    formatter(values.at(-1) || 0) + '</span>'
+  ).join('');
+  return '<article class="result-chart"><div class="result-chart-head"><strong>' + label +
+    '</strong><small>0s → ' + Math.round(match.duration) + 's</small></div><svg viewBox="0 0 ' +
+    width + ' ' + height + '" role="img" aria-label="' + label +
+    '随时间变化"><path d="M12 136H508" stroke="#e7ebf2" stroke-width="1"/>' + lines +
+    '</svg><div class="chart-legend">' + endLabels + '</div></article>';
+}
+
+function renderPostMatchAnalysis(teams, winner) {
+  const metrics = match.teams.map(team => ({id: team.id, ...averageMetrics(team.id)}));
+  const winnerMetrics = metrics.find(item => item.id === winner.id);
+  const territoryRank = [...metrics].sort((a, b) => b.territory - a.territory);
+  const resourceRank = [...metrics].sort((a, b) => b.resource - a.resource);
+  let edge = '综合控制';
+  let detail = '领地与资源的持续控制更均衡';
+  if (territoryRank[0].id === winner.id && resourceRank[0].id !== winner.id) {
+    edge = '领地控制'; detail = '整局平均领地占比排名第一';
+  } else if (resourceRank[0].id === winner.id && territoryRank[0].id !== winner.id) {
+    edge = '资源控制'; detail = '整局平均资源控制率排名第一';
+  } else if (resourceRank[0].id === winner.id && territoryRank[0].id === winner.id) {
+    edge = '双重控制'; detail = '平均领地与资源控制均排名第一';
+  }
+  el.insights.innerHTML =
+    '<div class="insight-primary"><span>关键优势</span><strong>' + edge + '</strong><p>' + detail +
+    '。平均领地 ' + (winnerMetrics.territory * 100).toFixed(1) + '%，平均资源控制 ' +
+    (winnerMetrics.resource * 100).toFixed(1) + '%。</p></div>' +
+    '<div class="insight-stat"><span>领先易手</span><strong>' + leadChanges() + '</strong><small>次</small></div>' +
+    '<div class="insight-stat"><span>终局翻色</span><strong>' + winner.captures + '</strong><small>格</small></div>';
+  el.charts.innerHTML =
+    chartSvg((team) => team.score, 'VP 趋势', value => value.toFixed(1)) +
+    chartSvg((team) => team.territory / CELL_COUNT * 100, '领地趋势', value => value.toFixed(1) + '%');
+}
+
 function finish() {
   running = false; ui(); el.state.textContent = '已结算';
   el.pause.disabled = true; el.start.disabled = false; el.start.textContent = '新一局';
@@ -171,6 +245,7 @@ function finish() {
     '<div class="result-line"><span>' + (rank + 1) + '. ' + TEAM_NAMES[team.id] +
     ' · ' + AGENT_META[team.strategy].name + '</span><strong>' +
     team.score.toFixed(1) + ' VP</strong></div>').join('');
+  renderPostMatchAnalysis(teams, winner);
   log(AGENT_META[winner.strategy].name + ' 以 ' + winner.score.toFixed(1) + ' VP 拿下本局。');
   el.dialog.showModal();
 }

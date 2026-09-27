@@ -1228,3 +1228,88 @@ html{
   .tour-report-stats{grid-template-columns:1fr}
   .round-meta{align-items:stretch}
 }
+
+/* Post-match explainability v1 */
+.result-dialog{width:min(760px,calc(100% - 32px))}
+.result-insights{
+  display:grid;
+  grid-template-columns:minmax(0,2fr) repeat(2,minmax(100px,.7fr));
+  gap:8px;
+  margin:14px 0;
+}
+.insight-primary,.insight-stat{
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:#f8faff;
+}
+.insight-primary{padding:13px 14px}
+.insight-primary>span,.insight-stat>span{
+  display:block;
+  margin-bottom:4px;
+  color:var(--muted);
+  font-size:10px;
+  font-weight:850;
+  letter-spacing:.04em;
+}
+.insight-primary strong{font-size:18px}
+.insight-primary p{
+  margin:5px 0 0;
+  color:var(--muted);
+  font-size:11px;
+  line-height:1.55;
+}
+.insight-stat{
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  padding:12px;
+  text-align:center;
+}
+.insight-stat strong{font-size:24px;line-height:1}
+.insight-stat small{margin-top:3px;color:var(--soft);font-size:10px}
+.result-charts{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+  margin:0 0 18px;
+}
+.result-chart{
+  min-width:0;
+  padding:11px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:#fff;
+}
+.result-chart-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
+}
+.result-chart-head strong{font-size:12px}
+.result-chart-head small{color:var(--soft);font-size:9px}
+.result-chart svg{
+  display:block;
+  width:100%;
+  height:auto;
+  margin:5px 0;
+  overflow:visible;
+}
+.chart-legend{
+  display:flex;
+  flex-wrap:wrap;
+  gap:4px 9px;
+  color:var(--muted);
+  font-size:9px;
+}
+.chart-legend span{display:flex;align-items:center;gap:4px}
+.chart-legend i{width:6px;height:6px;border-radius:50%}
+@media (max-width:620px){
+  .result-insights{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .insight-primary{grid-column:1/-1}
+  .result-charts{grid-template-columns:1fr}
+}
+@media (max-width:390px){
+  .result-insights{grid-template-columns:1fr 1fr}
+  .result-chart{padding:9px}
+}

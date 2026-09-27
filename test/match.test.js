@@ -65,3 +65,16 @@ test('duel seats use opposite sides and keep the same map and entrant random str
   assert.deepEqual(Array.from(left.resources), Array.from(right.resources));
   assert.equal(left.teams[0].agent.rng.next(), right.teams[1].agent.rng.next());
 });
+
+
+test('timeline records deterministic one-second snapshots and the final state', () => {
+  const a = new Match({...config, duration: 3});
+  const b = new Match({...config, duration: 3});
+  while (!a.finished) a.step(.035);
+  while (!b.finished) b.step(.035);
+  assert.deepEqual(a.timeline, b.timeline);
+  assert.equal(a.timeline[0].time, 0);
+  assert.equal(a.timeline.at(-1).time, 3);
+  assert.ok(a.timeline.length >= 4);
+  assert.equal(a.timeline.at(-1).teams.length, 4);
+});
