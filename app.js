@@ -15,7 +15,7 @@ const el = {
   again: $('#againBtn'), close: $('#closeResultBtn'), overlay: $('#overlayToggle'),
   seed: $('#seedInput'), rotation: $('#rotation'), newSeed: $('#newSeedBtn'),
   liveChart: $('#liveChart'), liveGrid: $('#liveChartGrid'), liveLines: $('#liveChartLines'),
-  liveLegend: $('#liveChartLegend')
+  liveLegend: $('#liveChartLegend'), durationSummary: $('#durationSummary'), speedSummary: $('#speedSummary')
 };
 const COLORS = ['#ff5b5b', '#4f7cff', '#25b77a', '#9b6bff'];
 const TEAM_NAMES = ['红方', '蓝方', '绿方', '紫方'];
@@ -81,7 +81,9 @@ function reset() {
   el.feed.innerHTML = '';
   log('种子 ' + match.seed + '，出生轮换 ' + (+el.rotation.value + 1) + '/4。');
   el.state.textContent = '待机';
-  el.start.textContent = '开始'; el.start.disabled = false;
+  el.durationSummary.textContent = el.duration.value + 's';
+  el.speedSummary.textContent = el.speed.value + '×';
+  el.start.textContent = '开始比赛'; el.start.disabled = false;
   el.pause.textContent = '暂停'; el.pause.disabled = true;
   ui(); draw();
 }
@@ -102,7 +104,7 @@ function pause() {
     log('模拟继续。');
   } else {
     el.pause.textContent = '继续'; el.start.disabled = false;
-    el.start.textContent = '继续'; el.state.textContent = '已暂停';
+    el.start.textContent = '继续比赛'; el.state.textContent = '已暂停';
     log('模拟暂停。');
   }
 }
@@ -132,36 +134,43 @@ function banner(message) {
 }
 
 function renderLiveChart() {
-  const width=720,height=190,left=42,right=12,top=12,bottom=28;
+  const width=720,height=360,left=48,right=14,top=16,bottom=32;
   const snapshots=match.timeline;
-  const current={
-    time:match.time,
-    teams:match.teams.map(team=>({id:team.id,score:team.score}))
-  };
+  const current={time:match.time,teams:match.teams.map(team=>({id:team.id,score:team.score}))};
   const data=snapshots.at(-1)?.time===match.time?snapshots:[...snapshots,current];
-  const maxVP=Math.max(10,...data.flatMap(point=>point.teams.map(team=>team.score)));
+
+  // VP/s 的理论上限是 10，因此整个回合从开始就使用固定 Y 轴。
+  // 历史点一旦绘制，其 x/y 坐标不会因为后续分数增长而改变。
+  const maxVP=match.duration*10;
   const x=time=>left+(width-left-right)*(time/match.duration);
-  const y=value=>top+(height-top-bottom)*(1-value/maxVP);
+  const y=value=>top+(height-top-bottom)*(1-Math.min(value,maxVP)/maxVP);
   const ticks=[0,.25,.5,.75,1];
+
   el.liveGrid.innerHTML=
     ticks.map(t=>'<line x1="'+left+'" y1="'+y(maxVP*t).toFixed(1)+'" x2="'+(width-right)+
       '" y2="'+y(maxVP*t).toFixed(1)+'" stroke="#e7ebf2" stroke-width="1"/>'+
-      '<text x="'+(left-7)+'" y="'+(y(maxVP*t)+3).toFixed(1)+'" text-anchor="end" fill="#8b96a8" font-size="9">'+
-      (maxVP*t).toFixed(0)+'</text>').join('')+
-    ticks.map(t=>'<text x="'+x(match.duration*t).toFixed(1)+'" y="'+(height-8)+
-      '" text-anchor="middle" fill="#8b96a8" font-size="9">'+Math.round(match.duration*t)+'s</text>').join('');
+      '<text x="'+(left-8)+'" y="'+(y(maxVP*t)+3).toFixed(1)+'" text-anchor="end" fill="#8b96a8" font-size="10">'+
+      Math.round(maxVP*t)+'</text>').join('')+
+    ticks.map(t=>'<line x1="'+x(match.duration*t).toFixed(1)+'" y1="'+top+'" x2="'+
+      x(match.duration*t).toFixed(1)+'" y2="'+(height-bottom)+'" stroke="#f0f2f6" stroke-width="1"/>'+
+      '<text x="'+x(match.duration*t).toFixed(1)+'" y="'+(height-9)+
+      '" text-anchor="middle" fill="#8b96a8" font-size="10">'+Math.round(match.duration*t)+'s</text>').join('');
+
   el.liveLines.innerHTML=match.teams.map(team=>{
     const points=data.map(point=>{
       const sample=point.teams.find(item=>item.id===team.id);
       return x(point.time).toFixed(1)+','+y(sample?.score||0).toFixed(1);
     }).join(' ');
+    const last=data.at(-1)?.teams.find(item=>item.id===team.id);
+    const cx=x(data.at(-1)?.time||0).toFixed(1),cy=y(last?.score||0).toFixed(1);
     return '<polyline points="'+points+'" fill="none" stroke="'+COLORS[team.id]+
-      '" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>';
+      '" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>'+
+      '<circle cx="'+cx+'" cy="'+cy+'" r="4.5" fill="'+COLORS[team.id]+'" stroke="#fff" stroke-width="2"/>';
   }).join('');
+
   el.liveLegend.innerHTML=match.teams.map(team=>'<span><i style="background:'+COLORS[team.id]+
     '"></i>'+TEAM_NAMES[team.id]+' <b>'+team.score.toFixed(1)+'</b></span>').join('');
 }
-
 function ui() {
   el.timer.textContent = formatTime(match.duration - match.time);
   const teams = [...match.teams].sort((a, b) => b.score - a.score);
@@ -335,9 +344,10 @@ function drawThinking(cw, ch) {
 el.start.onclick = start;
 el.pause.onclick = pause;
 el.reset.onclick = reset;
-el.duration.onchange = () => { if (!running) reset(); };
+el.duration.onchange = () => { el.durationSummary.textContent = el.duration.value + 's'; if (!running) reset(); };
 el.seed.onchange = reset;
 el.rotation.onchange = reset;
+el.speed.onchange = () => { el.speedSummary.textContent = el.speed.value + '×'; };
 el.newSeed.onclick = () => { el.seed.value = makeSeed(); reset(); };
 el.again.onclick = () => { el.dialog.close(); reset(); start(); };
 el.close.onclick = () => el.dialog.close();
