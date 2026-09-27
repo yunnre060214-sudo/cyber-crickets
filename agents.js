@@ -16,7 +16,7 @@ export const AGENT_META={
   turtle:{name:'Turtle 堡垒',desc:'高邻接密度推进，保持紧凑领地并降低暴露面。',tier:'防守型'},
   denial:{name:'Resource Denial',desc:'优先夺走敌占资源，其次封锁高价值节点。',tier:'压制型'},
   momentum:{name:'Momentum 变速器',desc:'原创策略：根据面积、敌压和赛程阶段动态切换节奏。',tier:'自适应型'},
-  strongest:{name:'最强',desc:'两步 VP 规划器：规则成功率模型 + Beam 前瞻 + 对手反制风险 + 在线成功率校准。',tier:'规划型'}
+  strongest:{name:'最强',desc:'阶段/比分感知 VP 规划器：真实边际 VP + 资源赛道 + 前沿跑道 + Beam 前瞻。',tier:'规划型'}
 };
 
 const pickBest=(arr,score)=>{
@@ -222,11 +222,9 @@ class MomentumAgent extends BaseAgent{
 class StrongestAgent extends BaseAgent{
   constructor(id,size,rng){
     super(id,size,rng);
-    this.recentTargets=new Int32Array(12).fill(-1);
+    this.recentTargets=new Int32Array(16).fill(-1);
     this.recentCursor=0;
     this.failures=new Map();
-    this.successEMA=.72;
-    this.attackEMA=.5;
   }
 
   estimatedChance(o,overclock){
@@ -234,88 +232,143 @@ class StrongestAgent extends BaseAgent{
       ? .93-(o.terrain-1)*.12
       : .39+o.ownN*.105-o.enemyN*.075-(o.terrain-1)*.05;
     if(overclock)p+=.075;
-    // Calibrate the rule model very gently from this match's observed outcomes.
-    p=.88*p+.12*this.successEMA;
+    // The rules already expose the exact probability model. Recent luck is not
+    // evidence that the next independent roll became easier or harder.
     return clamp(p,.12,.93);
   }
 
-  retryPenalty(o,final){
+  situation(v){
+    const teamCount=Math.max(2,v.teamCount||4);
+    const fair=1/teamCount;
+    const remaining=Math.max(.05,Number.isFinite(v.remaining)?v.remaining:(1-v.progress)*90);
+    const rank=Number.isFinite(v.rank)?v.rank:(v.share<fair*.92?2:1);
+    const scoreGap=Math.max(0,v.scoreGap||0);
+    const rateGap=Math.max(0,(v.leaderVpRate||0)-(v.vpRate||0));
+    const recoverability=clamp(scoreGap/Math.max(1,remaining*10),0,1);
+    const trailing=rank>1||v.share<fair*.9;
+    const leading=rank===1&&v.progress>.24;
+    const urgency=clamp((trailing?.14:0)+recoverability*1.85+
+      clamp(rateGap/3.5,0,1)*.42+(v.progress>.72?.10:0),0,1);
+    const phase=v.progress<.34?'early':v.progress<.72?'mid':v.progress<.88?'late':'final';
+    return {teamCount,fair,remaining,rank,trailing,leading,urgency,phase};
+  }
+
+  retryPenalty(o,s){
     const failed=this.failures.get(o.to)||0;
     let repeated=0;
     for(let i=0;i<this.recentTargets.length;i++)if(this.recentTargets[i]===o.to)repeated++;
-    return failed*(final?.32:1.2)+repeated*.2;
+    const strategic=o.resource>0||o.nearestResourceDist<=1;
+    const failWeight=strategic?.22:o.enemy?.58:(s.phase==='final'?.26:1);
+    const repeatWeight=strategic?.035:.10;
+    return failed*failWeight+repeated*repeatWeight;
   }
 
-  staticValue(o,v,{continuation=false}={}){
-    const remaining=Math.max(0,1-v.progress);
-    const late=v.progress>=.62, final=v.progress>=.82, behind=v.share<.235;
-    const p=this.estimatedChance(o,final);
-    const horizon=(continuation?.22:.34)+remaining*(continuation?1.18:1.72);
+  staticValue(o,v,{continuation=false,situation=null}={}){
+    const s=situation||this.situation(v);
+    const cellCount=Math.max(1,v.cellCount||v.width*v.height||this.size);
+    const resourceTotal=Math.max(1,v.resourceTotal||40);
+    const p=this.estimatedChance(o,s.phase==='final');
 
-    // Expected long-horizon scoring value, aligned to the 65/35 VP rule.
-    const area=6.5;
-    const resource=o.resource*3.5;
-    const denial=o.enemy?(final?5.4:4.25):0;
-    const direct=horizon*(area+resource+denial);
+    // Convert a capture into its expected remaining-match VP contribution.
+    // This fixes the old 6.5-vs-3.5 shortcut, which ignored that area is divided
+    // by 4096 cells while resources are divided by a much smaller resource pool.
+    const areaCarry=s.remaining*6.5/cellCount;
+    const resourceCarry=s.remaining*3.5*o.resource/resourceTotal;
+    const hold=clamp(.84+o.ownN*.06-o.enemyN*.05-o.enemyPressure*.13,.46,1.05);
+    const enemySwing=o.enemy
+      ?1+(s.trailing?.92:s.leading?.44:.68)
+      :1;
+    const continuationScale=continuation?.56:1;
+    const direct=(areaCarry+resourceCarry)*enemySwing*hold*continuationScale;
 
-    const path=o.nearestResourceDist>=99?0:(late?7.4:5.5)/(1+o.nearestResourceDist*.42);
-    const pull=o.resourcePull*(late?1.58:1.16);
-    const structure=o.ownN*1.72-o.enemyN*.48;
-    const frontier=o.owner<0?(behind?2.65:1.3):0;
-    const attack=o.enemy
-      ?2.35+o.ownN*1.42-o.enemyN*1.08+(o.resource>0?5.8:0)
-      :0;
+    // Treat movement toward the next uncontrolled resource as an investment.
+    // Resource specialists lead early because resource VP starts compounding
+    // immediately; this planner now prices that opportunity explicitly.
+    const d=o.nearestResourceDist;
+    const avgResourceValue=1.36;
+    const pathBase=s.remaining*3.5*avgResourceValue/resourceTotal;
+    const phasePath={early:1.10,mid:.94,late:.56,final:.14}[s.phase];
+    const resourceFair=1/s.teamCount;
+    const resourceDeficit=clamp((resourceFair-(v.resourceShare||0))/Math.max(.01,resourceFair),0,1);
+    const demand=(.84+resourceDeficit*.28+(s.trailing?.16*s.urgency:0))*(continuation?.62:1);
+    const distDecay={early:.28,mid:.36,late:.52,final:.88}[s.phase];
+    const path=(o.resource>0||d>=99)?0:
+      pathBase*phasePath*demand/(1+d*distDecay);
 
-    const friction=(o.terrain-1)*(final?.5:1.08);
-    const pressure=o.enemyPressure*(o.enemy?.52:1.18);
-    const retry=continuation?0:this.retryPenalty(o,final);
+    // Prefer frontier cells that leave several productive next moves. This is
+    // the anti-stall component that prevents a compact early shape from giving
+    // all strategic space to Runner / Potential / resource-chain opponents.
+    const next=o.continuations||[];
+    const openBranches=next.filter(n=>n.owner<0).length;
+    const attackBranches=next.filter(n=>n.enemy).length;
+    const runwayCells=openBranches*({early:7.0,mid:4.2,late:2.1,final:.45}[s.phase])+
+      attackBranches*({early:1.0,mid:2.1,late:2.8,final:1.2}[s.phase]);
+    const runway=areaCarry*runwayCells*(continuation?.34:1);
 
-    return {p,utility:p*(direct+path+pull+structure+frontier+attack)-friction-pressure-retry};
+    // In otherwise similar positions, move the frontier outward early and
+    // become more compact later or while protecting a lead.
+    const outward=areaCarry*clamp(o.distOwnCore/18,0,2.2)*
+      ({early:3.2,mid:1.55,late:.55,final:.08}[s.phase])*(continuation?.5:1);
+    const structureCells=o.ownN*({early:.62,mid:1.08,late:1.42,final:1.05}[s.phase])-
+      o.enemyN*({early:.12,mid:.42,late:.58,final:.22}[s.phase]);
+    const structure=areaCarry*structureCells*(s.leading?2.15:1.72)*(continuation?.58:1);
+
+    // Pressure is a cost, but resource objectives and comeback states are
+    // allowed to accept more contact instead of automatically yielding space.
+    const rawRisk=areaCarry*(o.enemyPressure*4.2+o.enemyN*.62+
+      Math.max(0,2-o.ownN)*(o.enemy?.72:.30));
+    const riskTolerance=clamp(1-(s.trailing?.46*s.urgency:0)+(s.leading?.18:0),.42,1.18);
+    const objectiveDiscount=(o.resource>0||d<=1)?.58:1;
+    const pressure=rawRisk*riskTolerance*objectiveDiscount*(continuation?.55:1);
+
+    const retry=this.retryPenalty(o,s)*areaCarry*
+      ({early:2.8,mid:2.55,late:1.7,final:.72}[s.phase])*(continuation?0:1);
+
+    return {p,utility:p*(direct+path+runway+outward+structure)-pressure-retry,
+      direct,path,runway};
   }
 
-  continuationValue(o,v){
+  continuationValue(o,v,s){
     const next=o.continuations||[];
     if(!next.length)return 0;
-
-    // Beam width 3: preserve multiple plausible continuations instead of trusting
-    // one brittle best-case branch. Best branch dominates, alternatives add robustness.
-    const scored=next.map(n=>this.staticValue(n,v,{continuation:true}).utility)
-      .sort((x,y)=>y-x).slice(0,3);
-    const best=scored[0]||0, second=scored[1]??best, third=scored[2]??second;
-    return .68*best+.22*second+.10*third;
-  }
-
-  opponentRisk(o,v){
-    // Local opponent model: enemy pressure + defense + exposed low-support pushes
-    // approximate how likely rivals are to contest or reverse this expansion.
-    const contact=o.enemyPressure*3.2+o.enemyN*.72;
-    const exposure=Math.max(0,2-o.ownN)*(o.enemy?1.15:.72);
-    const late=v.progress>=.82;
-    return (contact+exposure)*(late?.58:1);
+    const scored=next.map(n=>this.staticValue(n,v,{continuation:true,situation:s}).utility)
+      .sort((x,y)=>y-x).slice(0,4);
+    const weights=[.56,.24,.13,.07];
+    let value=0;
+    for(let i=0;i<scored.length;i++)value+=scored[i]*weights[i];
+    const areaCarry=s.remaining*6.5/Math.max(1,v.cellCount||v.width*v.height||this.size);
+    const breadth=Math.min(4,next.length)*areaCarry*
+      ({early:2.2,mid:1.25,late:.55,final:.08}[s.phase]);
+    return value+breadth;
   }
 
   selectAction(v){
     if(!v.options.length)return null;
-    const final=v.progress>=.82;
+    const s=this.situation(v);
 
-    // Stage 1: cheap rule-aware evaluation over every legal move.
-    const ranked=v.options.map(o=>{
-      const now=this.staticValue(o,v);
+    // The same target can appear from several friendly origins. Collapse those
+    // duplicates so the beam represents distinct strategic choices.
+    const unique=[],seen=new Set();
+    for(const o of v.options){
+      if(seen.has(o.to))continue;
+      seen.add(o.to);unique.push(o);
+    }
+
+    const ranked=unique.map(o=>{
+      const now=this.staticValue(o,v,{situation:s});
       return {o,now,pre:now.utility};
     }).sort((x,y)=>y.pre-x.pre);
 
-    // Stage 2: depth-2 search only on the strongest candidates. This keeps the
-    // decision budget bounded even when the frontier contains hundreds of moves.
-    const beam=ranked.slice(0,Math.min(18,ranked.length));
-    let best=null,bestScore=-Infinity,bestFuture=0,bestP=0;
+    const beamWidth={early:24,mid:22,late:18,final:12}[s.phase];
+    const lookWeight={early:.72,mid:.61,late:.40,final:.15}[s.phase];
+    const beam=ranked.slice(0,Math.min(beamWidth,ranked.length));
+    let best=null,bestScore=-Infinity,bestFuture=0,bestP=0,bestNow=null;
     for(const item of beam){
-      const future=this.continuationValue(item.o,v);
-      const risk=this.opponentRisk(item.o,v);
-      // First-step success gates access to the second-step branch.
-      const lookahead=item.now.p*future*(final?.34:.56);
-      const score=item.now.utility+lookahead-risk+this.rng.next()*.025;
+      const future=this.continuationValue(item.o,v,s);
+      const lookahead=item.now.p*future*lookWeight;
+      const score=item.now.utility+lookahead+this.rng.next()*1e-6;
       if(score>bestScore){
-        bestScore=score;best=item.o;bestFuture=lookahead;bestP=item.now.p;
+        bestScore=score;best=item.o;bestFuture=lookahead;bestP=item.now.p;bestNow=item.now;
       }
     }
 
@@ -323,12 +376,15 @@ class StrongestAgent extends BaseAgent{
       this.lastChoice=best.to;
       this.recentTargets[this.recentCursor]=best.to;
       this.recentCursor=(this.recentCursor+1)%this.recentTargets.length;
-      const motive=best.resource>0?'高价值资源':
-        best.enemy?'高收益翻色':
-        best.nearestResourceDist<=3?'资源通路':
+      const motive=best.resource>0?(best.enemy?'夺取敌方资源':'直接资源'):
+        best.nearestResourceDist<=2?'资源赛道':
+        best.enemy?'压制翻色':
+        (best.continuations?.filter(n=>n.owner<0).length||0)>=2?'扩张跑道':
         best.ownN>=2?'连续阵型':'边界扩张';
-      this.thought='两步 VP 规划：'+motive+'；首步成功率 '+Math.round(bestP*100)+
-        '%；后续价值 '+bestFuture.toFixed(1)+'；已计入反制风险';
+      const phaseName={early:'开局',mid:'中盘',late:'后盘',final:'终局'}[s.phase];
+      const posture=s.trailing?'追分':s.leading?'控盘':'均衡';
+      this.thought=phaseName+'·'+posture+'：'+motive+'；成功率 '+Math.round(bestP*100)+
+        '%；即时 '+bestNow.utility.toFixed(2)+'；前瞻 '+bestFuture.toFixed(2);
     }
     return best;
   }
@@ -337,20 +393,15 @@ class StrongestAgent extends BaseAgent{
     super.onResult(r);
     if(!r?.move)return;
     const key=r.move.to;
-    const success=r.success?1:0;
-    this.successEMA=this.successEMA*.94+success*.06;
-    if(r.move.enemy)this.attackEMA=this.attackEMA*.92+success*.08;
     if(r.success)this.failures.delete(key);
-    else this.failures.set(key,Math.min(5,(this.failures.get(key)||0)+1));
-    if(this.failures.size>96)this.failures.delete(this.failures.keys().next().value);
+    else this.failures.set(key,Math.min(6,(this.failures.get(key)||0)+1));
+    if(this.failures.size>128)this.failures.delete(this.failures.keys().next().value);
   }
 
   reset(){
     this.recentTargets.fill(-1);
     this.recentCursor=0;
     this.failures.clear();
-    this.successEMA=.72;
-    this.attackEMA=.5;
   }
 }
 

@@ -1,5 +1,5 @@
-import {createAgent} from './agents.js';
-import {createRng, deriveSeed, spawnFor, vpRate, resolveActions} from './rules.js';
+import {createAgent} from './agents.js?v=20260927-strongest-v2';
+import {createRng, deriveSeed, spawnFor, vpRate, resolveActions} from './rules.js?v=20260927-strongest-v2';
 
 export const WIDTH = 64, HEIGHT = 64, CELL_COUNT = WIDTH * HEIGHT;
 const DIRECTIONS = [[1, 0], [-1, 0], [0, 1], [0, -1]];
@@ -216,14 +216,49 @@ export class Match {
     this.time += elapsed;
     const news = this.events();
     const proposals = [];
+    const live = this.teams.map(team => ({
+      id: team.id,
+      score: team.score,
+      territory: team.territory,
+      resources: team.resources,
+      vpRate: vpRate(team.territory, CELL_COUNT, team.resources, this.resourceTotal)
+    }));
+    const standings = [...live].sort((a,b) =>
+      b.score-a.score || b.vpRate-a.vpRate || b.territory-a.territory || a.id-b.id);
     if (this.time < this.duration) for (const team of this.teams) {
       if (this.time < team.nextDecision) continue;
       const options = this.options(team.id);
       if (!options.length) continue;
       const contested = options.filter(option => option.enemy).length;
-      const view = {id: team.id, time: this.time, progress: this.time / this.duration,
-        share: team.territory / CELL_COUNT, localPressure: contested / options.length,
-        options, width: WIDTH, height: HEIGHT};
+      const mine=live[team.id], rank=standings.findIndex(item => item.id===team.id)+1;
+      const leader=standings[0], runnerUp=standings[rank===1?1:0]||leader;
+      const view = {
+        id: team.id,
+        time: this.time,
+        duration: this.duration,
+        remaining: Math.max(0,this.duration-this.time),
+        progress: this.time / this.duration,
+        teamCount: this.teams.length,
+        score: mine.score,
+        vpRate: mine.vpRate,
+        share: mine.territory / CELL_COUNT,
+        territory: mine.territory,
+        resources: mine.resources,
+        resourceShare: this.resourceTotal ? mine.resources / this.resourceTotal : 0,
+        resourceTotal: this.resourceTotal,
+        cellCount: CELL_COUNT,
+        rank,
+        scoreGap: Math.max(0,leader.score-mine.score),
+        leadMargin: rank===1 ? Math.max(0,mine.score-runnerUp.score) : 0,
+        leaderScore: leader.score,
+        leaderVpRate: leader.vpRate,
+        leaderShare: leader.territory / CELL_COUNT,
+        leaderResourceShare: this.resourceTotal ? leader.resources / this.resourceTotal : 0,
+        localPressure: contested / options.length,
+        options,
+        width: WIDTH,
+        height: HEIGHT
+      };
       const start = performance.now();
       let move;
       try { move = team.agent.selectAction(view); }
@@ -241,7 +276,12 @@ export class Match {
           time: this.time,
           teamId: team.id,
           strategy: team.strategy,
+          score: view.score,
+          vpRate: view.vpRate,
+          rank: view.rank,
+          scoreGap: view.scoreGap,
           share: view.share,
+          resourceShare: view.resourceShare,
           localPressure: view.localPressure,
           optionCount: options.length,
           thought: team.agent.thought || '',

@@ -91,6 +91,9 @@ test('decision and major-event logs preserve AI-analysis context', () => {
   assert.ok(Number.isInteger(decision.from.x));
   assert.ok(Number.isInteger(decision.to.y));
   assert.ok(decision.target && Number.isFinite(decision.target.enemyPressure));
+  assert.ok(Number.isInteger(decision.rank) && decision.rank >= 1);
+  assert.ok(Number.isFinite(decision.scoreGap));
+  assert.ok(Number.isFinite(decision.vpRate));
   assert.ok(decision.result && typeof decision.result.success === 'boolean');
   assert.ok(match.eventLog.some(event => event.type === 'major'));
 });

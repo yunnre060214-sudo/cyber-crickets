@@ -1,4 +1,4 @@
-import {Tournament} from './tournament.js';
+import {Tournament} from './tournament.js?v=20260927-strongest-v2';
 
 self.onmessage = event => {
   try {
