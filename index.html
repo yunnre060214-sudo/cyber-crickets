@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f4f5f7" />
+  <title>赛博斗蛐蛐 · 算法争夺战</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">CYBER CRICKETS</p>
+        <h1>赛博斗蛐蛐</h1>
+        <p class="subtitle">让算法自己抢色块。你只负责选阵容，然后看它们打。</p>
+      </div>
+      <div class="round-meta">
+        <div class="time-box">
+          <span>剩余时间</span>
+          <strong id="timer">01:30</strong>
+        </div>
+        <div class="state-pill" id="statePill">待机</div>
+      </div>
+    </header>
+
+    <section class="controls panel">
+      <div class="control-group">
+        <label for="duration">回合时长</label>
+        <select id="duration">
+          <option value="60">60 秒</option>
+          <option value="90" selected>90 秒</option>
+          <option value="120">120 秒</option>
+        </select>
+      </div>
+      <div class="control-group">
+        <label for="speed">模拟速度</label>
+        <select id="speed">
+          <option value="1" selected>1×</option>
+          <option value="2">2×</option>
+          <option value="4">4×</option>
+        </select>
+      </div>
+      <div class="button-row">
+        <button id="startBtn" class="primary">开始</button>
+        <button id="pauseBtn" disabled>暂停</button>
+        <button id="resetBtn">重置地图</button>
+      </div>
+    </section>
+
+    <section class="lineup panel">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">LINEUP</p>
+          <h2>算法阵容</h2>
+        </div>
+        <span class="hint">四个阵营使用同一算力预算，差异只来自决策策略。</span>
+      </div>
+      <div id="teamConfig" class="team-config"></div>
+    </section>
+
+    <section class="battle-layout">
+      <article class="arena panel">
+        <div class="arena-header">
+          <div>
+            <p class="eyebrow">LIVE MAP</p>
+            <h2>实时战场</h2>
+          </div>
+          <div class="legend">
+            <span><i class="resource-dot"></i>资源节点</span>
+            <span><i class="core-dot"></i>核心区</span>
+          </div>
+        </div>
+        <div class="canvas-wrap">
+          <canvas id="arena" width="720" height="720" aria-label="算法色块争夺战场"></canvas>
+          <div class="event-banner" id="eventBanner"></div>
+        </div>
+      </article>
+
+      <aside class="sidebar">
+        <section class="panel score-panel">
+          <div class="section-heading compact">
+            <div>
+              <p class="eyebrow">SCOREBOARD</p>
+              <h2>实时排名</h2>
+            </div>
+          </div>
+          <div id="scoreboard" class="scoreboard"></div>
+        </section>
+
+        <section class="panel feed-panel">
+          <div class="section-heading compact">
+            <div>
+              <p class="eyebrow">MATCH FEED</p>
+              <h2>战况</h2>
+            </div>
+          </div>
+          <div id="feed" class="feed"></div>
+        </section>
+      </aside>
+    </section>
+
+    <section class="panel explainer">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">RULES</p>
+          <h2>这一版的胜负逻辑</h2>
+        </div>
+      </div>
+      <div class="rule-grid">
+        <div><strong>占地</strong><span>每个色块持续贡献积分，规模大但边界也更难守。</span></div>
+        <div><strong>资源</strong><span>资源节点提供高额积分，并短暂提高附近扩张效率。</span></div>
+        <div><strong>交战</strong><span>敌方格可以被翻色，周围己方支援越多，成功率越高。</span></div>
+        <div><strong>决胜</strong><span>时间归零后比较总积分；核心区不可被彻底清除，保证整局都有反击机会。</span></div>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="resultDialog" class="result-dialog">
+    <div class="result-card">
+      <p class="eyebrow">ROUND OVER</p>
+      <h2 id="winnerTitle">回合结束</h2>
+      <p id="winnerSummary"></p>
+      <div id="resultList" class="result-list"></div>
+      <div class="button-row result-actions">
+        <button id="againBtn" class="primary">再来一局</button>
+        <button id="closeResultBtn">查看战场</button>
+      </div>
+    </div>
+  </dialog>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
