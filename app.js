@@ -16,7 +16,7 @@ const el = {
   seed: $('#seedInput'), rotation: $('#rotation'), newSeed: $('#newSeedBtn'),
   liveChart: $('#liveChart'), liveGrid: $('#liveChartGrid'), liveLines: $('#liveChartLines'),
   liveLegend: $('#liveChartLegend'), durationSummary: $('#durationSummary'), speedSummary: $('#speedSummary'),
-  exportLog: $('#exportLogBtn')
+  exportLog: $('#exportLogBtn'), resultExport: $('#resultExportBtn')
 };
 const COLORS = ['#ff5b5b', '#4f7cff', '#25b77a', '#9b6bff'];
 const TEAM_NAMES = ['红方', '蓝方', '绿方', '紫方'];
@@ -484,6 +484,7 @@ el.rotation.onchange = reset;
 el.speed.onchange = () => { el.speedSummary.textContent = el.speed.value + '×'; };
 el.newSeed.onclick = () => { el.seed.value = makeSeed(); reset(); };
 el.exportLog.onclick = exportMarkdownLog;
+el.resultExport.onclick = exportMarkdownLog;
 el.again.onclick = () => { el.dialog.close(); reset(); start(); };
 el.close.onclick = () => el.dialog.close();
 config(); reset(); initTournamentUI(); requestAnimationFrame(loop);
