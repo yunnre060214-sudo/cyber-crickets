@@ -15,7 +15,8 @@ export const AGENT_META={
   raider:{name:'Raider 掠袭者',desc:'专挑敌方薄弱边界翻色，偏好孤立目标。',tier:'侵袭型'},
   turtle:{name:'Turtle 堡垒',desc:'高邻接密度推进，保持紧凑领地并降低暴露面。',tier:'防守型'},
   denial:{name:'Resource Denial',desc:'优先夺走敌占资源，其次封锁高价值节点。',tier:'压制型'},
-  momentum:{name:'Momentum 变速器',desc:'原创策略：根据面积、敌压和赛程阶段动态切换节奏。',tier:'自适应型'}
+  momentum:{name:'Momentum 变速器',desc:'原创策略：根据面积、敌压和赛程阶段动态切换节奏。',tier:'自适应型'},
+  strongest:{name:'最强',desc:'规则感知复合优化器：估算成功率与剩余赛程 VP 边际收益，并动态平衡资源、领地、翻色、路径与阵型。',tier:'优化型'}
 };
 
 const pickBest=(arr,score)=>{
@@ -217,6 +218,113 @@ class MomentumAgent extends BaseAgent{
   }
 }
 
+
+class StrongestAgent extends BaseAgent{
+  constructor(id,size,rng){
+    super(id,size,rng);
+    this.recentTargets=new Int32Array(10).fill(-1);
+    this.recentCursor=0;
+    this.failures=new Map();
+  }
+
+  estimatedChance(o,overclock){
+    // Mirror the public combat model as closely as the decision view allows.
+    // ownN/enemyN are exactly the local support/defense quantities used by resolution.
+    let p=o.owner<0
+      ? .93-(o.terrain-1)*.12
+      : .39+o.ownN*.105-o.enemyN*.075-(o.terrain-1)*.05;
+    if(overclock)p+=.075;
+    return clamp(p,.12,.93);
+  }
+
+  selectAction(v){
+    if(!v.options.length)return null;
+    const remaining=Math.max(0,1-v.progress);
+    const overclock=v.progress>=.82;
+    const late=v.progress>=.62;
+    const final=v.progress>=.82;
+    const behind=v.share<.235;
+    const resourceVisible=v.options.some(o=>o.resource>0);
+
+    const m=this.choose(v.options,o=>{
+      const p=this.estimatedChance(o,overclock);
+
+      // Directly approximate marginal VP created by a successful ownership change.
+      // A neutral capture adds our area share. A flip additionally removes rival control,
+      // so its strategic swing is larger even though the scoring engine tracks each side separately.
+      const areaValue=6.5;
+      const resourceValue=o.resource*3.5;
+      const flipSwing=o.enemy?(final?5.2:4.1):0;
+      const horizon=.32+remaining*1.68;
+      const direct=horizon*(areaValue+resourceValue+flipSwing);
+
+      // Future option value: resources become more important before/after central injections;
+      // compact support raises future attack probability and reduces brittle tendrils.
+      const pathToResource=o.nearestResourceDist>=99?0:
+        (late?7.2:5.4)/(1+o.nearestResourceDist*.42);
+      const pull=o.resourcePull*(late?1.55:1.15);
+      const structure=o.ownN*1.65-o.enemyN*.42;
+      const frontier=o.owner<0?(behind?2.5:1.35):0;
+
+      // Selective aggression. Enemy cells with weak defense and strong own support are excellent
+      // because they gain territory while denying an opponent's future VP.
+      const attack=o.enemy?
+        2.2+o.ownN*1.35-o.enemyN*1.05+(o.resource>0?5.5:0):0;
+
+      // Avoid repeatedly wasting decisions on a stubborn target, but never permanently blacklist it.
+      const failed=this.failures.get(o.to)||0;
+      const retryPenalty=failed*(final?.35:1.15);
+      let repeatPenalty=0;
+      for(let i=0;i<this.recentTargets.length;i++)if(this.recentTargets[i]===o.to)repeatPenalty+=.22;
+
+      // Terrain matters twice: it lowers success probability already, and a high-resistance route
+      // also tends to consume more failed decision opportunities.
+      const friction=(o.terrain-1)*(final?.55:1.05);
+      const contestRisk=o.enemyPressure*(o.enemy?.55:1.15);
+
+      // Tiny seeded jitter only resolves near-ties and keeps all runs reproducible.
+      const utility=p*(direct+pathToResource+pull+structure+frontier+attack)
+        -retryPenalty-repeatPenalty-friction-contestRisk+this.rng.next()*.035;
+      return utility;
+    });
+
+    if(m){
+      this.recentTargets[this.recentCursor]=m.to;
+      this.recentCursor=(this.recentCursor+1)%this.recentTargets.length;
+      const p=this.estimatedChance(m,overclock);
+      const motive=m.resource>0?'高价值资源':
+        m.enemy?'高收益翻色':
+        m.nearestResourceDist<=3?'资源路径':
+        m.ownN>=2?'高成功率连续扩张':'边界扩张';
+      this.thought='VP 效用优化：'+motive+'，估计成功率 '+Math.round(p*100)+'%，兼顾剩余赛程收益';
+    }
+    return m;
+  }
+
+  onResult(r){
+    super.onResult(r);
+    if(!r?.move)return;
+    const key=r.move.to;
+    if(r.success)this.failures.delete(key);
+    else{
+      const next=(this.failures.get(key)||0)+1;
+      if(next<=5)this.failures.set(key,next);
+      else this.failures.set(key,5);
+    }
+    // Bound memory even in long custom simulations.
+    if(this.failures.size>96){
+      const first=this.failures.keys().next().value;
+      this.failures.delete(first);
+    }
+  }
+
+  reset(){
+    this.recentTargets.fill(-1);
+    this.recentCursor=0;
+    this.failures.clear();
+  }
+}
+
 function sampleOptions(options,limit,rng){
   if(options.length<=limit)return options;
   const sample=[...options];
@@ -227,6 +335,6 @@ function sampleOptions(options,limit,rng){
 }
 
 export function createAgent(type,id,size,rng){
-  const C={bfs:FloodAgent,dfs:SpearheadAgent,greedy:GreedyAgent,random:RandomAgent,aco:ACOAgent,voronoi:VoronoiAgent,potential:PotentialAgent,pid:PIDAgent,qlearn:QLearningAgent,minimax:CounterplayAgent,mcts:SamplingAgent,mst:ResourceChainAgent,runner:FrontierRunnerAgent,raider:RaiderAgent,turtle:TurtleAgent,denial:ResourceDenialAgent,momentum:MomentumAgent}[type]||RandomAgent;
+  const C={bfs:FloodAgent,dfs:SpearheadAgent,greedy:GreedyAgent,random:RandomAgent,aco:ACOAgent,voronoi:VoronoiAgent,potential:PotentialAgent,pid:PIDAgent,qlearn:QLearningAgent,minimax:CounterplayAgent,mcts:SamplingAgent,mst:ResourceChainAgent,runner:FrontierRunnerAgent,raider:RaiderAgent,turtle:TurtleAgent,denial:ResourceDenialAgent,momentum:MomentumAgent,strongest:StrongestAgent}[type]||RandomAgent;
   return new C(id,size,rng);
 }
