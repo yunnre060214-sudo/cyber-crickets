@@ -9,73 +9,125 @@
 </head>
 <body>
   <main class="app-shell">
-    <header class="console-header">
-      <a class="brand-lockup" href="./" aria-label="赛博斗蛐蛐首页">
-        <span class="brand-mark">CC</span>
-        <span><strong>赛博斗蛐蛐</strong><small>ALGORITHM ARENA</small></span>
-      </a>
-      <div class="match-strip">
-        <span class="state-pill" id="statePill">待机</span>
-        <span class="match-clock"><small>TIME LEFT</small><strong id="timer">01:30</strong></span>
-        <span class="match-spec"><b id="durationSummary">90s</b> ROUND</span>
-        <span class="match-spec"><b id="speedSummary">1×</b> SPEED</span>
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">CYBER CRICKETS</p>
+        <h1>赛博斗蛐蛐</h1>
+        <p class="subtitle">让算法自己抢色块。你只负责选阵容，然后看它们打。</p>
       </div>
-      <nav class="console-actions" aria-label="比赛操作">
-        <button id="startBtn" class="primary command-primary">开始比赛</button>
-        <button id="pauseBtn" disabled>暂停</button>
-        <details class="setup-menu">
-          <summary>设置</summary>
-          <div class="setup-popover">
-            <div class="setup-grid">
-              <div class="control-group"><label for="duration">回合时长</label><select id="duration"><option value="60">60 秒</option><option value="90" selected>90 秒</option><option value="120">120 秒</option></select></div>
-              <div class="control-group"><label for="speed">模拟速度</label><select id="speed"><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option></select></div>
-              <div class="control-group seed-control"><label for="seedInput">地图种子</label><input id="seedInput" type="text" maxlength="64" spellcheck="false" aria-label="地图种子" /></div>
-              <div class="control-group"><label for="rotation">出生轮换</label><select id="rotation"><option value="0">第 1 轮</option><option value="1">第 2 轮</option><option value="2">第 3 轮</option><option value="3">第 4 轮</option></select></div>
-            </div>
-            <label class="check-row setup-check"><input id="overlayToggle" type="checkbox" checked /> 显示决策痕迹</label>
-            <div class="setup-actions"><button id="resetBtn">同种子重开</button><button id="newSeedBtn">生成新地图</button></div>
-            <div class="setup-lineup"><div class="setup-lineup-head"><span>算法阵容</span><small>修改后自动重开</small></div><div id="teamConfig" class="team-config"></div></div>
-          </div>
-        </details>
-        <button id="tournamentOpen" class="league-shortcut">赛事</button>
-      </nav>
+      <div class="round-meta">
+        <div class="time-box">
+          <span>剩余时间</span>
+          <strong id="timer">01:30</strong>
+        </div>
+        <div class="state-pill" id="statePill">待机</div>
+      </div>
     </header>
 
-    <section class="spectator-console">
-      <aside class="ranking-rail">
-        <div class="rail-heading"><p class="eyebrow">LIVE RANKING</p><h2>实时排名</h2></div>
-        <div id="scoreboard" class="scoreboard"></div>
-      </aside>
-
-      <section class="battle-stage">
-        <div class="stage-head">
-          <div><p class="eyebrow">LIVE MAP · 64 × 64</p><h1>算法争夺战</h1></div>
-          <div class="legend"><span><i class="resource-dot"></i>资源</span><span><i class="core-dot"></i>核心</span><span><i class="decision-dot"></i>决策</span></div>
+    <section class="command-bar panel">
+      <div class="command-main">
+        <button id="startBtn" class="primary command-primary">开始比赛</button>
+        <button id="pauseBtn" disabled>暂停</button>
+      </div>
+      <div class="command-summary">
+        <span><b id="durationSummary">90s</b> 回合</span>
+        <span><b id="speedSummary">1×</b> 速度</span>
+        <span><b>4</b> Agent</span>
+      </div>
+      <details class="setup-menu">
+        <summary>比赛设置</summary>
+        <div class="setup-popover">
+          <div class="setup-grid">
+            <div class="control-group">
+              <label for="duration">回合时长</label>
+              <select id="duration"><option value="60">60 秒</option><option value="90" selected>90 秒</option><option value="120">120 秒</option></select>
+            </div>
+            <div class="control-group">
+              <label for="speed">模拟速度</label>
+              <select id="speed"><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option></select>
+            </div>
+            <div class="control-group seed-control">
+              <label for="seedInput">地图种子</label>
+              <input id="seedInput" type="text" maxlength="64" spellcheck="false" aria-label="地图种子" />
+            </div>
+            <div class="control-group">
+              <label for="rotation">出生轮换</label>
+              <select id="rotation"><option value="0">第 1 轮</option><option value="1">第 2 轮</option><option value="2">第 3 轮</option><option value="3">第 4 轮</option></select>
+            </div>
+          </div>
+          <label class="check-row setup-check"><input id="overlayToggle" type="checkbox" checked /> 显示决策痕迹</label>
+          <div class="setup-actions">
+            <button id="resetBtn">同种子重开</button>
+            <button id="newSeedBtn">生成新地图</button>
+          </div>
+          <div class="setup-lineup">
+            <div class="setup-lineup-head"><span>算法阵容</span><small>修改后自动重开</small></div>
+            <div id="teamConfig" class="team-config"></div>
+          </div>
         </div>
-        <div class="canvas-wrap">
-          <canvas id="arena" width="720" height="720" aria-label="算法色块争夺战场"></canvas>
-          <div class="event-banner" id="eventBanner"></div>
-        </div>
-      </section>
+      </details>
+      <button id="tournamentOpen" class="league-shortcut">赛事</button>
+    </section>
 
-      <aside class="telemetry-rail">
-        <section class="live-chart-panel" aria-label="实时比赛趋势">
-          <div class="live-chart-head"><div><p class="eyebrow">VP TELEMETRY</p><h3>积分走势</h3></div><span>TIME →</span></div>
-          <svg id="liveChart" viewBox="0 0 720 360" role="img" aria-label="各阵营累计 VP 随比赛时间变化"><g id="liveChartGrid"></g><g id="liveChartLines"></g></svg>
-          <div id="liveChartLegend" class="live-chart-legend"></div>
+    <section class="battle-layout">
+      <article class="arena panel">
+        <div class="arena-header">
+          <div>
+            <p class="eyebrow">LIVE MAP</p>
+            <h2>实时战场</h2>
+          </div>
+          <div class="legend">
+            <span><i class="resource-dot"></i>资源节点</span>
+            <span><i class="core-dot"></i>核心区</span><span><i class="decision-dot"></i>决策落点</span>
+          </div>
+        </div>
+        <div class="arena-stage">
+          <div class="canvas-wrap">
+            <canvas id="arena" width="720" height="720" aria-label="算法色块争夺战场"></canvas>
+            <div class="event-banner" id="eventBanner"></div>
+          </div>
+          <section class="live-chart-panel" aria-label="实时比赛趋势">
+            <div class="live-chart-head"><div><p class="eyebrow">LIVE TREND</p><h3>实时 VP 曲线</h3></div><span>X：时间 · Y：累计 VP</span></div>
+            <svg id="liveChart" viewBox="0 0 720 360" role="img" aria-label="各阵营累计 VP 随比赛时间变化"><g id="liveChartGrid"></g><g id="liveChartLines"></g></svg>
+            <div id="liveChartLegend" class="live-chart-legend"></div>
+          </section>
+        </div>
+      </article>
+
+      <aside class="sidebar">
+        <section class="panel score-panel">
+          <div class="section-heading compact">
+            <div>
+              <p class="eyebrow">SCOREBOARD</p>
+              <h2>实时排名</h2>
+            </div>
+          </div>
+          <div id="scoreboard" class="scoreboard"></div>
         </section>
-        <section class="feed-panel">
-          <div class="rail-heading"><p class="eyebrow">EVENT STREAM</p><h2>实时战况</h2></div>
+
+        <section class="panel feed-panel">
+          <div class="section-heading compact">
+            <div>
+              <p class="eyebrow">MATCH FEED</p>
+              <h2>战况</h2>
+            </div>
+          </div>
           <div id="feed" class="feed"></div>
         </section>
       </aside>
     </section>
 
-    <footer class="console-footer">
-      <span>VP/sec = 10 × (0.65 Territory + 0.35 Resource)</span>
-      <details class="rules-disclosure"><summary>比赛规则</summary><div class="rule-grid"><div><strong>持续积分</strong><span>每秒 VP = 10 ×（65% 领地占比 + 35% 资源价值占比）。</span></div><div><strong>资源</strong><span>控制资源越久，累计 VP 越多。</span></div><div><strong>同步行动</strong><span>四方观察同一快照，提交后统一结算。</span></div><div><strong>决胜</strong><span>时间归零后累计 VP 最高者获胜。</span></div></div></details>
-    </footer>
+    <details class="rules-disclosure panel">
+      <summary>查看比赛规则</summary>
+      <div class="rule-grid">
+        <div><strong>持续积分</strong><span>每秒 VP = 10 ×（65% 领地占比 + 35% 资源价值占比）。</span></div>
+        <div><strong>资源</strong><span>控制资源越久，累计 VP 越多。</span></div>
+        <div><strong>同步行动</strong><span>四方观察同一快照，提交后统一结算。</span></div>
+        <div><strong>决胜</strong><span>时间归零后累计 VP 最高者获胜。</span></div>
+      </div>
+    </details>
   </main>
+
   <div id="tournamentBackdrop" class="tour-backdrop" hidden></div>
   <aside id="tournamentDrawer" class="tour-drawer" role="dialog" aria-modal="true" aria-hidden="true" aria-label="比赛赛程">
     <header class="tour-drawer-header">
