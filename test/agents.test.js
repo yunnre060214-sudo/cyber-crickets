@@ -17,7 +17,7 @@ test('every strategy makes its random choices only through its injected seed str
   Math.random = () => { throw new Error('global random used'); };
   try {
     for (const type of ['bfs', 'dfs', 'greedy', 'random', 'aco', 'voronoi',
-      'potential', 'pid', 'qlearn', 'minimax', 'mcts', 'mst', 'runner', 'raider', 'turtle', 'denial', 'momentum']) {
+      'potential', 'pid', 'qlearn', 'minimax', 'mcts', 'mst', 'runner', 'raider', 'turtle', 'denial', 'momentum', 'strongest']) {
       const agent = createAgent(type, 0, 4096, createRng('agent:' + type));
       assert.ok(agent.selectAction(view), type);
     }
@@ -52,9 +52,25 @@ test('Q learning updates from reward and next state value', () => {
 });
 
 test('new tactical strategies are deterministic for the same seed', () => {
-  for (const type of ['runner', 'raider', 'turtle', 'denial', 'momentum']) {
+  for (const type of ['runner', 'raider', 'turtle', 'denial', 'momentum', 'strongest']) {
     const a=createAgent(type,0,4096,createRng('new:'+type));
     const b=createAgent(type,0,4096,createRng('new:'+type));
     assert.equal(a.selectAction(view)?.to,b.selectAction(view)?.to,type);
   }
+});
+
+
+test('strongest agent prefers a high-value resource when expected VP dominates', () => {
+  const agent=createAgent('strongest',0,4096,createRng('strongest-resource'));
+  const plain={...options[1],to:501,owner:-1,enemy:false,terrain:1,resource:0,ownN:2,enemyN:0,nearestResourceDist:5,resourcePull:2,enemyPressure:0};
+  const rich={...plain,to:502,resource:3,nearestResourceDist:0,resourcePull:12};
+  assert.equal(agent.selectAction({...view,options:[plain,rich]})?.to,502);
+});
+
+test('strongest agent penalizes repeated failed attacks without using hidden state', () => {
+  const agent=createAgent('strongest',0,4096,createRng('strongest-failure'));
+  const a={...options[0],to:601,owner:1,enemy:true,terrain:1,resource:0,ownN:2,enemyN:1,nearestResourceDist:8,resourcePull:1,enemyPressure:.25};
+  const b={...a,to:602};
+  for(let i=0;i<5;i++)agent.onResult({success:false,reward:-.15,move:a});
+  assert.equal(agent.selectAction({...view,progress:.4,options:[a,b]})?.to,602);
 });
