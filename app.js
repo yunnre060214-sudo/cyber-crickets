@@ -15,7 +15,8 @@ const el = {
   again: $('#againBtn'), close: $('#closeResultBtn'), overlay: $('#overlayToggle'),
   seed: $('#seedInput'), rotation: $('#rotation'), newSeed: $('#newSeedBtn'),
   liveChart: $('#liveChart'), liveGrid: $('#liveChartGrid'), liveLines: $('#liveChartLines'),
-  liveLegend: $('#liveChartLegend'), durationSummary: $('#durationSummary'), speedSummary: $('#speedSummary')
+  liveLegend: $('#liveChartLegend'), durationSummary: $('#durationSummary'), speedSummary: $('#speedSummary'),
+  exportLog: $('#exportLogBtn')
 };
 const COLORS = ['#ff5b5b', '#4f7cff', '#25b77a', '#9b6bff'];
 const TEAM_NAMES = ['红方', '蓝方', '绿方', '紫方'];
@@ -204,6 +205,92 @@ function log(message) {
   while (el.feed.children.length > 30) el.feed.lastChild.remove();
 }
 
+
+const mdSafe = value => String(value ?? '').replace(/\|/g, '\\|').replace(/\r?\n/g, ' ');
+const ownerName = id => id >= 0 ? TEAM_NAMES[id] : '无主';
+const terrainName = value => ({1:'普通',2:'复杂',3:'高阻力'}[value] || String(value));
+const fmtLog = value => Number.isFinite(value) ? Number(value).toFixed(3) : 'N/A';
+
+function buildMarkdownLog() {
+  const status = match.finished ? '已结束' : running ? '进行中' : match.time > 0 ? '已暂停 / 未结束' : '尚未开始';
+  const ranking = [...match.teams].sort((a,b)=>b.score-a.score);
+  const lines = [
+    '# Cyber Crickets 对局完整日志','',
+    '> 这是一份由「赛博斗蛐蛐 / Cyber Crickets」自动导出的单局 Markdown 对局档案。它不仅记录比赛结果，还保存比赛配置、算法信息、重大事件、宏观时间序列和逐次算法决策。设计目标是让一个没有看过原网页、没有任何前置聊天上下文的 AI，仅凭本文件就能分析各算法为什么这样行动、哪些决策有效或失误、局势如何演化、胜负由什么造成，以及策略可以如何改进。','',
+    '> 阅读约定：算法的 thought 是当次决策的简短可解释说明；决策前状态和结算结果是实际引擎记录。算法名称只代表策略风格，具体行为应以策略说明和本日志数据为准。','',
+    '## 1. 对局元数据','',
+    '| 字段 | 值 |','| --- | --- |',
+    '| 状态 | '+status+' |',
+    '| 地图 | '+WIDTH+' × '+HEIGHT+' |',
+    '| 地图种子 | '+mdSafe(match.seed)+' |',
+    '| 出生轮换 | '+(match.rotation+1)+'/4 |',
+    '| 设定时长 | '+match.duration+' 秒 |',
+    '| 已进行 | '+match.time.toFixed(3)+' 秒 |',
+    '| 模拟速度（导出时 UI 设置） | '+mdSafe(el.speed.value)+'× |',
+    '| 计分公式 | VP/sec = 10 × (0.65 × AreaShare + 0.35 × ResourceShare) |',
+    '| 决策总数 | '+match.decisionLog.length+' |',
+    '| 重大事件数 | '+match.eventLog.length+' |','',
+    '## 2. 参赛算法',''
+  ];
+  match.teams.forEach(team=>{
+    const meta=AGENT_META[team.strategy];
+    lines.push('### '+TEAM_NAMES[team.id]+'：'+meta.name,'',
+      '- 策略键：'+team.strategy,
+      '- 类型：'+meta.tier,
+      '- 策略说明：'+meta.desc,
+      '- 出生点：('+match.spawns[team.id][0]+', '+match.spawns[team.id][1]+')','');
+  });
+  lines.push('## 3. 当前 / 最终结果','',
+    '| 排名 | 阵营 | 算法 | VP | 领地 | 资源价值 | 翻色 |',
+    '| ---: | --- | --- | ---: | ---: | ---: | ---: |');
+  ranking.forEach((team,i)=>lines.push('| '+(i+1)+' | '+TEAM_NAMES[team.id]+' | '+mdSafe(AGENT_META[team.strategy].name)+' | '+team.score.toFixed(3)+' | '+team.territory+' ('+(team.territory/CELL_COUNT*100).toFixed(2)+'%) | '+team.resources+' | '+team.captures+' |'));
+  lines.push('','## 4. 重大事件时间线','');
+  if(!match.eventLog.length) lines.push('_截至导出时尚未发生全局重大事件。_');
+  else match.eventLog.forEach(e=>lines.push('- **T+'+e.time.toFixed(3)+'s** '+mdSafe(e.message)+'（'+mdSafe(e.banner)+'）'));
+  lines.push('','## 5. 每秒局势快照','',
+    '> 用于恢复宏观走势。每行是引擎保存的一次时间序列快照。','',
+    '| 时间 | 资源总价值 | 红方 VP / 领地 / 资源 | 蓝方 VP / 领地 / 资源 | 绿方 VP / 领地 / 资源 | 紫方 VP / 领地 / 资源 |',
+    '| ---: | ---: | --- | --- | --- | --- |');
+  for(const p of match.timeline){
+    const cells=[0,1,2,3].map(id=>{
+      const t=p.teams.find(x=>x.id===id);
+      return t ? t.score.toFixed(2)+' / '+(t.territory/CELL_COUNT*100).toFixed(2)+'% / '+t.resources : 'N/A';
+    });
+    lines.push('| '+p.time.toFixed(3)+'s | '+p.resourceTotal+' | '+cells.join(' | ')+' |');
+  }
+  lines.push('','## 6. 完整算法决策日志','',
+    '> 以下按真实执行顺序记录每一次算法决策。坐标为 (x, y)，左上角为 (0, 0)。owner=-1 表示目标格原本无主。localPressure 是当次候选边界中敌方格所占比例。reward 是动作结算后返回给算法的即时反馈，不等同于 VP。','');
+  if(!match.decisionLog.length) lines.push('_尚无算法决策。_');
+  for(const d of match.decisionLog){
+    const meta=AGENT_META[d.strategy], r=d.result;
+    lines.push('### D'+String(d.seq).padStart(5,'0')+' · T+'+d.time.toFixed(3)+'s · '+TEAM_NAMES[d.teamId]+' · '+meta.name,'',
+      '- **算法解释**：'+(mdSafe(d.thought)||'无'),
+      '- **决策前状态**：领地占比 '+(d.share*100).toFixed(2)+'%，局部敌压 '+(d.localPressure*100).toFixed(2)+'%，候选动作 '+d.optionCount+' 个，计算耗时 '+d.thinkMs.toFixed(3)+' ms。',
+      '- **动作**：从 ('+d.from.x+', '+d.from.y+') → ('+d.to.x+', '+d.to.y+')。',
+      '- **目标格**：原归属 '+ownerName(d.target.owner)+'；'+(d.target.enemy?'敌方格':'非敌方格')+'；地形 '+terrainName(d.target.terrain)+'；资源价值 '+d.target.resource+'；己方邻格 '+d.target.ownNeighbors+'；敌方邻格 '+d.target.enemyNeighbors+'。',
+      '- **空间特征**：距己方核心 '+d.target.distOwnCore+'；距最近敌方核心 '+d.target.distRivalCore+'；距最近未控制资源 '+d.target.nearestResourceDist+'；resourcePull '+fmtLog(d.target.resourcePull)+'；enemyPressure '+fmtLog(d.target.enemyPressure)+'。',
+      '- **结算**：'+(r ? (r.success?'成功':'失败')+'；previousOwner='+r.previousOwner+'（'+ownerName(r.previousOwner)+'）；reward='+fmtLog(r.reward) : '导出时尚未取得结算结果')+'。','');
+  }
+  lines.push('## 7. 给后续 AI 的分析建议','',
+    '你可以直接基于本文件进行分析，无需原始网页或之前的聊天记录。建议至少区分：宏观局势演化、算法决策偏好、重大事件响应、资源争夺、领地效率、进攻/防守转换、失败动作模式、最终胜因。如果提出算法修改建议，请引用具体决策编号（例如 D00124）或时间点作为证据，并区分“从日志直接观察到的事实”和“基于事实作出的推断”。','',
+    '---','',
+    '_由 Cyber Crickets 自动生成。导出时间：'+new Date().toISOString()+'_');
+  return lines.join('\n');
+}
+
+function exportMarkdownLog(){
+  const md=buildMarkdownLog();
+  const blob=new Blob([md],{type:'text/markdown;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  const safeSeed=String(match.seed).replace(/[^a-zA-Z0-9_-]+/g,'_').slice(0,32)||'match';
+  a.href=url;
+  a.download='cyber-crickets_'+safeSeed+'_'+Math.round(match.time)+'s.md';
+  document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+  log('已导出 AI 可读的完整 Markdown 对局日志。');
+}
+
 function averageMetrics(teamId) {
   const samples = match.timeline.length || 1;
   let territory = 0, resource = 0;
@@ -349,6 +436,7 @@ el.seed.onchange = reset;
 el.rotation.onchange = reset;
 el.speed.onchange = () => { el.speedSummary.textContent = el.speed.value + '×'; };
 el.newSeed.onclick = () => { el.seed.value = makeSeed(); reset(); };
+el.exportLog.onclick = exportMarkdownLog;
 el.again.onclick = () => { el.dialog.close(); reset(); start(); };
 el.close.onclick = () => el.dialog.close();
 config(); reset(); initTournamentUI(); requestAnimationFrame(loop);
