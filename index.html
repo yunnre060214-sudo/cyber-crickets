@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#f4f5f7" />
   <title>赛博斗蛐蛐 · 算法争夺战</title>
-  <link rel="stylesheet" href="./styles.css?v=20260927-strongest1" />
+  <link rel="stylesheet" href="./styles.css?v=20260927-winrate1" />
 </head>
 <body>
   <main class="app-shell">
@@ -122,11 +122,25 @@
 
     <details class="rules-disclosure panel">
       <summary>查看比赛规则</summary>
+      <div class="rule-intro">
+        <strong>核心目标</strong>
+        <p>四个 Agent 在同一张 64×64、共 4096 格的地图上自动争夺控制权。比赛没有血量与淘汰机制，每方的 3×3 核心区永久受保护。时间归零时，比较整局累计 VP，而不是只比较终局占地。</p>
+      </div>
       <div class="rule-grid">
-        <div><strong>持续积分</strong><span>每秒 VP = 10 ×（65% 领地占比 + 35% 资源价值占比）。</span></div>
-        <div><strong>资源</strong><span>控制资源越久，累计 VP 越多。</span></div>
-        <div><strong>同步行动</strong><span>四方观察同一快照，提交后统一结算。</span></div>
-        <div><strong>决胜</strong><span>时间归零后累计 VP 最高者获胜。</span></div>
+        <div><strong>持续积分</strong><span>VP/s = 10 ×（0.65 × 领地占比 + 0.35 × 资源价值占比）。一个格子或资源越早拿到、保持越久，对累计 VP 的贡献通常越大。</span></div>
+        <div><strong>领地与资源</strong><span>领地占比按己方控制格数 ÷ 4096 计算；资源占比按己方当前控制的资源价值 ÷ 地图当前资源总价值计算。资源价值有 1 和 3 两档。</span></div>
+        <div><strong>合法行动</strong><span>Agent 每次只能从己方控制格向上下左右四邻格扩张；目标必须是非己方格，并且不能是任何阵营的受保护核心。</span></div>
+        <div><strong>同步行动</strong><span>各方基于同一个决策前快照独立选择动作，随后统一结算。某一方不会因为代码执行顺序更靠前而先占格。</span></div>
+        <div><strong>无主格成功率</strong><span>基础公式为 0.93 − 0.12 ×（地形等级 − 1）。普通、复杂、高阻力地形会依次降低扩张成功率，最终概率限制在 12%～93%。</span></div>
+        <div><strong>翻色成功率</strong><span>攻击敌方格时：0.39 + 0.105 × 己方支援邻格 − 0.075 × 防守邻格 − 0.05 ×（地形等级 − 1）。终局超频再增加 7.5 个百分点。</span></div>
+        <div><strong>同格冲突</strong><span>若多个阵营在同一结算轮都成功指向同一个目标格，引擎使用种子随机流从成功者中选出唯一最终占领者，其余动作按失败处理。</span></div>
+        <div><strong>即时 reward</strong><span>成功动作的算法反馈值为 1 + 4 × 目标资源价值；若原本属于敌方，再加 0.5。失败为 −0.15。reward 用于部分算法学习或反馈，不直接加入 VP。</span></div>
+        <div><strong>重大事件</strong><span>约 33% 赛程触发资源潮汐，中央新增 12 个资源；约 62% 赛程中央区域随机生成高价值资源；约 82% 赛程进入终局超频。</span></div>
+        <div><strong>决策频率</strong><span>每个 Agent 约每 0.085 个模拟秒获得一次决策机会。界面速度 1×/2×/4×只改变模拟播放速度，不改变算法在相同模拟时间内的决策频率。</span></div>
+        <div><strong>可复现性</strong><span>地图、事件、冲突和 Agent 随机行为使用确定性种子随机流。同代码版本、同种子、同阵容、同时长与同出生轮换应得到相同结果。</span></div>
+        <div><strong>当前胜率</strong><span>实时排名中的“当前胜率”是局势估计值：综合已累计 VP、当前 VP/s、历史平均得分速度和剩余时间，再归一化为四方合计 100%。它用于观战，不参与结算，也不是大量历史对局统计胜率。</span></div>
+        <div><strong>出生轮换</strong><span>四方模式有四种出生轮换，可用同一地图让不同 Agent 依次处于四个角，降低固定出生位置造成的偏差。</span></div>
+        <div><strong>决胜</strong><span>时间归零后累计 VP 最高者获胜。终局领地最多、资源最多或翻色次数最多都不单独决定胜负。</span></div>
       </div>
     </details>
   </main>
@@ -170,6 +184,6 @@
     </div>
   </dialog>
 
-  <script type="module" src="./app.js?v=20260927-strongest2"></script>
+  <script type="module" src="./app.js?v=20260927-winrate1"></script>
 </body>
 </html>

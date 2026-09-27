@@ -2248,3 +2248,15 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated;background
   .insight-stat{border-right:0!important;border-bottom:1px solid var(--sep)!important}
   .insight-stat:last-child{border-bottom:0!important}
 }
+
+/* Live win estimate + expanded rules */
+.score-winrate{margin:0 0 6px;color:var(--secondary);font:500 10px/1.3 ui-monospace,SFMono-Regular,Menlo,monospace}
+.score-winrate strong{color:var(--text);font-weight:650}
+.rule-intro{padding:14px 0;border-bottom:1px solid var(--sep)}
+.rule-intro strong{display:block;margin-bottom:5px;color:var(--text);font-size:12px;font-weight:600}
+.rule-intro p{margin:0;max-width:980px;color:var(--secondary);font-size:11px;line-height:1.65}
+.rules-disclosure .rule-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:0;border-left:1px solid var(--sep);border-top:1px solid var(--sep)}
+.rules-disclosure .rule-grid>div{min-height:0;padding:12px 14px;border:0;border-right:1px solid var(--sep);border-bottom:1px solid var(--sep);border-radius:0;background:#fff}
+.rules-disclosure .rule-grid>div strong{display:block;margin-bottom:5px;font-size:11px;font-weight:600}
+.rules-disclosure .rule-grid>div span{display:block;color:var(--secondary);font-size:10.5px;line-height:1.6}
+@media(max-width:760px){.rules-disclosure .rule-grid{grid-template-columns:1fr}}
