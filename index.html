@@ -41,11 +41,25 @@
           <option value="4">4×</option>
         </select>
       </div>
+      <div class="control-group seed-control">
+        <label for="seedInput">地图种子</label>
+        <input id="seedInput" type="text" maxlength="64" spellcheck="false" aria-label="地图种子" />
+      </div>
+      <div class="control-group">
+        <label for="rotation">出生轮换</label>
+        <select id="rotation">
+          <option value="0">第 1 轮</option>
+          <option value="1">第 2 轮</option>
+          <option value="2">第 3 轮</option>
+          <option value="3">第 4 轮</option>
+        </select>
+      </div>
       <div class="control-group overlay-control"><label>观战图层</label><label class="check-row"><input id="overlayToggle" type="checkbox" checked /> 显示决策痕迹</label></div>
       <div class="button-row">
         <button id="startBtn" class="primary">开始</button>
         <button id="pauseBtn" disabled>暂停</button>
-        <button id="resetBtn">重置地图</button>
+        <button id="resetBtn">同种子重开</button>
+        <button id="newSeedBtn">新地图</button>
       </div>
     </section>
 
@@ -55,7 +69,7 @@
           <p class="eyebrow">LINEUP</p>
           <h2>算法阵容</h2>
         </div>
-        <span class="hint">每个阵营通过统一 Agent 接口决策；重算法会更聪明，但决策频率更低。</span>
+        <span class="hint">四方按同一间隔决策；耗时只作观测数据，不影响行动次数。</span>
       </div>
       <div id="teamConfig" class="team-config"></div>
     </section>
@@ -109,10 +123,10 @@
         </div>
       </div>
       <div class="rule-grid">
-        <div><strong>占地</strong><span>每个色块持续贡献积分，规模大但边界也更难守。</span></div>
-        <div><strong>资源</strong><span>资源节点提供高额积分，并短暂提高附近扩张效率。</span></div>
-        <div><strong>交战</strong><span>敌方格可以被翻色，周围己方支援越多，成功率越高。</span></div>
-        <div><strong>决胜</strong><span>时间归零后比较总积分；核心区不可被彻底清除，保证整局都有反击机会。</span></div>
+        <div><strong>持续积分</strong><span>每秒 VP = 10 ×（65% 领地占比 + 35% 资源价值占比）。</span></div>
+        <div><strong>资源</strong><span>控制资源的时间越久，累计 VP 越多；抢占瞬间没有爆分。</span></div>
+        <div><strong>同步行动</strong><span>四方观察同一张地图快照，提交动作后统一结算冲突。</span></div>
+        <div><strong>复现与决胜</strong><span>同一种子、阵容和出生轮换可复现；时间归零后累计 VP 最高者获胜。</span></div>
       </div>
     </section>
   </main>

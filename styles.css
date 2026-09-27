@@ -165,6 +165,7 @@ h2{
 
 .controls{
   display:flex;
+  flex-wrap:wrap;
   align-items:end;
   gap:14px;
   padding:14px;
@@ -199,6 +200,21 @@ select{
 }
 select:hover{border-color:#c3cfe1}
 select:focus{
+  border-color:rgba(71,104,255,.62);
+  box-shadow:0 0 0 4px rgba(71,104,255,.10);
+}
+.seed-control input{
+  width:160px;
+  min-height:44px;
+  padding:0 12px;
+  border:1px solid var(--line);
+  border-radius:13px;
+  background:#fff;
+  color:var(--text);
+  font-weight:750;
+  outline:none;
+}
+.seed-control input:focus{
   border-color:rgba(71,104,255,.62);
   box-shadow:0 0 0 4px rgba(71,104,255,.10);
 }

@@ -21,6 +21,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Test rules and agents
+        run: npm test
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 

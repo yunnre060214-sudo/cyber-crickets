@@ -1,0 +1,8 @@
+{
+  "name": "cyber-crickets",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test"
+  }
+}
