@@ -1,7 +1,7 @@
-import {AGENT_META} from './agents.js?v=20260927-strongest-v3';
-import {Match, WIDTH, HEIGHT, CELL_COUNT} from './match.js?v=20260927-strongest-v3';
-import {vpRate} from './rules.js?v=20260927-strongest-v3';
-import {initTournamentUI} from './tournament-ui.js?v=20260927-strongest-v3';
+import {AGENT_META} from './agents.js?v=20260928-strongest-v4';
+import {Match, WIDTH, HEIGHT, CELL_COUNT} from './match.js?v=20260928-strongest-v4';
+import {vpRate} from './rules.js?v=20260928-strongest-v4';
+import {initTournamentUI} from './tournament-ui.js?v=20260928-strongest-v4';
 
 const $ = selector => document.querySelector(selector);
 const canvas = $('#arena'), ctx = canvas.getContext('2d');
