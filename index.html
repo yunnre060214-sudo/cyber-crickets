@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#f4f5f7" />
   <title>赛博斗蛐蛐 · 算法争夺战</title>
-  <link rel="stylesheet" href="./styles.css" />
+  <link rel="stylesheet" href="./styles.css?v=20260927-log2" />
 </head>
 <body>
   <main class="app-shell">
@@ -35,7 +35,6 @@
         <span><b>4</b> Agent</span>
       </div>
       <div class="command-tools">
-      <button id="exportLogBtn" type="button" class="export-log-btn">导出日志</button>
       <details class="setup-menu">
         <summary>比赛设置</summary>
         <div class="setup-popover">
@@ -104,6 +103,7 @@
               <p class="eyebrow">SCOREBOARD</p>
               <h2>实时排名</h2>
             </div>
+            <button id="exportLogBtn" type="button" class="score-export-btn">导出 MD 日志</button>
           </div>
           <div id="scoreboard" class="scoreboard"></div>
         </section>
@@ -156,6 +156,6 @@
     </div>
   </dialog>
 
-  <script type="module" src="./app.js"></script>
+  <script type="module" src="./app.js?v=20260927-log2"></script>
 </body>
 </html>
