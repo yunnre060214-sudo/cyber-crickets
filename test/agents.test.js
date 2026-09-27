@@ -10,7 +10,7 @@ const options = Array.from({length: 40}, (_, n) => ({
   distRivalCore: 40 - n, nearestResourceDist: n % 9,
   resourcePull: n % 8, enemyPressure: n % 3 / 4
 }));
-const view = {id: 0, time: 1, progress: 0.2, share: 0.1, localPressure: 0, options, width: 64, height: 64};
+const view = {id: 0, time: 18, duration: 90, remaining: 72, progress: 0.2, teamCount: 4, score: 6, vpRate: 1.1, rank: 2, scoreGap: 2, leaderVpRate: 1.35, share: 0.1, resourceShare: 0.08, resourceTotal: 40, cellCount: 4096, localPressure: 0, options, width: 64, height: 64};
 
 test('every strategy makes its random choices only through its injected seed stream', () => {
   const original = Math.random;
@@ -85,4 +85,26 @@ test('strongest agent uses depth-2 continuation value when first-step values are
     {...base,from:702,to:704,resource:1,nearestResourceDist:1,resourcePull:6,ownN:2}
   ]};
   assert.equal(agent.selectAction({...view,options:[dead,futureRich]})?.to,702);
+});
+
+
+test('strongest agent keeps the published success probability independent of recent luck', () => {
+  const agent=createAgent('strongest',0,4096,createRng('strongest-probability'));
+  const move={...options[1],to:801,owner:-1,enemy:false,terrain:1,resource:0,ownN:1,enemyN:0,nearestResourceDist:8,resourcePull:1,enemyPressure:0};
+  const expected=agent.estimatedChance(move,false);
+  for(let i=0;i<6;i++)agent.onResult({success:false,reward:-.15,move});
+  assert.equal(agent.estimatedChance(move,false),expected);
+  assert.equal(expected,.93);
+});
+
+test('strongest agent prefers an open early runway over a compact dead end when economics are equal', () => {
+  const agent=createAgent('strongest',0,4096,createRng('strongest-runway'));
+  const base={...options[1],owner:-1,enemy:false,terrain:1,resource:0,enemyN:0,nearestResourceDist:8,resourcePull:1,enemyPressure:0,distOwnCore:12};
+  const dead={...base,to:901,ownN:3,continuations:[]};
+  const runway={...base,to:902,ownN:1,continuations:[
+    {...base,from:902,to:903,ownN:2,distOwnCore:13},
+    {...base,from:902,to:904,ownN:2,distOwnCore:13},
+    {...base,from:902,to:905,ownN:2,distOwnCore:13}
+  ]};
+  assert.equal(agent.selectAction({...view,progress:.12,remaining:79,options:[dead,runway]})?.to,902);
 });
