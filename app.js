@@ -140,9 +140,11 @@ function renderLiveChart() {
   const current={time:match.time,teams:match.teams.map(team=>({id:team.id,score:team.score}))};
   const data=snapshots.at(-1)?.time===match.time?snapshots:[...snapshots,current];
 
-  // VP/s 的理论上限是 10，因此整个回合从开始就使用固定 Y 轴。
-  // 历史点一旦绘制，其 x/y 坐标不会因为后续分数增长而改变。
-  const maxVP=match.duration*10;
+  // Y 轴上限随比赛时长配置变化，但在一局内部保持固定。
+  // 60 / 90 / 120 秒分别使用 300 / 450 / 600 VP，避免短局曲线被压在底部，
+  // 同时保持历史点在比赛进行过程中不会因动态缩放而移动。
+  const yAxisMaxByDuration={60:300,90:450,120:600};
+  const maxVP=yAxisMaxByDuration[match.duration] ?? match.duration*5;
   const x=time=>left+(width-left-right)*(time/match.duration);
   const y=value=>top+(height-top-bottom)*(1-Math.min(value,maxVP)/maxVP);
   const ticks=[0,.25,.5,.75,1];
