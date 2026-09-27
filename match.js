@@ -1,5 +1,5 @@
-import {createAgent} from './agents.js?v=20260927-strongest-v2';
-import {createRng, deriveSeed, spawnFor, vpRate, resolveActions} from './rules.js?v=20260927-strongest-v2';
+import {createAgent} from './agents.js?v=20260927-strongest-v3';
+import {createRng, deriveSeed, spawnFor, vpRate, resolveActions} from './rules.js?v=20260927-strongest-v3';
 
 export const WIDTH = 64, HEIGHT = 64, CELL_COUNT = WIDTH * HEIGHT;
 const DIRECTIONS = [[1, 0], [-1, 0], [0, 1], [0, -1]];
