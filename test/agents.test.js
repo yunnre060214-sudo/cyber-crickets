@@ -88,14 +88,24 @@ test('strongest agent uses depth-2 continuation value when first-step values are
 });
 
 
-test('strongest gives resources a temporary opening premium for exactly the first 8 simulated seconds', () => {
-  const agent=createAgent('strongest',0,4096,createRng('strongest-opening'));
-  const plain={...options[1],to:901,owner:-1,enemy:false,terrain:1,resource:0,ownN:2,enemyN:0,nearestResourceDist:4,resourcePull:2,enemyPressure:0,continuations:[]};
-  const rich={...plain,to:902,resource:1,nearestResourceDist:0,resourcePull:12};
-  const earlyView={...view,time:7.99,progress:.1,options:[plain,rich]};
-  const normalView={...view,time:8.01,progress:.1,options:[plain,rich]};
-  const earlyDelta=agent.staticValue(rich,earlyView).utility-agent.staticValue(plain,earlyView).utility;
-  const normalDelta=agent.staticValue(rich,normalView).utility-agent.staticValue(plain,normalView).utility;
-  assert.ok(earlyDelta>normalDelta);
-  assert.equal(agent.selectAction(earlyView)?.to,902);
+test('strongest opening values high-quality frontier branches instead of an eight-second resource-only rush', () => {
+  const agent=createAgent('strongest',0,4096,createRng('strongest-opening-v4'));
+  const compact={...options[1],to:901,owner:-1,enemy:false,terrain:1,resource:0,ownN:2,enemyN:0,distOwnCore:10,distRivalCore:40,nearestResourceDist:7,resourcePull:1.5,enemyPressure:0,continuations:[]};
+  const open={...compact,to:902,ownN:0,continuations:[
+    {"from":901,"to":903,"dir":[1,0],"owner":-1,"enemy":false,"terrain":1,"resource":0,"ownN":1,"enemyN":0,"distOwnCore":10,"distRivalCore":40,"nearestResourceDist":7,"resourcePull":1.5,"enemyPressure":0,"continuations":[]},
+    {"from":901,"to":904,"dir":[1,0],"owner":-1,"enemy":false,"terrain":1,"resource":0,"ownN":1,"enemyN":0,"distOwnCore":10,"distRivalCore":40,"nearestResourceDist":7,"resourcePull":1.5,"enemyPressure":0,"continuations":[]},
+    {"from":901,"to":905,"dir":[1,0],"owner":-1,"enemy":false,"terrain":1,"resource":0,"ownN":1,"enemyN":0,"distOwnCore":10,"distRivalCore":40,"nearestResourceDist":7,"resourcePull":1.5,"enemyPressure":0,"continuations":[]}
+  ]};
+  const openingView={...view,time:5,progress:.08,remaining:55,rank:2,scoreGap:2,leaderVpRate:1,vpRate:.8,leadMargin:0,options:[compact,open]};
+  assert.ok(agent.staticValue(open,openingView).utility>agent.staticValue(compact,openingView).utility);
+  assert.equal(agent.selectAction(openingView)?.to,902);
+});
+
+test('strongest risk posture becomes more aggressive when trailing and more conservative with a lead cushion', () => {
+  const agent=createAgent('strongest',0,4096,createRng('strongest-posture'));
+  const trailing=agent.posture({...view,remaining:30,rank:3,scoreGap:36,leaderVpRate:1.5,vpRate:.8,leadMargin:0});
+  const leading=agent.posture({...view,remaining:30,rank:1,scoreGap:0,leaderVpRate:1.5,vpRate:1.5,leadMargin:36});
+  assert.ok(trailing.catchup>0);
+  assert.ok(leading.cushion>0);
+  assert.ok(trailing.risk>leading.risk);
 });
