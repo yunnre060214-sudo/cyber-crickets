@@ -44,3 +44,15 @@ http://localhost:8080
 4. 赛后时间线、领地曲线和逐帧回放。
 5. Web Worker，将算法计算从 UI 主线程分离。
 6. 自定义算法接口，让玩家提交自己的策略函数参赛。
+
+
+## 算法系统 v2
+
+战场算法统一实现为可插拔 Agent：`selectAction(view) → action`。当前内置 BFS、DFS、Greedy、Random、ACO 蚁群、Voronoi、势场、PID、Q-Learning、Minimax、MCTS 和 MST 共 12 种策略。
+
+- ACO 会维护并可视化信息素轨迹。
+- Q-Learning 会把 Q 表保存在浏览器 localStorage，在多局之间保留经验。
+- MCTS 使用毫秒级时间预算执行 rollout。
+- Minimax 使用短视野最坏情况评估，天然更偏防堵和反制。
+- 深谋型 Agent 具有更低决策频率，以“思考成本”换取更高决策质量。
+- 实时排名卡会显示算法当前意图和本次决策耗时。
