@@ -9,7 +9,7 @@ const inside = (x, y) => x >= 0 && x < WIDTH && y >= 0 && y < HEIGHT;
 const distance = (a, b) => Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]);
 
 export class Match {
-  constructor({seed, rotation = 0, duration = 90, strategies}) {
+  constructor({seed, rotation = 0, duration = 90, strategies, agentKeys}) {
     this.seed = String(seed);
     this.rotation = rotation;
     this.duration = duration;
@@ -25,12 +25,14 @@ export class Match {
     this.core = new Int8Array(CELL_COUNT).fill(-1);
     this.resourceCells = [];
     this.resourceTotal = 0;
-    this.spawns = strategies.map((_, id) => spawnFor(id, rotation));
+    this.spawns = strategies.length === 2
+      ? [[5, 32], [58, 32]]
+      : strategies.map((_, id) => spawnFor(id, rotation));
     this.teams = strategies.map((strategy, id) => ({
       id, strategy, score: 0, captures: 0, resources: 0, territory: 0,
       nextDecision: 0, thinkMs: 0, lastMove: null,
       agent: createAgent(strategy, id, CELL_COUNT,
-        createRng(deriveSeed(this.seed, 'agent:' + id + ':' + strategy)))
+        createRng(deriveSeed(this.seed, 'agent:' + (agentKeys?.[id] ?? id) + ':' + strategy)))
     }));
     for (let i = 0; i < CELL_COUNT; i++)
       this.terrain[i] = 1 + (this.rng.next() < .17) + (this.rng.next() < .04);

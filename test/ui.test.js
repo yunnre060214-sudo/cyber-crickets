@@ -26,8 +26,12 @@ test('the page exposes its shareable seed, rotation and VP scoring', async () =>
     element('#feed').lastEntry = entry;
     element('#feed').children.unshift(entry);
   };
+  const tournamentSelectors = new Set([
+    '#tournamentOpen', '#tournamentDrawer', '#tournamentBackdrop',
+    '#tournamentClose', '#tournamentContent', '#tournamentStatus'
+  ]);
   globalThis.document = {
-    querySelector: element,
+    querySelector: selector => tournamentSelectors.has(selector) ? null : element(selector),
     createElement: () => ({
       innerHTML: '', className: '', textContent: '', parts: [],
       appendChild(child) { this.parts.push(child.textContent); },

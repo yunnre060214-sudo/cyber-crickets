@@ -1,6 +1,7 @@
 import {AGENT_META} from './agents.js';
 import {Match, WIDTH, HEIGHT, CELL_COUNT} from './match.js';
 import {vpRate} from './rules.js';
+import {initTournamentUI} from './tournament-ui.js';
 
 const $ = selector => document.querySelector(selector);
 const canvas = $('#arena'), ctx = canvas.getContext('2d');
@@ -231,4 +232,4 @@ el.rotation.onchange = reset;
 el.newSeed.onclick = () => { el.seed.value = makeSeed(); reset(); };
 el.again.onclick = () => { el.dialog.close(); reset(); start(); };
 el.close.onclick = () => el.dialog.close();
-config(); reset(); requestAnimationFrame(loop);
+config(); reset(); initTournamentUI(); requestAnimationFrame(loop);

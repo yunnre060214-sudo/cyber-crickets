@@ -93,6 +93,12 @@
       </article>
 
       <aside class="sidebar">
+        <section class="panel tournament-launch">
+          <p class="eyebrow">CYBER CRICKETS LEAGUE</p>
+          <h2>比赛赛程</h2>
+          <p>从八种算法中选参赛者，逐轮推进循环赛、淘汰赛、小组赛或瑞士轮。</p>
+          <button id="tournamentOpen" class="primary">新建比赛 / 查看赛程</button>
+        </section>
         <section class="panel score-panel">
           <div class="section-heading compact">
             <div>
@@ -130,6 +136,16 @@
       </div>
     </section>
   </main>
+
+  <div id="tournamentBackdrop" class="tour-backdrop" hidden></div>
+  <aside id="tournamentDrawer" class="tour-drawer" role="dialog" aria-modal="true" aria-hidden="true" aria-label="比赛赛程">
+    <header class="tour-drawer-header">
+      <div><p class="eyebrow">LEAGUE MANAGER</p><h2>比赛赛程</h2></div>
+      <button id="tournamentClose" type="button" aria-label="关闭比赛赛程">关闭</button>
+    </header>
+    <div id="tournamentContent" class="tour-content"></div>
+    <p id="tournamentStatus" class="tour-status" role="status"></p>
+  </aside>
 
   <dialog id="resultDialog" class="result-dialog">
     <div class="result-card">

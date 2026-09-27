@@ -52,3 +52,16 @@ test('a full match accumulates only VP from control and ends at the selected dur
   match.step(.035);
   assert.deepEqual(match.teams.map(a => a.score), oldScores);
 });
+
+test('duel seats use opposite sides and keep the same map and entrant random streams after swapping', () => {
+  const left = new Match({seed: 'duel', duration: 60,
+    strategies: ['random', 'greedy'], agentKeys: ['entry-a', 'entry-b']});
+  const right = new Match({seed: 'duel', duration: 60,
+    strategies: ['greedy', 'random'], agentKeys: ['entry-b', 'entry-a']});
+  assert.equal(left.owner[32 * 64 + 5], 0);
+  assert.equal(left.owner[32 * 64 + 58], 1);
+  assert.equal(right.owner[32 * 64 + 5], 0);
+  assert.deepEqual(Array.from(left.terrain), Array.from(right.terrain));
+  assert.deepEqual(Array.from(left.resources), Array.from(right.resources));
+  assert.equal(left.teams[0].agent.rng.next(), right.teams[1].agent.rng.next());
+});
