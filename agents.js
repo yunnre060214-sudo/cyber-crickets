@@ -16,7 +16,7 @@ export const AGENT_META={
   turtle:{name:'Turtle 堡垒',desc:'高邻接密度推进，保持紧凑领地并降低暴露面。',tier:'防守型'},
   denial:{name:'Resource Denial',desc:'优先夺走敌占资源，其次封锁高价值节点。',tier:'压制型'},
   momentum:{name:'Momentum 变速器',desc:'原创策略：根据面积、敌压和赛程阶段动态切换节奏。',tier:'自适应型'},
-  strongest:{name:'最强',desc:'两步 VP 规划器：8 秒开局资源冲刺 + Beam 前瞻 + 对手反制风险 + 后期爆发。',tier:'规划型'}
+  strongest:{name:'最强',desc:'阶段化 VP 规划器：高质量前沿抢占 + 比分感知攻守 + Beam 前瞻 + 资源阻断 + 终局爆发。',tier:'规划型'}
 };
 
 const pickBest=(arr,score)=>{
@@ -222,11 +222,31 @@ class MomentumAgent extends BaseAgent{
 class StrongestAgent extends BaseAgent{
   constructor(id,size,rng){
     super(id,size,rng);
-    this.recentTargets=new Int32Array(12).fill(-1);
+    this.recentTargets=new Int32Array(14).fill(-1);
     this.recentCursor=0;
     this.failures=new Map();
     this.successEMA=.72;
     this.attackEMA=.5;
+  }
+
+  phase(v){
+    if(v.progress<.18)return 'opening';
+    if(v.progress<.48)return 'expansion';
+    if(v.progress<.82)return 'contest';
+    return 'final';
+  }
+
+  posture(v){
+    const remaining=Math.max(1,v.remaining);
+    const baseline=Math.max(.12,v.leaderVpRate);
+    const catchup=v.rank>1
+      ?clamp(v.scoreGap/(remaining*baseline+1),0,1.6)
+      :0;
+    const cushion=v.rank===1
+      ?clamp(v.leadMargin/(remaining*Math.max(.12,v.vpRate)+1),0,1.4)
+      :0;
+    const risk=clamp(.46+catchup*.42-cushion*.28,.18,1.14);
+    return {catchup,cushion,risk};
   }
 
   estimatedChance(o,overclock){
@@ -234,7 +254,6 @@ class StrongestAgent extends BaseAgent{
       ? .93-(o.terrain-1)*.12
       : .39+o.ownN*.105-o.enemyN*.075-(o.terrain-1)*.05;
     if(overclock)p+=.075;
-    // Calibrate the rule model very gently from this match's observed outcomes.
     p=.88*p+.12*this.successEMA;
     return clamp(p,.12,.93);
   }
@@ -243,78 +262,122 @@ class StrongestAgent extends BaseAgent{
     const failed=this.failures.get(o.to)||0;
     let repeated=0;
     for(let i=0;i<this.recentTargets.length;i++)if(this.recentTargets[i]===o.to)repeated++;
-    return failed*(final?.32:1.2)+repeated*.2;
+    return failed*(final?.3:1.15)+repeated*(final?.08:.2);
+  }
+
+  frontierQuality(o,v,phase,posture){
+    const branches=Math.min(4,o.continuations?.length||0);
+    const openness=Math.max(0,2-o.ownN);
+    const reach=clamp(o.distOwnCore/18,0,2.6);
+    const forward=clamp((o.distOwnCore-o.distRivalCore)/18,-1.2,1.2);
+    const neutral=o.owner<0?1:0;
+
+    if(phase==='opening'){
+      return neutral*(branches*1.55+openness*1.35+reach*1.05)
+        +(o.nearestResourceDist<=4?(4-o.nearestResourceDist)*1.05:0);
+    }
+    if(phase==='expansion'){
+      return neutral*(branches*1.12+openness*.82+reach*.68)
+        +forward*.72+(o.nearestResourceDist<=3?(4-o.nearestResourceDist)*.8:0);
+    }
+    if(phase==='contest'){
+      return branches*.34+forward*.48
+        +(o.enemy?1.4+posture.catchup*1.9:0);
+    }
+    return branches*.08+(o.enemy?1.6:0);
   }
 
   staticValue(o,v,{continuation=false}={}){
+    const phase=this.phase(v), final=phase==='final';
+    const posture=this.posture(v);
     const remaining=Math.max(0,1-v.progress);
-    const opening=v.time<8;
-    const late=v.progress>=.62, final=v.progress>=.82, behind=v.share<.235;
     const p=this.estimatedChance(o,final);
     const horizon=(continuation?.22:.34)+remaining*(continuation?1.18:1.72);
 
-    // Expected long-horizon scoring value, aligned to the 65/35 VP rule.
+    const resourceWeight={
+      opening:6.9,
+      expansion:4.6,
+      contest:6.4,
+      final:8.2
+    }[phase];
     const area=6.5;
-    const resource=o.resource*(opening?8.0:3.5);
-    const denial=o.enemy?(final?5.4:4.25):0;
+    const resource=o.resource*resourceWeight*(o.enemy?1.42:1);
+    const denial=o.enemy
+      ?(phase==='final'?6.1:phase==='contest'?4.9:3.7)
+        +(o.resource>0?o.resource*(4.6+posture.catchup*2.2):0)
+      :0;
     const direct=horizon*(area+resource+denial);
 
-    const path=o.nearestResourceDist>=99?0:(late?7.4:opening?8.0:5.5)/(1+o.nearestResourceDist*.42);
-    const pull=o.resourcePull*(late?1.58:opening?1.7:1.16);
-    const structure=o.ownN*1.72-o.enemyN*.48;
-    const frontier=o.owner<0?(behind?2.65:1.3):0;
+    const path=o.nearestResourceDist>=99?0:
+      ({opening:8.1,expansion:6.4,contest:5.1,final:3.2}[phase])/
+      (1+o.nearestResourceDist*.42);
+    const pull=o.resourcePull*({opening:1.58,expansion:1.26,contest:1.18,final:.92}[phase]);
+    const cohesion=o.ownN*({opening:.72,expansion:1.02,contest:1.58,final:1.9}[phase])
+      -o.enemyN*({opening:.34,expansion:.42,contest:.52,final:.42}[phase]);
+    const quality=this.frontierQuality(o,v,phase,posture);
     const attack=o.enemy
-      ?2.35+o.ownN*1.42-o.enemyN*1.08+(o.resource>0?5.8:0)
+      ?2.5+o.ownN*1.38-o.enemyN*.92+(o.resource>0?6.2:0)
+        +posture.catchup*2.6
       :0;
 
-    const friction=(o.terrain-1)*(final?.5:1.08);
-    const pressure=o.enemyPressure*(o.enemy?.52:1.18);
+    const friction=(o.terrain-1)*({opening:1.0,expansion:.92,contest:.72,final:.45}[phase]);
+    const pressure=o.enemyPressure*(o.enemy?.48:phase==='opening'?1.0:.86);
     const retry=continuation?0:this.retryPenalty(o,final);
 
-    return {p,utility:p*(direct+path+pull+structure+frontier+attack)-friction-pressure-retry};
+    const leadControl=posture.cushion>0
+      ?posture.cushion*(o.ownN*1.05-o.enemyPressure*.7+(o.enemy&&o.resource?2.4:0))
+      :0;
+    const comeback=posture.catchup>0
+      ?posture.catchup*((o.enemy?2.25:0)+o.resource*1.75+(o.owner<0?quality*.18:0))
+      :0;
+
+    return {
+      p,
+      utility:p*(direct+path+pull+cohesion+quality+attack+leadControl+comeback)
+        -friction-pressure-retry
+    };
   }
 
   continuationValue(o,v){
     const next=o.continuations||[];
     if(!next.length)return 0;
-
-    // Beam width 3: preserve multiple plausible continuations instead of trusting
-    // one brittle best-case branch. Best branch dominates, alternatives add robustness.
     const scored=next.map(n=>this.staticValue(n,v,{continuation:true}).utility)
       .sort((x,y)=>y-x).slice(0,3);
     const best=scored[0]||0, second=scored[1]??best, third=scored[2]??second;
-    return .68*best+.22*second+.10*third;
+    return .66*best+.23*second+.11*third;
   }
 
   opponentRisk(o,v){
-    // Local opponent model: enemy pressure + defense + exposed low-support pushes
-    // approximate how likely rivals are to contest or reverse this expansion.
-    const contact=o.enemyPressure*3.2+o.enemyN*.72;
-    const exposure=Math.max(0,2-o.ownN)*(o.enemy?1.15:.72);
-    const late=v.progress>=.82;
-    return (contact+exposure)*(late?.58:1);
+    const phase=this.phase(v), posture=this.posture(v);
+    const contact=o.enemyPressure*3.15+o.enemyN*.7;
+    const exposure=Math.max(0,2-o.ownN)*(o.enemy?1.08:.66);
+    const stage=phase==='final'?.52:phase==='contest'?.78:1;
+    return (contact+exposure)*stage*(1-posture.catchup*.22+posture.cushion*.14);
   }
 
   selectAction(v){
     if(!v.options.length)return null;
-    const final=v.progress>=.82;
-
-    // Stage 1: cheap rule-aware evaluation over every legal move.
+    const phase=this.phase(v), posture=this.posture(v);
     const ranked=v.options.map(o=>{
       const now=this.staticValue(o,v);
       return {o,now,pre:now.utility};
     }).sort((x,y)=>y.pre-x.pre);
 
-    // Stage 2: depth-2 search only on the strongest candidates. This keeps the
-    // decision budget bounded even when the frontier contains hundreds of moves.
-    const beam=ranked.slice(0,Math.min(18,ranked.length));
+    const width=phase==='final'?18:phase==='contest'?22:24;
+    const beam=ranked.slice(0,Math.min(width,ranked.length));
+    const lookaheadWeight={
+      opening:.46,
+      expansion:.56,
+      contest:.62,
+      final:.34
+    }[phase];
+
     let best=null,bestScore=-Infinity,bestFuture=0,bestP=0;
     for(const item of beam){
       const future=this.continuationValue(item.o,v);
       const risk=this.opponentRisk(item.o,v);
-      // First-step success gates access to the second-step branch.
-      const lookahead=item.now.p*future*(final?.34:.56);
-      const score=item.now.utility+lookahead-risk+this.rng.next()*.025;
+      const lookahead=item.now.p*future*lookaheadWeight;
+      const score=item.now.utility+lookahead-risk*posture.risk+this.rng.next()*.02;
       if(score>bestScore){
         bestScore=score;best=item.o;bestFuture=lookahead;bestP=item.now.p;
       }
@@ -324,12 +387,15 @@ class StrongestAgent extends BaseAgent{
       this.lastChoice=best.to;
       this.recentTargets[this.recentCursor]=best.to;
       this.recentCursor=(this.recentCursor+1)%this.recentTargets.length;
-      const motive=best.resource>0?'高价值资源':
-        best.enemy?'高收益翻色':
+      const motive=best.enemy&&best.resource>0?'夺取敌方资源':
+        best.resource>0?'高价值资源':
+        best.enemy?'主动翻色':
+        phase==='opening'&&best.ownN<=1?'抢占高质量前沿':
         best.nearestResourceDist<=3?'资源通路':
         best.ownN>=2?'连续阵型':'边界扩张';
-      this.thought='两步 VP 规划：'+motive+'；首步成功率 '+Math.round(bestP*100)+
-        '%；后续价值 '+bestFuture.toFixed(1)+'；已计入反制风险';
+      const stance=posture.catchup>.35?'追分':posture.cushion>.35?'控场':'均衡';
+      this.thought='阶段化 VP 规划：'+motive+'；'+stance+'；首步成功率 '+Math.round(bestP*100)+
+        '%；后续价值 '+bestFuture.toFixed(1)+'；阶段 '+phase;
     }
     return best;
   }
