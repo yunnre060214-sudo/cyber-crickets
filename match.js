@@ -157,6 +157,25 @@ export class Match {
       enemyPressure: this.enemyAround(move.to, id) / 4};
   }
 
+  continuations(id, move) {
+    // Public depth-2 local lookahead: assume the first move succeeds, then expose
+    // legal moves originating from the newly captured cell. Every Agent receives
+    // this same field; no future RNG or hidden outcome is exposed.
+    const result = [], [x, y] = xy(move.to);
+    for (const dir of DIRECTIONS) {
+      const nx=x+dir[0], ny=y+dir[1];
+      if (!inside(nx,ny)) continue;
+      const to=index(nx,ny);
+      if (to===move.from || this.owner[to]===id || this.core[to]>=0) continue;
+      const next=this.enrich(id,{from:move.to,to,dir});
+      // Under the hypothetical first-step success, the new origin becomes one
+      // additional friendly neighbor of every second-step target.
+      next.ownN=Math.min(4,next.ownN+1);
+      result.push(next);
+    }
+    return result;
+  }
+
   options(id) {
     const owned = [], options = [];
     for (let i = 0; i < CELL_COUNT; i++) if (this.owner[i] === id) owned.push(i);
@@ -169,7 +188,9 @@ export class Match {
         if (!inside(nx, ny)) continue;
         const to = index(nx, ny);
         if (this.owner[to] === id || this.core[to] >= 0) continue;
-        options.push(this.enrich(id, {from, to, dir}));
+        const option=this.enrich(id,{from,to,dir});
+        option.continuations=this.continuations(id,option);
+        options.push(option);
       }
     }
     return options;
