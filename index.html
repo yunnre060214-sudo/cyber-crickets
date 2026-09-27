@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#f4f5f7" />
   <title>赛博斗蛐蛐 · 算法争夺战</title>
-  <link rel="stylesheet" href="./styles.css?v=20260927-log2" />
+  <link rel="stylesheet" href="./styles.css?v=20260927-result3" />
 </head>
 <body>
   <main class="app-shell">
@@ -143,19 +143,33 @@
 
   <dialog id="resultDialog" class="result-dialog">
     <div class="result-card">
-      <p class="eyebrow">ROUND OVER</p>
-      <h2 id="winnerTitle">回合结束</h2>
-      <p id="winnerSummary"></p>
-      <div id="resultList" class="result-list"></div>
-      <section id="resultInsights" class="result-insights" aria-label="胜因分析"></section>
-      <section id="resultCharts" class="result-charts" aria-label="对局趋势"></section>
-      <div class="button-row result-actions">
-        <button id="againBtn" class="primary">再来一局</button>
-        <button id="closeResultBtn">查看战场</button>
-      </div>
+      <header class="result-header">
+        <div>
+          <p class="eyebrow">ROUND COMPLETE</p>
+          <h2 id="winnerTitle">回合结束</h2>
+          <p id="winnerSummary" class="result-summary"></p>
+        </div>
+        <button id="resultExportBtn" class="result-export" type="button">导出 MD 日志</button>
+      </header>
+      <section class="result-section">
+        <div class="result-section-title"><span>FINAL STANDINGS</span><strong>最终排名</strong></div>
+        <div id="resultList" class="result-list"></div>
+      </section>
+      <section class="result-section">
+        <div class="result-section-title"><span>MATCH DIAGNOSIS</span><strong>胜因诊断</strong></div>
+        <section id="resultInsights" class="result-insights" aria-label="胜因分析"></section>
+      </section>
+      <section class="result-section">
+        <div class="result-section-title"><span>TRENDS</span><strong>对局走势</strong></div>
+        <section id="resultCharts" class="result-charts" aria-label="对局趋势"></section>
+      </section>
+      <footer class="button-row result-actions">
+        <button id="closeResultBtn">返回战场</button>
+        <button id="againBtn" class="primary">使用当前配置再来一局</button>
+      </footer>
     </div>
   </dialog>
 
-  <script type="module" src="./app.js?v=20260927-log2"></script>
+  <script type="module" src="./app.js?v=20260927-result3"></script>
 </body>
 </html>
