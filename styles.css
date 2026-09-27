@@ -1313,3 +1313,40 @@ html{
   .result-insights{grid-template-columns:1fr 1fr}
   .result-chart{padding:9px}
 }
+
+/* Live match trend */
+.live-chart-panel{
+  margin-top:14px;
+  padding:14px;
+  border:1px solid var(--line);
+  border-radius:16px;
+  background:rgba(255,255,255,.78);
+}
+.live-chart-head{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:5px;
+}
+.live-chart-head .eyebrow{margin-bottom:4px}
+.live-chart-head h3{margin:0;font-size:15px}
+.live-chart-head>span{color:var(--muted);font-size:10px;font-weight:700}
+#liveChart{display:block;width:100%;height:auto;overflow:visible}
+.live-chart-legend{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:5px 15px;
+  color:var(--muted);
+  font-size:10px;
+}
+.live-chart-legend span{display:flex;align-items:center;gap:5px}
+.live-chart-legend i{width:7px;height:7px;border-radius:50%}
+.live-chart-legend b{color:var(--text);font-variant-numeric:tabular-nums}
+@media(max-width:620px){
+  .live-chart-panel{margin-top:10px;padding:10px}
+  .live-chart-head{align-items:flex-start;flex-direction:column;gap:3px}
+  #liveChart{min-height:150px}
+  .live-chart-legend{justify-content:flex-start;gap:4px 11px}
+}

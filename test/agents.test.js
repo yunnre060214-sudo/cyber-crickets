@@ -17,7 +17,7 @@ test('every strategy makes its random choices only through its injected seed str
   Math.random = () => { throw new Error('global random used'); };
   try {
     for (const type of ['bfs', 'dfs', 'greedy', 'random', 'aco', 'voronoi',
-      'potential', 'pid', 'qlearn', 'minimax', 'mcts', 'mst']) {
+      'potential', 'pid', 'qlearn', 'minimax', 'mcts', 'mst', 'runner', 'raider', 'turtle', 'denial', 'momentum']) {
       const agent = createAgent(type, 0, 4096, createRng('agent:' + type));
       assert.ok(agent.selectAction(view), type);
     }
@@ -49,4 +49,12 @@ test('Q learning updates from reward and next state value', () => {
   agent.q.LHR = {expand: 5, attack: 1, resource: 0, fortify: 0};
   agent.selectAction({...view, share: .3, localPressure: .6, options});
   assert.ok(Math.abs(agent.q.SLN.expand - 2.972) < 1e-10);
+});
+
+test('new tactical strategies are deterministic for the same seed', () => {
+  for (const type of ['runner', 'raider', 'turtle', 'denial', 'momentum']) {
+    const a=createAgent(type,0,4096,createRng('new:'+type));
+    const b=createAgent(type,0,4096,createRng('new:'+type));
+    assert.equal(a.selectAction(view)?.to,b.selectAction(view)?.to,type);
+  }
 });

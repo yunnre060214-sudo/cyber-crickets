@@ -10,7 +10,12 @@ export const AGENT_META={
   qlearn:{name:'Q-Learning 学习者',desc:'在扩张、进攻、资源、巩固四种宏观策略间在线学习。',tier:'学习型'},
   minimax:{name:'防反启发式',desc:'按局部敌压估计反击风险；不构造博弈树。',tier:'防守型'},
   mcts:{name:'Monte Carlo 采样',desc:'固定次数采样候选落点；不执行 MCTS 树搜索。',tier:'采样型'},
-  mst:{name:'资源链启发式',desc:'优先靠近资源节点；不构造最小生成树。',tier:'结构型'}
+  mst:{name:'资源链启发式',desc:'优先靠近资源节点；不构造最小生成树。',tier:'结构型'},
+  runner:{name:'Frontier Runner',desc:'低阻力优先，牺牲阵型换取最快铺图速度。',tier:'竞速型'},
+  raider:{name:'Raider 掠袭者',desc:'专挑敌方薄弱边界翻色，偏好孤立目标。',tier:'侵袭型'},
+  turtle:{name:'Turtle 堡垒',desc:'高邻接密度推进，保持紧凑领地并降低暴露面。',tier:'防守型'},
+  denial:{name:'Resource Denial',desc:'优先夺走敌占资源，其次封锁高价值节点。',tier:'压制型'},
+  momentum:{name:'Momentum 变速器',desc:'原创策略：根据面积、敌压和赛程阶段动态切换节奏。',tier:'自适应型'}
 };
 
 const pickBest=(arr,score)=>{
@@ -167,6 +172,51 @@ class ResourceChainAgent extends BaseAgent{
   }
 }
 
+class FrontierRunnerAgent extends BaseAgent{
+  selectAction(v){
+    const m=this.choose(v.options,o=>(o.owner<0?6:0)-o.terrain*3.2-o.ownN*.45+
+      o.resource*2.5-o.enemyPressure*1.2+this.rng.next()*1.8);
+    this.thought='寻找最低阻力缺口，以铺图速度换阵型完整度';return m;
+  }
+}
+
+class RaiderAgent extends BaseAgent{
+  selectAction(v){
+    const m=this.choose(v.options,o=>(o.enemy?10:0)+(o.enemy?Math.max(0,3-o.enemyN)*3:0)+
+      o.resource*4-o.ownN*.35-o.terrain+this.rng.next()*1.4);
+    this.thought='寻找敌方薄弱边界，优先切掉孤立格';return m;
+  }
+}
+
+class TurtleAgent extends BaseAgent{
+  selectAction(v){
+    const m=this.choose(v.options,o=>o.ownN*4.6-o.enemyN*2.4+(o.enemy?.8:2.5)+
+      o.resource*3-o.terrain*.7+this.rng.next()*.8);
+    this.thought='压缩暴露边界，沿高邻接区域稳步推进';return m;
+  }
+}
+
+class ResourceDenialAgent extends BaseAgent{
+  selectAction(v){
+    const m=this.choose(v.options,o=>o.resource*(o.enemy?16:11)+(o.enemy?4:0)+
+      o.resourcePull*1.6-o.enemyN*.8-o.terrain+this.rng.next());
+    this.thought='优先切断对手资源收益，再抢无主节点';return m;
+  }
+}
+
+class MomentumAgent extends BaseAgent{
+  selectAction(v){
+    const behind=v.share<.22, late=v.progress>.68, pressured=v.localPressure>.32;
+    const attack=clamp((behind?.28:0)+(late?.32:0)+(pressured?.2:0)+.28,0,1);
+    const m=this.choose(v.options,o=>attack*((o.enemy?8:1)+o.resource*4+o.enemyN*.7)+
+      (1-attack)*(o.ownN*3.1+(o.owner<0?3:0)-o.enemyN)+
+      (late?o.resource*3:0)-o.terrain*.9+this.rng.next()*1.1);
+    this.thought=attack>.7?'进入冲刺档，主动争夺敌区和资源':
+      attack<.45?'保持巡航档，扩大连续领地':'切入变速档，扩张与进攻并行';
+    return m;
+  }
+}
+
 function sampleOptions(options,limit,rng){
   if(options.length<=limit)return options;
   const sample=[...options];
@@ -177,6 +227,6 @@ function sampleOptions(options,limit,rng){
 }
 
 export function createAgent(type,id,size,rng){
-  const C={bfs:FloodAgent,dfs:SpearheadAgent,greedy:GreedyAgent,random:RandomAgent,aco:ACOAgent,voronoi:VoronoiAgent,potential:PotentialAgent,pid:PIDAgent,qlearn:QLearningAgent,minimax:CounterplayAgent,mcts:SamplingAgent,mst:ResourceChainAgent}[type]||RandomAgent;
+  const C={bfs:FloodAgent,dfs:SpearheadAgent,greedy:GreedyAgent,random:RandomAgent,aco:ACOAgent,voronoi:VoronoiAgent,potential:PotentialAgent,pid:PIDAgent,qlearn:QLearningAgent,minimax:CounterplayAgent,mcts:SamplingAgent,mst:ResourceChainAgent,runner:FrontierRunnerAgent,raider:RaiderAgent,turtle:TurtleAgent,denial:ResourceDenialAgent,momentum:MomentumAgent}[type]||RandomAgent;
   return new C(id,size,rng);
 }

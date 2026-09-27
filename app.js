@@ -13,7 +13,9 @@ const el = {
   title: $('#winnerTitle'), summary: $('#winnerSummary'), results: $('#resultList'),
   insights: $('#resultInsights'), charts: $('#resultCharts'),
   again: $('#againBtn'), close: $('#closeResultBtn'), overlay: $('#overlayToggle'),
-  seed: $('#seedInput'), rotation: $('#rotation'), newSeed: $('#newSeedBtn')
+  seed: $('#seedInput'), rotation: $('#rotation'), newSeed: $('#newSeedBtn'),
+  liveChart: $('#liveChart'), liveGrid: $('#liveChartGrid'), liveLines: $('#liveChartLines'),
+  liveLegend: $('#liveChartLegend')
 };
 const COLORS = ['#ff5b5b', '#4f7cff', '#25b77a', '#9b6bff'];
 const TEAM_NAMES = ['红方', '蓝方', '绿方', '紫方'];
@@ -129,10 +131,42 @@ function banner(message) {
   bannerTimer = setTimeout(() => el.banner.classList.remove('show'), 2200);
 }
 
+function renderLiveChart() {
+  const width=720,height=190,left=42,right=12,top=12,bottom=28;
+  const snapshots=match.timeline;
+  const current={
+    time:match.time,
+    teams:match.teams.map(team=>({id:team.id,score:team.score}))
+  };
+  const data=snapshots.at(-1)?.time===match.time?snapshots:[...snapshots,current];
+  const maxVP=Math.max(10,...data.flatMap(point=>point.teams.map(team=>team.score)));
+  const x=time=>left+(width-left-right)*(time/match.duration);
+  const y=value=>top+(height-top-bottom)*(1-value/maxVP);
+  const ticks=[0,.25,.5,.75,1];
+  el.liveGrid.innerHTML=
+    ticks.map(t=>'<line x1="'+left+'" y1="'+y(maxVP*t).toFixed(1)+'" x2="'+(width-right)+
+      '" y2="'+y(maxVP*t).toFixed(1)+'" stroke="#e7ebf2" stroke-width="1"/>'+
+      '<text x="'+(left-7)+'" y="'+(y(maxVP*t)+3).toFixed(1)+'" text-anchor="end" fill="#8b96a8" font-size="9">'+
+      (maxVP*t).toFixed(0)+'</text>').join('')+
+    ticks.map(t=>'<text x="'+x(match.duration*t).toFixed(1)+'" y="'+(height-8)+
+      '" text-anchor="middle" fill="#8b96a8" font-size="9">'+Math.round(match.duration*t)+'s</text>').join('');
+  el.liveLines.innerHTML=match.teams.map(team=>{
+    const points=data.map(point=>{
+      const sample=point.teams.find(item=>item.id===team.id);
+      return x(point.time).toFixed(1)+','+y(sample?.score||0).toFixed(1);
+    }).join(' ');
+    return '<polyline points="'+points+'" fill="none" stroke="'+COLORS[team.id]+
+      '" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>';
+  }).join('');
+  el.liveLegend.innerHTML=match.teams.map(team=>'<span><i style="background:'+COLORS[team.id]+
+    '"></i>'+TEAM_NAMES[team.id]+' <b>'+team.score.toFixed(1)+'</b></span>').join('');
+}
+
 function ui() {
   el.timer.textContent = formatTime(match.duration - match.time);
   const teams = [...match.teams].sort((a, b) => b.score - a.score);
   const maxScore = Math.max(1, ...teams.map(team => team.score));
+  renderLiveChart();
   el.score.innerHTML = teams.map((team, rank) => {
     const meta = AGENT_META[team.strategy], thought = team.agent.thought || '等待决策';
     const rate = vpRate(team.territory, CELL_COUNT, team.resources, match.resourceTotal);
