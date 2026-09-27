@@ -16,7 +16,7 @@ export const AGENT_META={
   turtle:{name:'Turtle 堡垒',desc:'高邻接密度推进，保持紧凑领地并降低暴露面。',tier:'防守型'},
   denial:{name:'Resource Denial',desc:'优先夺走敌占资源，其次封锁高价值节点。',tier:'压制型'},
   momentum:{name:'Momentum 变速器',desc:'原创策略：根据面积、敌压和赛程阶段动态切换节奏。',tier:'自适应型'},
-  strongest:{name:'最强',desc:'规则感知复合优化器：估算成功率与剩余赛程 VP 边际收益，并动态平衡资源、领地、翻色、路径与阵型。',tier:'优化型'}
+  strongest:{name:'最强',desc:'两步 VP 规划器：规则成功率模型 + Beam 前瞻 + 对手反制风险 + 在线成功率校准。',tier:'规划型'}
 };
 
 const pickBest=(arr,score)=>{
@@ -222,106 +222,135 @@ class MomentumAgent extends BaseAgent{
 class StrongestAgent extends BaseAgent{
   constructor(id,size,rng){
     super(id,size,rng);
-    this.recentTargets=new Int32Array(10).fill(-1);
+    this.recentTargets=new Int32Array(12).fill(-1);
     this.recentCursor=0;
     this.failures=new Map();
+    this.successEMA=.72;
+    this.attackEMA=.5;
   }
 
   estimatedChance(o,overclock){
-    // Mirror the public combat model as closely as the decision view allows.
-    // ownN/enemyN are exactly the local support/defense quantities used by resolution.
     let p=o.owner<0
       ? .93-(o.terrain-1)*.12
       : .39+o.ownN*.105-o.enemyN*.075-(o.terrain-1)*.05;
     if(overclock)p+=.075;
+    // Calibrate the rule model very gently from this match's observed outcomes.
+    p=.88*p+.12*this.successEMA;
     return clamp(p,.12,.93);
+  }
+
+  retryPenalty(o,final){
+    const failed=this.failures.get(o.to)||0;
+    let repeated=0;
+    for(let i=0;i<this.recentTargets.length;i++)if(this.recentTargets[i]===o.to)repeated++;
+    return failed*(final?.32:1.2)+repeated*.2;
+  }
+
+  staticValue(o,v,{continuation=false}={}){
+    const remaining=Math.max(0,1-v.progress);
+    const late=v.progress>=.62, final=v.progress>=.82, behind=v.share<.235;
+    const p=this.estimatedChance(o,final);
+    const horizon=(continuation?.22:.34)+remaining*(continuation?1.18:1.72);
+
+    // Expected long-horizon scoring value, aligned to the 65/35 VP rule.
+    const area=6.5;
+    const resource=o.resource*3.5;
+    const denial=o.enemy?(final?5.4:4.25):0;
+    const direct=horizon*(area+resource+denial);
+
+    const path=o.nearestResourceDist>=99?0:(late?7.4:5.5)/(1+o.nearestResourceDist*.42);
+    const pull=o.resourcePull*(late?1.58:1.16);
+    const structure=o.ownN*1.72-o.enemyN*.48;
+    const frontier=o.owner<0?(behind?2.65:1.3):0;
+    const attack=o.enemy
+      ?2.35+o.ownN*1.42-o.enemyN*1.08+(o.resource>0?5.8:0)
+      :0;
+
+    const friction=(o.terrain-1)*(final?.5:1.08);
+    const pressure=o.enemyPressure*(o.enemy?.52:1.18);
+    const retry=continuation?0:this.retryPenalty(o,final);
+
+    return {p,utility:p*(direct+path+pull+structure+frontier+attack)-friction-pressure-retry};
+  }
+
+  continuationValue(o,v){
+    const next=o.continuations||[];
+    if(!next.length)return 0;
+
+    // Beam width 3: preserve multiple plausible continuations instead of trusting
+    // one brittle best-case branch. Best branch dominates, alternatives add robustness.
+    const scored=next.map(n=>this.staticValue(n,v,{continuation:true}).utility)
+      .sort((x,y)=>y-x).slice(0,3);
+    const best=scored[0]||0, second=scored[1]??best, third=scored[2]??second;
+    return .68*best+.22*second+.10*third;
+  }
+
+  opponentRisk(o,v){
+    // Local opponent model: enemy pressure + defense + exposed low-support pushes
+    // approximate how likely rivals are to contest or reverse this expansion.
+    const contact=o.enemyPressure*3.2+o.enemyN*.72;
+    const exposure=Math.max(0,2-o.ownN)*(o.enemy?1.15:.72);
+    const late=v.progress>=.82;
+    return (contact+exposure)*(late?.58:1);
   }
 
   selectAction(v){
     if(!v.options.length)return null;
-    const remaining=Math.max(0,1-v.progress);
-    const overclock=v.progress>=.82;
-    const late=v.progress>=.62;
     const final=v.progress>=.82;
-    const behind=v.share<.235;
-    const resourceVisible=v.options.some(o=>o.resource>0);
 
-    const m=this.choose(v.options,o=>{
-      const p=this.estimatedChance(o,overclock);
+    // Stage 1: cheap rule-aware evaluation over every legal move.
+    const ranked=v.options.map(o=>{
+      const now=this.staticValue(o,v);
+      return {o,now,pre:now.utility};
+    }).sort((x,y)=>y.pre-x.pre);
 
-      // Directly approximate marginal VP created by a successful ownership change.
-      // A neutral capture adds our area share. A flip additionally removes rival control,
-      // so its strategic swing is larger even though the scoring engine tracks each side separately.
-      const areaValue=6.5;
-      const resourceValue=o.resource*3.5;
-      const flipSwing=o.enemy?(final?5.2:4.1):0;
-      const horizon=.32+remaining*1.68;
-      const direct=horizon*(areaValue+resourceValue+flipSwing);
-
-      // Future option value: resources become more important before/after central injections;
-      // compact support raises future attack probability and reduces brittle tendrils.
-      const pathToResource=o.nearestResourceDist>=99?0:
-        (late?7.2:5.4)/(1+o.nearestResourceDist*.42);
-      const pull=o.resourcePull*(late?1.55:1.15);
-      const structure=o.ownN*1.65-o.enemyN*.42;
-      const frontier=o.owner<0?(behind?2.5:1.35):0;
-
-      // Selective aggression. Enemy cells with weak defense and strong own support are excellent
-      // because they gain territory while denying an opponent's future VP.
-      const attack=o.enemy?
-        2.2+o.ownN*1.35-o.enemyN*1.05+(o.resource>0?5.5:0):0;
-
-      // Avoid repeatedly wasting decisions on a stubborn target, but never permanently blacklist it.
-      const failed=this.failures.get(o.to)||0;
-      const retryPenalty=failed*(final?.35:1.15);
-      let repeatPenalty=0;
-      for(let i=0;i<this.recentTargets.length;i++)if(this.recentTargets[i]===o.to)repeatPenalty+=.22;
-
-      // Terrain matters twice: it lowers success probability already, and a high-resistance route
-      // also tends to consume more failed decision opportunities.
-      const friction=(o.terrain-1)*(final?.55:1.05);
-      const contestRisk=o.enemyPressure*(o.enemy?.55:1.15);
-
-      // Tiny seeded jitter only resolves near-ties and keeps all runs reproducible.
-      const utility=p*(direct+pathToResource+pull+structure+frontier+attack)
-        -retryPenalty-repeatPenalty-friction-contestRisk+this.rng.next()*.035;
-      return utility;
-    });
-
-    if(m){
-      this.recentTargets[this.recentCursor]=m.to;
-      this.recentCursor=(this.recentCursor+1)%this.recentTargets.length;
-      const p=this.estimatedChance(m,overclock);
-      const motive=m.resource>0?'高价值资源':
-        m.enemy?'高收益翻色':
-        m.nearestResourceDist<=3?'资源路径':
-        m.ownN>=2?'高成功率连续扩张':'边界扩张';
-      this.thought='VP 效用优化：'+motive+'，估计成功率 '+Math.round(p*100)+'%，兼顾剩余赛程收益';
+    // Stage 2: depth-2 search only on the strongest candidates. This keeps the
+    // decision budget bounded even when the frontier contains hundreds of moves.
+    const beam=ranked.slice(0,Math.min(18,ranked.length));
+    let best=null,bestScore=-Infinity,bestFuture=0,bestP=0;
+    for(const item of beam){
+      const future=this.continuationValue(item.o,v);
+      const risk=this.opponentRisk(item.o,v);
+      // First-step success gates access to the second-step branch.
+      const lookahead=item.now.p*future*(final?.34:.56);
+      const score=item.now.utility+lookahead-risk+this.rng.next()*.025;
+      if(score>bestScore){
+        bestScore=score;best=item.o;bestFuture=lookahead;bestP=item.now.p;
+      }
     }
-    return m;
+
+    if(best){
+      this.lastChoice=best.to;
+      this.recentTargets[this.recentCursor]=best.to;
+      this.recentCursor=(this.recentCursor+1)%this.recentTargets.length;
+      const motive=best.resource>0?'高价值资源':
+        best.enemy?'高收益翻色':
+        best.nearestResourceDist<=3?'资源通路':
+        best.ownN>=2?'连续阵型':'边界扩张';
+      this.thought='两步 VP 规划：'+motive+'；首步成功率 '+Math.round(bestP*100)+
+        '%；后续价值 '+bestFuture.toFixed(1)+'；已计入反制风险';
+    }
+    return best;
   }
 
   onResult(r){
     super.onResult(r);
     if(!r?.move)return;
     const key=r.move.to;
+    const success=r.success?1:0;
+    this.successEMA=this.successEMA*.94+success*.06;
+    if(r.move.enemy)this.attackEMA=this.attackEMA*.92+success*.08;
     if(r.success)this.failures.delete(key);
-    else{
-      const next=(this.failures.get(key)||0)+1;
-      if(next<=5)this.failures.set(key,next);
-      else this.failures.set(key,5);
-    }
-    // Bound memory even in long custom simulations.
-    if(this.failures.size>96){
-      const first=this.failures.keys().next().value;
-      this.failures.delete(first);
-    }
+    else this.failures.set(key,Math.min(5,(this.failures.get(key)||0)+1));
+    if(this.failures.size>96)this.failures.delete(this.failures.keys().next().value);
   }
 
   reset(){
     this.recentTargets.fill(-1);
     this.recentCursor=0;
     this.failures.clear();
+    this.successEMA=.72;
+    this.attackEMA=.5;
   }
 }
 
