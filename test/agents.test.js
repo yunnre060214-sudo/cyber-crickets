@@ -74,3 +74,15 @@ test('strongest agent penalizes repeated failed attacks without using hidden sta
   for(let i=0;i<5;i++)agent.onResult({success:false,reward:-.15,move:a});
   assert.equal(agent.selectAction({...view,progress:.4,options:[a,b]})?.to,602);
 });
+
+
+test('strongest agent uses depth-2 continuation value when first-step values are similar', () => {
+  const agent=createAgent('strongest',0,4096,createRng('strongest-lookahead'));
+  const base={...options[1],owner:-1,enemy:false,terrain:1,resource:0,ownN:2,enemyN:0,nearestResourceDist:8,resourcePull:1,enemyPressure:0};
+  const dead={...base,to:701,continuations:[]};
+  const futureRich={...base,to:702,continuations:[
+    {...base,from:702,to:703,resource:3,nearestResourceDist:0,resourcePull:12,ownN:3},
+    {...base,from:702,to:704,resource:1,nearestResourceDist:1,resourcePull:6,ownN:2}
+  ]};
+  assert.equal(agent.selectAction({...view,options:[dead,futureRich]})?.to,702);
+});
