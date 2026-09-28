@@ -1,5 +1,5 @@
-import {AGENT_META} from './agents.js?v=20260928-strongest-v4';
-import {FORMAT_NAMES, Tournament} from './tournament.js?v=20260928-strongest-v4';
+import {AGENT_META} from './agents.js?v=20260928-custom-controls-v1';
+import {FORMAT_NAMES, Tournament} from './tournament.js?v=20260928-custom-controls-v1';
 
 const STORAGE_KEY = 'cyber-crickets-tournaments-v1';
 const escapeHTML = value => String(value).replace(/[&<>"']/g, character =>
@@ -34,7 +34,10 @@ export function renderCreateForm() {
     '<label>比赛名称<input name="name" maxlength="80" value="算法联赛" required></label>' +
     '<div class="tour-form-pair"><label>赛制<select name="format">' + formats + '</select></label>' +
     '<label>单局时长<select name="duration"><option value="60">60 秒</option>' +
-    '<option value="90" selected>90 秒</option><option value="120">120 秒</option></select></label></div>' +
+    '<option value="90" selected>90 秒</option><option value="120">120 秒</option>' +
+    '<option value="180">180 秒</option><option value="custom">自定义…</option></select></label></div>' +
+    '<label class="tour-custom-duration" data-tour-custom-duration hidden>自定义单局时长（秒）' +
+    '<input name="durationCustom" type="number" min="10" max="1800" step="1" value="180" inputmode="numeric"></label>' +
     '<label>赛事种子<input name="seed" maxlength="64" spellcheck="false" required></label>' +
     '<div class="tour-slot-grid">' + slots + '</div>' +
     '<p id="tournamentError" class="tour-error" role="alert"></p>' +
@@ -172,7 +175,7 @@ export function advanceInWorker(tournament, WorkerCtor = globalThis.Worker) {
       }, 0);
       return;
     }
-    const worker = new WorkerCtor(new URL('./tournament-worker.js?v=20260928-strongest-v4', import.meta.url), {type: 'module'});
+    const worker = new WorkerCtor(new URL('./tournament-worker.js?v=20260928-custom-controls-v1', import.meta.url), {type: 'module'});
     worker.onmessage = event => {
       worker.terminate();
       if (!event.data?.ok) {reject(new Error(event.data?.error || '赛程计算失败')); return;}
@@ -251,15 +254,23 @@ export function initTournamentUI() {
       }).finally(() => {busy = false;});
     }
   });
+  content.addEventListener('change', event => {
+    if (event.target?.name !== 'duration') return;
+    const custom = content.querySelector('[data-tour-custom-duration]');
+    if (custom) custom.hidden = event.target.value !== 'custom';
+  });
   content.addEventListener('submit', event => {
     if (event.target.id !== 'tournamentForm') return;
     event.preventDefault();
     const form = event.target, fields = new FormData(form);
     try {
+      const durationField = fields.get('duration');
+      const duration = durationField === 'custom'
+        ? Number(fields.get('durationCustom')) : Number(durationField);
       const tournament = new Tournament({
         id: crypto.getRandomValues(new Uint32Array(2)).join('-'),
         name: fields.get('name').trim(), format: fields.get('format'),
-        duration: Number(fields.get('duration')), seed: fields.get('seed').trim(),
+        duration, seed: fields.get('seed').trim(),
         entrants: [...form.querySelectorAll('[data-entry]')].map(select => select.value)
       });
       records.unshift(tournament); records = records.slice(0, 20);
