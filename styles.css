@@ -2661,3 +2661,116 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated;background
   .setup-menu[open] .setup-popover{animation:none!important}
 }
 
+/* Mobile settings drawer v3: non-sticky inline drawer with internal scrolling and persistent close control. */
+.setup-drawer-head{display:none}
+@media (max-width:700px){
+  .command-bar{
+    position:relative!important;
+    top:auto!important;
+    z-index:20;
+    overflow:visible;
+  }
+  .command-tools{
+    position:relative;
+    display:block;
+    width:100%;
+    min-width:0;
+    margin:0;
+    padding-top:44px;
+  }
+  .command-tools>.setup-menu{
+    position:static;
+    display:block;
+    width:100%;
+    margin:0;
+  }
+  .command-tools>.setup-menu>summary,
+  .command-tools>.league-shortcut{
+    position:absolute;
+    top:0;
+    width:50%;
+    min-height:44px;
+    height:44px;
+    margin:0;
+  }
+  .command-tools>.setup-menu>summary{
+    left:0;
+    border-left:0;
+    border-right:1px solid var(--sep);
+  }
+  .command-tools>.league-shortcut{
+    right:0;
+    border-right:0!important;
+  }
+  .command-tools .setup-popover{
+    position:static!important;
+    inset:auto!important;
+    width:100%!important;
+    max-width:none!important;
+    max-height:min(62dvh,560px)!important;
+    margin:0!important;
+    padding:0 12px 14px!important;
+    overflow-x:hidden!important;
+    overflow-y:auto!important;
+    -webkit-overflow-scrolling:touch;
+    overscroll-behavior:contain;
+    touch-action:pan-y;
+    border:0!important;
+    border-top:1px solid var(--sep)!important;
+    border-radius:0!important;
+    background:var(--surface-alt)!important;
+    box-shadow:none!important;
+    -webkit-backdrop-filter:none!important;
+    backdrop-filter:none!important;
+  }
+  .setup-drawer-head{
+    position:sticky;
+    top:0;
+    z-index:5;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    min-height:48px;
+    margin:0 -12px 12px;
+    padding:0 12px;
+    border-bottom:1px solid var(--sep);
+    background:rgba(248,248,250,.96);
+    -webkit-backdrop-filter:saturate(180%) blur(18px);
+    backdrop-filter:saturate(180%) blur(18px);
+  }
+  .setup-drawer-head strong{
+    color:var(--text);
+    font-size:13px;
+    font-weight:600;
+  }
+  .setup-drawer-head button{
+    min-height:34px;
+    height:34px;
+    padding:0 12px;
+    border:1px solid var(--sep);
+    border-radius:0;
+    background:#fff;
+    color:var(--blue);
+    box-shadow:none;
+    font-size:12px;
+    font-weight:600;
+  }
+  .setup-menu[open] .setup-popover{
+    animation:mobile-settings-drop .16s ease-out;
+  }
+  .setup-grid{padding-top:0}
+}
+@media (max-width:460px){
+  .command-tools{padding-top:46px}
+  .command-tools>.setup-menu>summary,
+  .command-tools>.league-shortcut{
+    min-height:46px;
+    height:46px;
+  }
+  .command-tools .setup-popover{
+    max-height:min(66dvh,540px)!important;
+  }
+  .setup-drawer-head{min-height:46px}
+}
+
