@@ -2,7 +2,7 @@
 
 Cyber Crickets 是一个纯前端的**算法自动对抗与观战模拟器**。四个 Agent 在同一张 64×64 网格地图上争夺领地和资源；玩家负责选择算法、地图种子、比赛时长和出生轮换，开局后不直接操作。最终胜负由整场比赛持续累积的 VP（Victory Points）决定。
 
-**在线试玩：** https://yunnre060214-sudo.github.io/cyber-crickets/?v=20260928-mobile-v1
+**在线试玩：** https://yunnre060214-sudo.github.io/cyber-crickets/?v=20260928-mobile-v2
 
 ## 1. 核心玩法
 
