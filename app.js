@@ -1,7 +1,7 @@
-import {AGENT_META} from './agents.js?v=20260928-custom-controls-v1';
-import {Match, WIDTH, HEIGHT, CELL_COUNT} from './match.js?v=20260928-custom-controls-v1';
-import {vpRate} from './rules.js?v=20260928-custom-controls-v1';
-import {initTournamentUI} from './tournament-ui.js?v=20260928-custom-controls-v1';
+import {AGENT_META} from './agents.js?v=20260928-vp-legend-v1';
+import {Match, WIDTH, HEIGHT, CELL_COUNT} from './match.js?v=20260928-vp-legend-v1';
+import {vpRate} from './rules.js?v=20260928-vp-legend-v1';
+import {initTournamentUI} from './tournament-ui.js?v=20260928-vp-legend-v1';
 
 const $ = selector => document.querySelector(selector);
 const canvas = $('#arena'), ctx = canvas.getContext('2d');
@@ -216,7 +216,8 @@ function renderLiveChart() {
   }).join('');
 
   el.liveLegend.innerHTML=match.teams.map(team=>'<span><i style="background:'+COLORS[team.id]+
-    '"></i>'+TEAM_NAMES[team.id]+' <b>'+team.score.toFixed(1)+'</b></span>').join('');
+    '"></i>'+TEAM_NAMES[team.id]+'·'+AGENT_META[team.strategy].name+
+    ' <b>'+team.score.toFixed(1)+'</b></span>').join('');
 }
 function currentWinProbabilities() {
   const teams=match.teams;
