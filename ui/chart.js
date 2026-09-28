@@ -1,5 +1,5 @@
-import {AGENT_META} from '../agents.js?v=20260928-ui-refactor-v1';
-import {COLORS, TEAM_NAMES} from './constants.js?v=20260928-ui-refactor-v1';
+import {AGENT_META} from '../agents.js?v=20260928-strongest-v6';
+import {COLORS, TEAM_NAMES} from './constants.js?v=20260928-strongest-v6';
 
 export function renderLiveChart({match, el}) {
   const width=720,height=360,left=48,right=14,top=16,bottom=32;

@@ -1,5 +1,5 @@
-import {AGENT_META} from '../agents.js?v=20260928-ui-refactor-v1';
-import {COLORS, TEAM_NAMES} from './constants.js?v=20260928-ui-refactor-v1';
+import {AGENT_META} from '../agents.js?v=20260928-strongest-v6';
+import {COLORS, TEAM_NAMES} from './constants.js?v=20260928-strongest-v6';
 
 const DURATION_PRESETS = new Set([60, 90, 120, 180]);
 const SPEED_PRESETS = new Set([1, 2, 4]);

@@ -1,5 +1,5 @@
-import {WIDTH, HEIGHT} from '../match.js?v=20260928-ui-refactor-v1';
-import {COLORS} from './constants.js?v=20260928-ui-refactor-v1';
+import {WIDTH, HEIGHT} from '../match.js?v=20260928-strongest-v6';
+import {COLORS} from './constants.js?v=20260928-strongest-v6';
 
 export function drawArena({match, canvas, ctx, overlayEnabled}) {
   const cw = canvas.width / WIDTH, ch = canvas.height / HEIGHT;

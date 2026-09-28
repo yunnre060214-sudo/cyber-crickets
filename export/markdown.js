@@ -1,6 +1,6 @@
-import {AGENT_META} from '../agents.js?v=20260928-ui-refactor-v1';
-import {WIDTH, HEIGHT, CELL_COUNT} from '../match.js?v=20260928-ui-refactor-v1';
-import {TEAM_NAMES} from '../ui/constants.js?v=20260928-ui-refactor-v1';
+import {AGENT_META} from '../agents.js?v=20260928-strongest-v6';
+import {WIDTH, HEIGHT, CELL_COUNT} from '../match.js?v=20260928-strongest-v6';
+import {TEAM_NAMES} from '../ui/constants.js?v=20260928-strongest-v6';
 
 const mdSafe = value => String(value ?? '').replace(/\|/g, '\\|').replace(/\r?\n/g, ' ');
 const ownerName = id => id >= 0 ? TEAM_NAMES[id] : '无主';

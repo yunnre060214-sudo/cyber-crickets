@@ -1,11 +1,11 @@
-import {AGENT_META} from './agents.js?v=20260928-strongest-v5';
-import {Match} from './match.js?v=20260928-strongest-v5';
-import {initTournamentUI} from './tournament-ui.js?v=20260928-strongest-v5';
-import {createSettingsController} from './ui/settings.js?v=20260928-ui-refactor-v1';
-import {renderScoreboard} from './ui/scoreboard.js?v=20260928-ui-refactor-v1';
-import {drawArena} from './ui/map-renderer.js?v=20260928-ui-refactor-v1';
-import {renderMatchResult} from './ui/report.js?v=20260928-ui-refactor-v1';
-import {exportMarkdownLog} from './export/markdown.js?v=20260928-ui-refactor-v1';
+import {AGENT_META} from './agents.js?v=20260928-strongest-v6';
+import {Match} from './match.js?v=20260928-strongest-v6';
+import {initTournamentUI} from './tournament-ui.js?v=20260928-strongest-v6';
+import {createSettingsController} from './ui/settings.js?v=20260928-strongest-v6';
+import {renderScoreboard} from './ui/scoreboard.js?v=20260928-strongest-v6';
+import {drawArena} from './ui/map-renderer.js?v=20260928-strongest-v6';
+import {renderMatchResult} from './ui/report.js?v=20260928-strongest-v6';
+import {exportMarkdownLog} from './export/markdown.js?v=20260928-strongest-v6';
 
 const $ = selector => document.querySelector(selector);
 const canvas = $('#arena'), ctx = canvas.getContext('2d');

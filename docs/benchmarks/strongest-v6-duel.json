@@ -1,0 +1,2216 @@
+{
+  "profile": "duel",
+  "baselineCommit": "5c4aad40bbe7edf0932e51d342a538bcf9cde9ca",
+  "step": 0.035,
+  "candidateSourceHashes": {
+    "agents.js": "612f79734aff59659d825baa31fd0c5d74db995b",
+    "match.js": "b61dfc1155625e58409248270505140eb6096114",
+    "rules.js": "6f249b74ccaa6d1bc20dbb5e9ebf81ecc732ff95"
+  },
+  "note": "Fixed-seed sample; seeds, durations and rotations are correlated. Timing is local wall-clock data.",
+  "summary": {
+    "baseline": {
+      "games": 34,
+      "wins": 31,
+      "ties": 0,
+      "meanRank": 1.088235294117647,
+      "meanVP": 579.863638699883,
+      "meanMargin": 360.7506281890279,
+      "meanTerritory": 903.0294117647059,
+      "meanThinkMs": 0.12292936268790342,
+      "meanP95ThinkMs": 0.21990214705793257
+    },
+    "candidate": {
+      "games": 34,
+      "wins": 34,
+      "ties": 0,
+      "meanRank": 1,
+      "meanVP": 601.1228545007167,
+      "meanMargin": 419.119192193234,
+      "meanTerritory": 995.3823529411765,
+      "meanThinkMs": 0.10105676609583104,
+      "meanP95ThinkMs": 0.1714044999997133
+    },
+    "byDuration": {
+      "180": {
+        "baseline": {
+          "games": 34,
+          "wins": 31,
+          "ties": 0,
+          "meanRank": 1.088235294117647,
+          "meanVP": 579.863638699883,
+          "meanMargin": 360.7506281890279,
+          "meanTerritory": 903.0294117647059,
+          "meanThinkMs": 0.12292936268790342,
+          "meanP95ThinkMs": 0.21990214705793257
+        },
+        "candidate": {
+          "games": 34,
+          "wins": 34,
+          "ties": 0,
+          "meanRank": 1,
+          "meanVP": 601.1228545007167,
+          "meanMargin": 419.119192193234,
+          "meanTerritory": 995.3823529411765,
+          "meanThinkMs": 0.10105676609583104,
+          "meanP95ThinkMs": 0.1714044999997133
+        }
+      }
+    },
+    "fixtures": {
+      "baseline": {
+        "wins": 15,
+        "ties": 0
+      },
+      "candidate": {
+        "wins": 17,
+        "ties": 0
+      },
+      "total": 17
+    }
+  },
+  "results": [
+    {
+      "config": {
+        "seed": "strongest-v6-duel-eval",
+        "rotation": 0,
+        "duration": 180,
+        "strategies": [
+          "strongest",
+          "bfs"
+        ],
+        "agentKeys": [
+          "strongest",
+          "bfs"
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 627.1688820641087,
+        "margin": 413.81026716015754,
+        "territory": 1112,
+        "resources": 81,
+        "peakTerritory": 1112,
+        "meanThinkMs": 0.1651711487747925,
+        "p95ThinkMs": 0.39383400000002666,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 627.1688820641087,
+            "territory": 1112,
+            "resources": 81
+          },
+          {
+            "strategy": "bfs",
+            "vp": 213.35861490395118,
+            "territory": 1039,
+            "resources": 12
+          }
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 602.404867178929,
+        "margin": 394.1848596179408,
+        "territory": 993,
+        "resources": 78,
+        "peakTerritory": 993,
+        "meanThinkMs": 0.14653201750292155,
+        "p95ThinkMs": 0.27491699999995944,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 602.404867178929,
+            "territory": 993,
+            "resources": 78
+          },
+          {
+            "strategy": "bfs",
+            "vp": 208.2200075609882,
+            "territory": 905,
+            "resources": 11
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-duel-eval",
+        "rotation": 0,
+        "duration": 180,
+        "strategies": [
+          "bfs",
+          "strongest"
+        ],
+        "agentKeys": [
+          "bfs",
+          "strongest"
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 676.8104664590905,
+        "margin": 462.90898612471335,
+        "territory": 1157,
+        "resources": 86,
+        "peakTerritory": 1158,
+        "meanThinkMs": 0.11281450116686725,
+        "p95ThinkMs": 0.21937500000012733,
+        "teams": [
+          {
+            "strategy": "bfs",
+            "vp": 213.90148033437723,
+            "territory": 1070,
+            "resources": 9
+          },
+          {
+            "strategy": "strongest",
+            "vp": 676.8104664590905,
+            "territory": 1157,
+            "resources": 86
+          }
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 709.2042159338208,
+        "margin": 496.04255977133784,
+        "territory": 1080,
+        "resources": 88,
+        "peakTerritory": 1080,
+        "meanThinkMs": 0.1285425472578692,
+        "p95ThinkMs": 0.25991700000031415,
+        "teams": [
+          {
+            "strategy": "bfs",
+            "vp": 213.16165616248298,
+            "territory": 987,
+            "resources": 11
+          },
+          {
+            "strategy": "strongest",
+            "vp": 709.2042159338208,
+            "territory": 1080,
+            "resources": 88
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-duel-eval",
+        "rotation": 0,
+        "duration": 180,
+        "strategies": [
+          "strongest",
+          "dfs"
+        ],
+        "agentKeys": [
+          "strongest",
+          "dfs"
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 353.7927454772723,
+        "margin": 158.975994914987,
+        "territory": 857,
+        "resources": 35,
+        "peakTerritory": 857,
+        "meanThinkMs": 0.1309719795799384,
+        "p95ThinkMs": 0.24487499999941065,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 353.7927454772723,
+            "territory": 857,
+            "resources": 35
+          },
+          {
+            "strategy": "dfs",
+            "vp": 194.8167505622853,
+            "territory": 278,
+            "resources": 21
+          }
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 377.5572109227432,
+        "margin": 111.85827001213511,
+        "territory": 789,
+        "resources": 35,
+        "peakTerritory": 792,
+        "meanThinkMs": 0.11817553558925784,
+        "p95ThinkMs": 0.2064170000003287,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 377.5572109227432,
+            "territory": 789,
+            "resources": 35
+          },
+          {
+            "strategy": "dfs",
+            "vp": 265.6989409106081,
+            "territory": 455,
+            "resources": 52
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-duel-eval",
+        "rotation": 0,
+        "duration": 180,
+        "strategies": [
+          "dfs",
+          "strongest"
+        ],
+        "agentKeys": [
+          "dfs",
+          "strongest"
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 509.5720567454896,
+        "margin": 309.51573166359105,
+        "territory": 933,
+        "resources": 69,
+        "peakTerritory": 933,
+        "meanThinkMs": 0.11711520653444223,
+        "p95ThinkMs": 0.2010840000002645,
+        "teams": [
+          {
+            "strategy": "dfs",
+            "vp": 200.0563250818985,
+            "territory": 699,
+            "resources": 19
+          },
+          {
+            "strategy": "strongest",
+            "vp": 509.5720567454896,
+            "territory": 933,
+            "resources": 69
+          }
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 516.2507671527763,
+        "margin": 321.71751069659103,
+        "territory": 763,
+        "resources": 70,
+        "peakTerritory": 763,
+        "meanThinkMs": 0.14578588214705168,
+        "p95ThinkMs": 0.2788330000003043,
+        "teams": [
+          {
+            "strategy": "dfs",
+            "vp": 194.5332564561853,
+            "territory": 520,
+            "resources": 19
+          },
+          {
+            "strategy": "strongest",
+            "vp": 516.2507671527763,
+            "territory": 763,
+            "resources": 70
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-duel-eval",
+        "rotation": 0,
+        "duration": 180,
+        "strategies": [
+          "strongest",
+          "greedy"
+        ],
+        "agentKeys": [
+          "strongest",
+          "greedy"
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 557.3758128477683,
+        "margin": 323.36944438281364,
+        "territory": 794,
+        "resources": 64,
+        "peakTerritory": 794,
+        "meanThinkMs": 0.14115429463243964,
+        "p95ThinkMs": 0.2398749999993015,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 557.3758128477683,
+            "territory": 794,
+            "resources": 64
+          },
+          {
+            "strategy": "greedy",
+            "vp": 234.00636846495468,
+            "territory": 642,
+            "resources": 34
+          }
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 520.7310861681333,
+        "margin": 347.7837512503303,
+        "territory": 796,
+        "resources": 75,
+        "peakTerritory": 796,
+        "meanThinkMs": 0.11976965927652741,
+        "p95ThinkMs": 0.21912499999962165,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 520.7310861681333,
+            "territory": 796,
+            "resources": 75
+          },
+          {
+            "strategy": "greedy",
+            "vp": 172.94733491780303,
+            "territory": 576,
+            "resources": 13
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-duel-eval",
+        "rotation": 0,
+        "duration": 180,
+        "strategies": [
+          "greedy",
+          "strongest"
+        ],
+        "agentKeys": [
+          "greedy",
+          "strongest"
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 669.1507903917748,
+        "margin": 464.00284398801466,
+        "territory": 955,
+        "resources": 80,
+        "peakTerritory": 957,
+        "meanThinkMs": 0.10991390606768098,
+        "p95ThinkMs": 0.19529200000033597,
+        "teams": [
+          {
+            "strategy": "greedy",
+            "vp": 205.14794640376013,
+            "territory": 766,
+            "resources": 15
+          },
+          {
+            "strategy": "strongest",
+            "vp": 669.1507903917748,
+            "territory": 955,
+            "resources": 80
+          }
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 653.739510803893,
+        "margin": 418.28727230682625,
+        "territory": 982,
+        "resources": 65,
+        "peakTerritory": 982,
+        "meanThinkMs": 0.13959317269542934,
+        "p95ThinkMs": 0.26749999999810825,
+        "teams": [
+          {
+            "strategy": "greedy",
+            "vp": 235.4522384970668,
+            "territory": 704,
+            "resources": 34
+          },
+          {
+            "strategy": "strongest",
+            "vp": 653.739510803893,
+            "territory": 982,
+            "resources": 65
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-duel-eval",
+        "rotation": 0,
+        "duration": 180,
+        "strategies": [
+          "strongest",
+          "random"
+        ],
+        "agentKeys": [
+          "strongest",
+          "random"
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 712.49187904812,
+        "margin": 513.1035611375438,
+        "territory": 1159,
+        "resources": 92,
+        "peakTerritory": 1159,
+        "meanThinkMs": 0.13775057176198047,
+        "p95ThinkMs": 0.265625,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 712.49187904812,
+            "territory": 1159,
+            "resources": 92
+          },
+          {
+            "strategy": "random",
+            "vp": 199.3883179105762,
+            "territory": 978,
+            "resources": 7
+          }
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 712.1813191646187,
+        "margin": 516.2467037538945,
+        "territory": 1193,
+        "resources": 95,
+        "peakTerritory": 1193,
+        "meanThinkMs": 0.11365611726955675,
+        "p95ThinkMs": 0.20470800000111922,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 712.1813191646187,
+            "territory": 1193,
+            "resources": 95
+          },
+          {
+            "strategy": "random",
+            "vp": 195.93461541072412,
+            "territory": 1055,
+            "resources": 4
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-duel-eval",
+        "rotation": 0,
+        "duration": 180,
+        "strategies": [
+          "random",
+          "strongest"
+        ],
+        "agentKeys": [
+          "random",
+          "strongest"
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 687.8894214792729,
+        "margin": 482.28622778941735,
+        "territory": 1174,
+        "resources": 89,
+        "peakTerritory": 1174,
+        "meanThinkMs": 0.10504326196035753,
+        "p95ThinkMs": 0.18891599999915343,
+        "teams": [
+          {
+            "strategy": "random",
+            "vp": 205.60319368985552,
+            "territory": 1014,
+            "resources": 6
+          },
+          {
+            "strategy": "strongest",
+            "vp": 687.8894214792729,
+            "territory": 1174,
+            "resources": 89
+          }
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 736.9678785672394,
+        "margin": 536.5770216533454,
+        "territory": 1161,
+        "resources": 88,
+        "peakTerritory": 1161,
+        "meanThinkMs": 0.13416600583435762,
+        "p95ThinkMs": 0.286166999998386,
+        "teams": [
+          {
+            "strategy": "random",
+            "vp": 200.39085691389397,
+            "territory": 984,
+            "resources": 11
+          },
+          {
+            "strategy": "strongest",
+            "vp": 736.9678785672394,
+            "territory": 1161,
+            "resources": 88
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-duel-eval",
+        "rotation": 0,
+        "duration": 180,
+        "strategies": [
+          "strongest",
+          "aco"
+        ],
+        "agentKeys": [
+          "strongest",
+          "aco"
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 556.159383835976,
+        "margin": 414.78671696954393,
+        "territory": 843,
+        "resources": 79,
+        "peakTerritory": 843,
+        "meanThinkMs": 0.1316840933489242,
+        "p95ThinkMs": 0.23412499999903957,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 556.159383835976,
+            "territory": 843,
+            "resources": 79
+          },
+          {
+            "strategy": "aco",
+            "vp": 141.372666866432,
+            "territory": 469,
+            "resources": 9
+          }
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 550.5480866761418,
+        "margin": 393.3461274291119,
+        "territory": 824,
+        "resources": 76,
+        "peakTerritory": 824,
+        "meanThinkMs": 0.10524642707114232,
+        "p95ThinkMs": 0.18566599999758182,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 550.5480866761418,
+            "territory": 824,
+            "resources": 76
+          },
+          {
+            "strategy": "aco",
+            "vp": 157.20195924702986,
+            "territory": 496,
+            "resources": 12
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-duel-eval",
+        "rotation": 0,
+        "duration": 180,
+        "strategies": [
+          "aco",
+          "strongest"
+        ],
+        "agentKeys": [
+          "aco",
+          "strongest"
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 619.8042145108902,
+        "margin": 473.55874581142825,
+        "territory": 841,
+        "resources": 81,
+        "peakTerritory": 842,
+        "meanThinkMs": 0.10513298308053008,
+        "p95ThinkMs": 0.1768339999980526,
+        "teams": [
+          {
+            "strategy": "aco",
+            "vp": 146.24546869946195,
+            "territory": 525,
+            "resources": 11
+          },
+          {
+            "strategy": "strongest",
+            "vp": 619.8042145108902,
+            "territory": 841,
+            "resources": 81
+          }
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 647.4976626051103,
+        "margin": 472.5806876443001,
+        "territory": 758,
+        "resources": 82,
+        "peakTerritory": 758,
+        "meanThinkMs": 0.12298625962664364,
+        "p95ThinkMs": 0.21895800000129384,
+        "teams": [
+          {
+            "strategy": "aco",
+            "vp": 174.91697496081025,
+            "territory": 538,
+            "resources": 17
+          },
+          {
+            "strategy": "strongest",
+            "vp": 647.4976626051103,
+            "territory": 758,
+            "resources": 82
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-duel-eval",
+        "rotation": 0,
+        "duration": 180,
+        "strategies": [
+          "strongest",
+          "voronoi"
+        ],
+        "agentKeys": [
+          "strongest",
+          "voronoi"
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 734.0558956459854,
+        "margin": 533.2993636573705,
+        "territory": 1162,
+        "resources": 92,
+        "peakTerritory": 1162,
+        "meanThinkMs": 0.1116759772461721,
+        "p95ThinkMs": 0.19474999999874854,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 734.0558956459854,
+            "territory": 1162,
+            "resources": 92
+          },
+          {
+            "strategy": "voronoi",
+            "vp": 200.7565319886149,
+            "territory": 1053,
+            "resources": 7
+          }
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 734.1160440008729,
+        "margin": 539.7519625244603,
+        "territory": 1182,
+        "resources": 92,
+        "peakTerritory": 1182,
+        "meanThinkMs": 0.09348054667447278,
+        "p95ThinkMs": 0.15666700000292622,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 734.1160440008729,
+            "territory": 1182,
+            "resources": 92
+          },
+          {
+            "strategy": "voronoi",
+            "vp": 194.36408147641262,
+            "territory": 1042,
+            "resources": 7
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-duel-eval",
+        "rotation": 0,
+        "duration": 180,
+        "strategies": [
+          "voronoi",
+          "strongest"
+        ],
+        "agentKeys": [
+          "voronoi",
+          "strongest"
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 688.1320044074488,
+        "margin": 490.2556205862328,
+        "territory": 1095,
+        "resources": 81,
+        "peakTerritory": 1095,
+        "meanThinkMs": 0.09362780513415117,
+        "p95ThinkMs": 0.1624999999985448,
+        "teams": [
+          {
+            "strategy": "voronoi",
+            "vp": 197.87638382121597,
+            "territory": 1084,
+            "resources": 10
+          },
+          {
+            "strategy": "strongest",
+            "vp": 688.1320044074488,
+            "territory": 1095,
+            "resources": 81
+          }
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 741.880833715308,
+        "margin": 547.9156832340876,
+        "territory": 1149,
+        "resources": 87,
+        "peakTerritory": 1149,
+        "meanThinkMs": 0.11483898541422012,
+        "p95ThinkMs": 0.2038749999992433,
+        "teams": [
+          {
+            "strategy": "voronoi",
+            "vp": 193.96515048122038,
+            "territory": 1066,
+            "resources": 10
+          },
+          {
+            "strategy": "strongest",
+            "vp": 741.880833715308,
+            "territory": 1149,
+            "resources": 87
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-duel-eval",
+        "rotation": 0,
+        "duration": 180,
+        "strategies": [
+          "strongest",
+          "potential"
+        ],
+        "agentKeys": [
+          "strongest",
+          "potential"
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 430.4097253714222,
+        "margin": 107.34726743387483,
+        "territory": 587,
+        "resources": 54,
+        "peakTerritory": 591,
+        "meanThinkMs": 0.14157022928828933,
+        "p95ThinkMs": 0.20604199999797856,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 430.4097253714222,
+            "territory": 587,
+            "resources": 54
+          },
+          {
+            "strategy": "potential",
+            "vp": 323.0624579375474,
+            "territory": 286,
+            "resources": 39
+          }
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 535.0342900970745,
+        "margin": 383.7752687680527,
+        "territory": 994,
+        "resources": 77,
+        "peakTerritory": 994,
+        "meanThinkMs": 0.09644460210025158,
+        "p95ThinkMs": 0.15616700000100536,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 535.0342900970745,
+            "territory": 994,
+            "resources": 77
+          },
+          {
+            "strategy": "potential",
+            "vp": 151.25902132902183,
+            "territory": 154,
+            "resources": 11
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-duel-eval",
+        "rotation": 0,
+        "duration": 180,
+        "strategies": [
+          "potential",
+          "strongest"
+        ],
+        "agentKeys": [
+          "potential",
+          "strongest"
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 526.0308411335616,
+        "margin": 399.3214227653022,
+        "territory": 761,
+        "resources": 81,
+        "peakTerritory": 761,
+        "meanThinkMs": 0.09696730105012628,
+        "p95ThinkMs": 0.1562080000003334,
+        "teams": [
+          {
+            "strategy": "potential",
+            "vp": 126.70941836825939,
+            "territory": 119,
+            "resources": 7
+          },
+          {
+            "strategy": "strongest",
+            "vp": 526.0308411335616,
+            "territory": 761,
+            "resources": 81
+          }
+        ]
+      },
+      "baseline": {
+        "rank": 2,
+        "vp": 161.3969954599838,
+        "margin": -393.9857933313158,
+        "territory": 583,
+        "resources": 0,
+        "peakTerritory": 583,
+        "meanThinkMs": 0.12220599416574883,
+        "p95ThinkMs": 0.21358400000463007,
+        "teams": [
+          {
+            "strategy": "potential",
+            "vp": 555.3827887912996,
+            "territory": 754,
+            "resources": 99
+          },
+          {
+            "strategy": "strongest",
+            "vp": 161.3969954599838,
+            "territory": 583,
+            "resources": 0
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-duel-eval",
+        "rotation": 0,
+        "duration": 180,
+        "strategies": [
+          "strongest",
+          "pid"
+        ],
+        "agentKeys": [
+          "strongest",
+          "pid"
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 541.2468864611029,
+        "margin": 419.7658746634279,
+        "territory": 649,
+        "resources": 83,
+        "peakTerritory": 651,
+        "meanThinkMs": 0.13011052450412722,
+        "p95ThinkMs": 0.22004200000083074,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 541.2468864611029,
+            "territory": 649,
+            "resources": 83
+          },
+          {
+            "strategy": "pid",
+            "vp": 121.48101179767504,
+            "territory": 372,
+            "resources": 5
+          }
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 582.007621811442,
+        "margin": 479.65947846512745,
+        "territory": 911,
+        "resources": 84,
+        "peakTerritory": 911,
+        "meanThinkMs": 0.09909383605619417,
+        "p95ThinkMs": 0.1472090000024764,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 582.007621811442,
+            "territory": 911,
+            "resources": 84
+          },
+          {
+            "strategy": "pid",
+            "vp": 102.34814334631463,
+            "territory": 304,
+            "resources": 4
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-duel-eval",
+        "rotation": 0,
+        "duration": 180,
+        "strategies": [
+          "pid",
+          "strongest"
+        ],
+        "agentKeys": [
+          "pid",
+          "strongest"
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 550.3586836307973,
+        "margin": 382.28507682172074,
+        "territory": 821,
+        "resources": 77,
+        "peakTerritory": 821,
+        "meanThinkMs": 0.1015366114352452,
+        "p95ThinkMs": 0.17041700000117999,
+        "teams": [
+          {
+            "strategy": "pid",
+            "vp": 168.07360680907655,
+            "territory": 498,
+            "resources": 11
+          },
+          {
+            "strategy": "strongest",
+            "vp": 550.3586836307973,
+            "territory": 821,
+            "resources": 77
+          }
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 646.2095662040875,
+        "margin": 542.0459283620331,
+        "territory": 733,
+        "resources": 90,
+        "peakTerritory": 733,
+        "meanThinkMs": 0.1309731662777129,
+        "p95ThinkMs": 0.22095799999806331,
+        "teams": [
+          {
+            "strategy": "pid",
+            "vp": 104.16363784205437,
+            "territory": 332,
+            "resources": 6
+          },
+          {
+            "strategy": "strongest",
+            "vp": 646.2095662040875,
+            "territory": 733,
+            "resources": 90
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-duel-eval",
+        "rotation": 0,
+        "duration": 180,
+        "strategies": [
+          "strongest",
+          "qlearn"
+        ],
+        "agentKeys": [
+          "strongest",
+          "qlearn"
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 679.7681407200151,
+        "margin": 457.22777929691654,
+        "territory": 1274,
+        "resources": 90,
+        "peakTerritory": 1274,
+        "meanThinkMs": 0.10185929054840669,
+        "p95ThinkMs": 0.19066700000257697,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 679.7681407200151,
+            "territory": 1274,
+            "resources": 90
+          },
+          {
+            "strategy": "qlearn",
+            "vp": 222.54036142309863,
+            "territory": 1135,
+            "resources": 8
+          }
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 646.2403811257823,
+        "margin": 450.7902514821526,
+        "territory": 1209,
+        "resources": 86,
+        "peakTerritory": 1209,
+        "meanThinkMs": 0.09088958926484406,
+        "p95ThinkMs": 0.13999999999941792,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 646.2403811257823,
+            "territory": 1209,
+            "resources": 86
+          },
+          {
+            "strategy": "qlearn",
+            "vp": 195.45012964362968,
+            "territory": 962,
+            "resources": 6
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-duel-eval",
+        "rotation": 0,
+        "duration": 180,
+        "strategies": [
+          "qlearn",
+          "strongest"
+        ],
+        "agentKeys": [
+          "qlearn",
+          "strongest"
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 641.6989518883397,
+        "margin": 445.63898080787754,
+        "territory": 1199,
+        "resources": 82,
+        "peakTerritory": 1199,
+        "meanThinkMs": 0.08680326896166424,
+        "p95ThinkMs": 0.15420799999992596,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 196.05997108046216,
+            "territory": 1132,
+            "resources": 6
+          },
+          {
+            "strategy": "strongest",
+            "vp": 641.6989518883397,
+            "territory": 1199,
+            "resources": 82
+          }
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 706.9170298135847,
+        "margin": 499.3039037691764,
+        "territory": 1157,
+        "resources": 85,
+        "peakTerritory": 1157,
+        "meanThinkMs": 0.09764243057174674,
+        "p95ThinkMs": 0.1902090000003227,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 207.61312604440832,
+            "territory": 1000,
+            "resources": 11
+          },
+          {
+            "strategy": "strongest",
+            "vp": 706.9170298135847,
+            "territory": 1157,
+            "resources": 85
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-duel-eval",
+        "rotation": 0,
+        "duration": 180,
+        "strategies": [
+          "strongest",
+          "minimax"
+        ],
+        "agentKeys": [
+          "strongest",
+          "minimax"
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 693.5629295433067,
+        "margin": 466.5284268343027,
+        "territory": 1229,
+        "resources": 90,
+        "peakTerritory": 1229,
+        "meanThinkMs": 0.10831701166878334,
+        "p95ThinkMs": 0.19920899999851827,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 693.5629295433067,
+            "territory": 1229,
+            "resources": 90
+          },
+          {
+            "strategy": "minimax",
+            "vp": 227.03450270900402,
+            "territory": 1166,
+            "resources": 9
+          }
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 636.8683473406583,
+        "margin": 419.8822064616255,
+        "territory": 1027,
+        "resources": 80,
+        "peakTerritory": 1027,
+        "meanThinkMs": 0.0888975017502754,
+        "p95ThinkMs": 0.15308299999742303,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 636.8683473406583,
+            "territory": 1027,
+            "resources": 80
+          },
+          {
+            "strategy": "minimax",
+            "vp": 216.98614087903272,
+            "territory": 973,
+            "resources": 12
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-duel-eval",
+        "rotation": 0,
+        "duration": 180,
+        "strategies": [
+          "minimax",
+          "strongest"
+        ],
+        "agentKeys": [
+          "minimax",
+          "strongest"
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 695.6174848115627,
+        "margin": 467.527874332965,
+        "territory": 1200,
+        "resources": 86,
+        "peakTerritory": 1200,
+        "meanThinkMs": 0.08881954725791182,
+        "p95ThinkMs": 0.15429199999925913,
+        "teams": [
+          {
+            "strategy": "minimax",
+            "vp": 228.08961047859773,
+            "territory": 1189,
+            "resources": 10
+          },
+          {
+            "strategy": "strongest",
+            "vp": 695.6174848115627,
+            "territory": 1200,
+            "resources": 86
+          }
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 718.0496721919587,
+        "margin": 494.22327673836753,
+        "territory": 1075,
+        "resources": 84,
+        "peakTerritory": 1075,
+        "meanThinkMs": 0.11009132730459058,
+        "p95ThinkMs": 0.20341699999698903,
+        "teams": [
+          {
+            "strategy": "minimax",
+            "vp": 223.82639545359118,
+            "territory": 1054,
+            "resources": 15
+          },
+          {
+            "strategy": "strongest",
+            "vp": 718.0496721919587,
+            "territory": 1075,
+            "resources": 84
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-duel-eval",
+        "rotation": 0,
+        "duration": 180,
+        "strategies": [
+          "strongest",
+          "mcts"
+        ],
+        "agentKeys": [
+          "strongest",
+          "mcts"
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 547.955668840564,
+        "margin": 358.1773199894793,
+        "territory": 909,
+        "resources": 76,
+        "peakTerritory": 909,
+        "meanThinkMs": 0.10660776954506916,
+        "p95ThinkMs": 0.2056250000023283,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 547.955668840564,
+            "territory": 909,
+            "resources": 76
+          },
+          {
+            "strategy": "mcts",
+            "vp": 189.77834885108473,
+            "territory": 782,
+            "resources": 16
+          }
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 549.6551053689321,
+        "margin": 353.67708499056255,
+        "territory": 899,
+        "resources": 70,
+        "peakTerritory": 899,
+        "meanThinkMs": 0.09285035472586912,
+        "p95ThinkMs": 0.14787500000238651,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 549.6551053689321,
+            "territory": 899,
+            "resources": 70
+          },
+          {
+            "strategy": "mcts",
+            "vp": 195.9780203783696,
+            "territory": 722,
+            "resources": 18
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-duel-eval",
+        "rotation": 0,
+        "duration": 180,
+        "strategies": [
+          "mcts",
+          "strongest"
+        ],
+        "agentKeys": [
+          "mcts",
+          "strongest"
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 646.8477406548988,
+        "margin": 474.52446555771417,
+        "territory": 891,
+        "resources": 83,
+        "peakTerritory": 891,
+        "meanThinkMs": 0.09823202042011506,
+        "p95ThinkMs": 0.16424999999435386,
+        "teams": [
+          {
+            "strategy": "mcts",
+            "vp": 172.32327509718462,
+            "territory": 702,
+            "resources": 12
+          },
+          {
+            "strategy": "strongest",
+            "vp": 646.8477406548988,
+            "territory": 891,
+            "resources": 83
+          }
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 657.5250129851339,
+        "margin": 439.2408498449055,
+        "territory": 953,
+        "resources": 63,
+        "peakTerritory": 953,
+        "meanThinkMs": 0.10978416861149376,
+        "p95ThinkMs": 0.1962920000005397,
+        "teams": [
+          {
+            "strategy": "mcts",
+            "vp": 218.28416314022843,
+            "territory": 819,
+            "resources": 36
+          },
+          {
+            "strategy": "strongest",
+            "vp": 657.5250129851339,
+            "territory": 953,
+            "resources": 63
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-duel-eval",
+        "rotation": 0,
+        "duration": 180,
+        "strategies": [
+          "strongest",
+          "mst"
+        ],
+        "agentKeys": [
+          "strongest",
+          "mst"
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 437.10064577666793,
+        "margin": 272.45786020117765,
+        "territory": 664,
+        "resources": 75,
+        "peakTerritory": 664,
+        "meanThinkMs": 0.12290417677947263,
+        "p95ThinkMs": 0.19995799999742303,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 437.10064577666793,
+            "territory": 664,
+            "resources": 75
+          },
+          {
+            "strategy": "mst",
+            "vp": 164.64278557549028,
+            "territory": 112,
+            "resources": 16
+          }
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 518.3642574155232,
+        "margin": 427.2213228242456,
+        "territory": 722,
+        "resources": 87,
+        "peakTerritory": 722,
+        "meanThinkMs": 0.10554354259050022,
+        "p95ThinkMs": 0.1698340000002645,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 518.3642574155232,
+            "territory": 722,
+            "resources": 87
+          },
+          {
+            "strategy": "mst",
+            "vp": 91.14293459127762,
+            "territory": 78,
+            "resources": 1
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-duel-eval",
+        "rotation": 0,
+        "duration": 180,
+        "strategies": [
+          "mst",
+          "strongest"
+        ],
+        "agentKeys": [
+          "mst",
+          "strongest"
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 506.52823593854646,
+        "margin": 389.72915887518366,
+        "territory": 806,
+        "resources": 84,
+        "peakTerritory": 806,
+        "meanThinkMs": 0.10032627946321271,
+        "p95ThinkMs": 0.1592090000049211,
+        "teams": [
+          {
+            "strategy": "mst",
+            "vp": 116.79907706336283,
+            "territory": 75,
+            "resources": 4
+          },
+          {
+            "strategy": "strongest",
+            "vp": 506.52823593854646,
+            "territory": 806,
+            "resources": 84
+          }
+        ]
+      },
+      "baseline": {
+        "rank": 2,
+        "vp": 152.7852023765588,
+        "margin": -160.60469976621994,
+        "territory": 186,
+        "resources": 12,
+        "peakTerritory": 190,
+        "meanThinkMs": 0.12968920303379744,
+        "p95ThinkMs": 0.18795899999531684,
+        "teams": [
+          {
+            "strategy": "mst",
+            "vp": 313.38990214277874,
+            "territory": 177,
+            "resources": 29
+          },
+          {
+            "strategy": "strongest",
+            "vp": 152.7852023765588,
+            "territory": 186,
+            "resources": 12
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-duel-eval",
+        "rotation": 0,
+        "duration": 180,
+        "strategies": [
+          "strongest",
+          "runner"
+        ],
+        "agentKeys": [
+          "strongest",
+          "runner"
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 706.899706681147,
+        "margin": 499.21386744155626,
+        "territory": 1253,
+        "resources": 95,
+        "peakTerritory": 1253,
+        "meanThinkMs": 0.11242654259037844,
+        "p95ThinkMs": 0.20324999999866122,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 706.899706681147,
+            "territory": 1253,
+            "resources": 95
+          },
+          {
+            "strategy": "runner",
+            "vp": 207.68583923959073,
+            "territory": 1122,
+            "resources": 4
+          }
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 740.0860301489869,
+        "margin": 481.66723140220404,
+        "territory": 1557,
+        "resources": 96,
+        "peakTerritory": 1557,
+        "meanThinkMs": 0.08706826662748475,
+        "p95ThinkMs": 0.1497499999968568,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 740.0860301489869,
+            "territory": 1557,
+            "resources": 96
+          },
+          {
+            "strategy": "runner",
+            "vp": 258.41879874678284,
+            "territory": 1578,
+            "resources": 3
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-duel-eval",
+        "rotation": 0,
+        "duration": 180,
+        "strategies": [
+          "runner",
+          "strongest"
+        ],
+        "agentKeys": [
+          "runner",
+          "strongest"
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 724.952517548615,
+        "margin": 475.7250679685467,
+        "territory": 1535,
+        "resources": 91,
+        "peakTerritory": 1535,
+        "meanThinkMs": 0.08918017794643603,
+        "p95ThinkMs": 0.1587499999877764,
+        "teams": [
+          {
+            "strategy": "runner",
+            "vp": 249.2274495800683,
+            "territory": 1567,
+            "resources": 7
+          },
+          {
+            "strategy": "strongest",
+            "vp": 724.952517548615,
+            "territory": 1535,
+            "resources": 91
+          }
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 765.4832768641778,
+        "margin": 537.4393787164051,
+        "territory": 1346,
+        "resources": 92,
+        "peakTerritory": 1346,
+        "meanThinkMs": 0.10844744165651475,
+        "p95ThinkMs": 0.21695799998997245,
+        "teams": [
+          {
+            "strategy": "runner",
+            "vp": 228.0438981477727,
+            "territory": 1400,
+            "resources": 7
+          },
+          {
+            "strategy": "strongest",
+            "vp": 765.4832768641778,
+            "territory": 1346,
+            "resources": 92
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-duel-eval",
+        "rotation": 0,
+        "duration": 180,
+        "strategies": [
+          "strongest",
+          "raider"
+        ],
+        "agentKeys": [
+          "strongest",
+          "raider"
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 530.7334334741981,
+        "margin": 337.39792778865376,
+        "territory": 782,
+        "resources": 69,
+        "peakTerritory": 782,
+        "meanThinkMs": 0.11166767444586184,
+        "p95ThinkMs": 0.19733300000370946,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 530.7334334741981,
+            "territory": 782,
+            "resources": 69
+          },
+          {
+            "strategy": "raider",
+            "vp": 193.33550568554435,
+            "territory": 534,
+            "resources": 28
+          }
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 502.7542992449439,
+        "margin": 321.8256861190369,
+        "territory": 763,
+        "resources": 73,
+        "peakTerritory": 764,
+        "meanThinkMs": 0.09496227712934703,
+        "p95ThinkMs": 0.15345800000068266,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 502.7542992449439,
+            "territory": 763,
+            "resources": 73
+          },
+          {
+            "strategy": "raider",
+            "vp": 180.92861312590702,
+            "territory": 499,
+            "resources": 15
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-duel-eval",
+        "rotation": 0,
+        "duration": 180,
+        "strategies": [
+          "raider",
+          "strongest"
+        ],
+        "agentKeys": [
+          "raider",
+          "strongest"
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 518.6125184573249,
+        "margin": 323.4732285588059,
+        "territory": 730,
+        "resources": 64,
+        "peakTerritory": 730,
+        "meanThinkMs": 0.09558233955665743,
+        "p95ThinkMs": 0.14691599999787286,
+        "teams": [
+          {
+            "strategy": "raider",
+            "vp": 195.139289898519,
+            "territory": 500,
+            "resources": 24
+          },
+          {
+            "strategy": "strongest",
+            "vp": 518.6125184573249,
+            "territory": 730,
+            "resources": 64
+          }
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 551.6605269590854,
+        "margin": 316.0098350164285,
+        "territory": 715,
+        "resources": 48,
+        "peakTerritory": 715,
+        "meanThinkMs": 0.1220896452743743,
+        "p95ThinkMs": 0.20804199999838602,
+        "teams": [
+          {
+            "strategy": "raider",
+            "vp": 235.6506919426569,
+            "territory": 606,
+            "resources": 48
+          },
+          {
+            "strategy": "strongest",
+            "vp": 551.6605269590854,
+            "territory": 715,
+            "resources": 48
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-duel-eval",
+        "rotation": 0,
+        "duration": 180,
+        "strategies": [
+          "strongest",
+          "turtle"
+        ],
+        "agentKeys": [
+          "strongest",
+          "turtle"
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 720.3658124137662,
+        "margin": 473.7212787901407,
+        "territory": 1444,
+        "resources": 91,
+        "peakTerritory": 1444,
+        "meanThinkMs": 0.0967419527421331,
+        "p95ThinkMs": 0.1835830000054557,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 720.3658124137662,
+            "territory": 1444,
+            "resources": 91
+          },
+          {
+            "strategy": "turtle",
+            "vp": 246.64453362362556,
+            "territory": 1402,
+            "resources": 8
+          }
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 619.3176550034779,
+        "margin": 359.46119778107175,
+        "territory": 1385,
+        "resources": 84,
+        "peakTerritory": 1385,
+        "meanThinkMs": 0.08227016044350643,
+        "p95ThinkMs": 0.1390419999952428,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 619.3176550034779,
+            "territory": 1385,
+            "resources": 84
+          },
+          {
+            "strategy": "turtle",
+            "vp": 259.8564572224061,
+            "territory": 1440,
+            "resources": 4
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-duel-eval",
+        "rotation": 0,
+        "duration": 180,
+        "strategies": [
+          "turtle",
+          "strongest"
+        ],
+        "agentKeys": [
+          "turtle",
+          "strongest"
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 763.6104756760307,
+        "margin": 547.6423547635029,
+        "territory": 1392,
+        "resources": 98,
+        "peakTerritory": 1392,
+        "meanThinkMs": 0.08839761843663091,
+        "p95ThinkMs": 0.15541700000176206,
+        "teams": [
+          {
+            "strategy": "turtle",
+            "vp": 215.96812091252772,
+            "territory": 1425,
+            "resources": 1
+          },
+          {
+            "strategy": "strongest",
+            "vp": 763.6104756760307,
+            "territory": 1392,
+            "resources": 98
+          }
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 721.6051587395644,
+        "margin": 510.95168522879214,
+        "territory": 1046,
+        "resources": 87,
+        "peakTerritory": 1046,
+        "meanThinkMs": 0.12169222053663693,
+        "p95ThinkMs": 0.22233399999095127,
+        "teams": [
+          {
+            "strategy": "turtle",
+            "vp": 210.6534735107723,
+            "territory": 1079,
+            "resources": 12
+          },
+          {
+            "strategy": "strongest",
+            "vp": 721.6051587395644,
+            "territory": 1046,
+            "resources": 87
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-duel-eval",
+        "rotation": 0,
+        "duration": 180,
+        "strategies": [
+          "strongest",
+          "denial"
+        ],
+        "agentKeys": [
+          "strongest",
+          "denial"
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 332.4663317674261,
+        "margin": 106.30021804226772,
+        "territory": 314,
+        "resources": 70,
+        "peakTerritory": 314,
+        "meanThinkMs": 0.10723284947488555,
+        "p95ThinkMs": 0.14083400000527035,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 332.4663317674261,
+            "territory": 314,
+            "resources": 70
+          },
+          {
+            "strategy": "denial",
+            "vp": 226.16611372515837,
+            "territory": 179,
+            "resources": 15
+          }
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 502.2939223300478,
+        "margin": 382.4219178307033,
+        "territory": 774,
+        "resources": 82,
+        "peakTerritory": 774,
+        "meanThinkMs": 0.10036542882129526,
+        "p95ThinkMs": 0.15416600000753533,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 502.2939223300478,
+            "territory": 774,
+            "resources": 82
+          },
+          {
+            "strategy": "denial",
+            "vp": 119.87200449934448,
+            "territory": 100,
+            "resources": 6
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-duel-eval",
+        "rotation": 0,
+        "duration": 180,
+        "strategies": [
+          "denial",
+          "strongest"
+        ],
+        "agentKeys": [
+          "denial",
+          "strongest"
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 519.528355048342,
+        "margin": 393.0960960804814,
+        "territory": 760,
+        "resources": 79,
+        "peakTerritory": 760,
+        "meanThinkMs": 0.09764214060684968,
+        "p95ThinkMs": 0.15254199999617413,
+        "teams": [
+          {
+            "strategy": "denial",
+            "vp": 126.43225896786058,
+            "territory": 112,
+            "resources": 9
+          },
+          {
+            "strategy": "strongest",
+            "vp": 519.528355048342,
+            "territory": 760,
+            "resources": 79
+          }
+        ]
+      },
+      "baseline": {
+        "rank": 2,
+        "vp": 213.84561240334457,
+        "margin": -121.71970236053639,
+        "territory": 243,
+        "resources": 18,
+        "peakTerritory": 246,
+        "meanThinkMs": 0.1444271120185365,
+        "p95ThinkMs": 0.18408399999316316,
+        "teams": [
+          {
+            "strategy": "denial",
+            "vp": 335.56531476388096,
+            "territory": 218,
+            "resources": 58
+          },
+          {
+            "strategy": "strongest",
+            "vp": 213.84561240334457,
+            "territory": 243,
+            "resources": 18
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-duel-eval",
+        "rotation": 0,
+        "duration": 180,
+        "strategies": [
+          "strongest",
+          "momentum"
+        ],
+        "agentKeys": [
+          "strongest",
+          "momentum"
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 551.2279791359052,
+        "margin": 396.86657979211094,
+        "territory": 800,
+        "resources": 82,
+        "peakTerritory": 800,
+        "meanThinkMs": 0.11506972520416502,
+        "p95ThinkMs": 0.1884169999975711,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 551.2279791359052,
+            "territory": 800,
+            "resources": 82
+          },
+          {
+            "strategy": "momentum",
+            "vp": 154.3613993437943,
+            "territory": 506,
+            "resources": 6
+          }
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 553.3987466104539,
+        "margin": 404.7113549127015,
+        "territory": 855,
+        "resources": 82,
+        "peakTerritory": 855,
+        "meanThinkMs": 0.09593501166865591,
+        "p95ThinkMs": 0.14991700000246055,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 553.3987466104539,
+            "territory": 855,
+            "resources": 82
+          },
+          {
+            "strategy": "momentum",
+            "vp": 148.68739169775245,
+            "territory": 457,
+            "resources": 6
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-duel-eval",
+        "rotation": 0,
+        "duration": 180,
+        "strategies": [
+          "momentum",
+          "strongest"
+        ],
+        "agentKeys": [
+          "momentum",
+          "strongest"
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 609.4730236336093,
+        "margin": 500.295976449107,
+        "territory": 720,
+        "resources": 87,
+        "peakTerritory": 720,
+        "meanThinkMs": 0.11761420361727457,
+        "p95ThinkMs": 0.20354200000292622,
+        "teams": [
+          {
+            "strategy": "momentum",
+            "vp": 109.17704718450224,
+            "territory": 381,
+            "resources": 5
+          },
+          {
+            "strategy": "strongest",
+            "vp": 609.4730236336093,
+            "territory": 720,
+            "resources": 87
+          }
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 701.5629339156457,
+        "margin": 557.1462124061024,
+        "territory": 941,
+        "resources": 94,
+        "peakTerritory": 941,
+        "meanThinkMs": 0.12372695682617203,
+        "p95ThinkMs": 0.20954199999687262,
+        "teams": [
+          {
+            "strategy": "momentum",
+            "vp": 144.41672150954327,
+            "territory": 565,
+            "resources": 5
+          },
+          {
+            "strategy": "strongest",
+            "vp": 701.5629339156457,
+            "territory": 941,
+            "resources": 94
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,5 +1,5 @@
-import {AGENT_META} from './agents.js?v=20260928-strongest-v5';
-import {FORMAT_NAMES, Tournament} from './tournament.js?v=20260928-strongest-v5';
+import {AGENT_META} from './agents.js?v=20260928-strongest-v6';
+import {FORMAT_NAMES, Tournament} from './tournament.js?v=20260928-strongest-v6';
 
 const STORAGE_KEY = 'cyber-crickets-tournaments-v1';
 const escapeHTML = value => String(value).replace(/[&<>"']/g, character =>
@@ -175,7 +175,7 @@ export function advanceInWorker(tournament, WorkerCtor = globalThis.Worker) {
       }, 0);
       return;
     }
-    const worker = new WorkerCtor(new URL('./tournament-worker.js?v=20260928-strongest-v5', import.meta.url), {type: 'module'});
+    const worker = new WorkerCtor(new URL('./tournament-worker.js?v=20260928-strongest-v6', import.meta.url), {type: 'module'});
     worker.onmessage = event => {
       worker.terminate();
       if (!event.data?.ok) {reject(new Error(event.data?.error || '赛程计算失败')); return;}

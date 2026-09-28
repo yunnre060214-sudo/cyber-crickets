@@ -1,6 +1,6 @@
-import {AGENT_META} from './agents.js?v=20260928-strongest-v5';
-import {Match} from './match.js?v=20260928-strongest-v5';
-import {createRng, deriveSeed} from './rules.js?v=20260928-custom-controls-v1';
+import {AGENT_META} from './agents.js?v=20260928-strongest-v6';
+import {Match} from './match.js?v=20260928-strongest-v6';
+import {createRng, deriveSeed} from './rules.js?v=20260928-strongest-v6';
 
 export const FORMAT_NAMES = {
   round_robin: '单循环',

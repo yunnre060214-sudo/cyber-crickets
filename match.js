@@ -1,5 +1,5 @@
-import {createAgent} from './agents.js?v=20260928-strongest-v5';
-import {createRng, deriveSeed, spawnFor, vpRate, resolveActions} from './rules.js?v=20260928-custom-controls-v1';
+import {createAgent} from './agents.js?v=20260928-strongest-v6';
+import {createRng, deriveSeed, spawnFor, vpRate, resolveActions} from './rules.js?v=20260928-strongest-v6';
 
 export const WIDTH = 64, HEIGHT = 64, CELL_COUNT = WIDTH * HEIGHT;
 const DIRECTIONS = [[1, 0], [-1, 0], [0, 1], [0, -1]];
@@ -112,49 +112,61 @@ export class Match {
     return news;
   }
 
-  neighbors(i, id) {
+  ownerAt(i, capture) {
+    return capture?.index===i?capture.owner:this.owner[i];
+  }
+
+  neighbors(i, id, capture) {
     const [x, y] = xy(i);
     let count = 0;
     for (const [dx, dy] of DIRECTIONS) {
       const nx = x + dx, ny = y + dy;
-      if (inside(nx, ny) && this.owner[index(nx, ny)] === id) count++;
+      if (inside(nx, ny) && this.ownerAt(index(nx, ny),capture) === id) count++;
     }
     return count;
   }
 
-  enemyAround(i, id) {
+  enemyAround(i, id, capture) {
     const [x, y] = xy(i);
     let count = 0;
     for (const [dx, dy] of DIRECTIONS) {
       const nx = x + dx, ny = y + dy;
       if (inside(nx, ny)) {
-        const v = this.owner[index(nx, ny)];
+        const v = this.ownerAt(index(nx, ny),capture);
         if (v >= 0 && v !== id) count++;
       }
     }
     return count;
   }
 
-  nearestResourceDist(point, id) {
+  nearestResourceDist(point, id, capture) {
     let best = 99;
-    for (const i of this.resourceCells) if (this.owner[i] !== id) {
+    for (const i of this.resourceCells) if (this.ownerAt(i,capture) !== id) {
       best = Math.min(best, distance(point, xy(i)));
       if (best <= 1) break;
     }
     return best;
   }
 
-  enrich(id, move) {
-    const owner = this.owner[move.to], point = xy(move.to);
-    const ownN = this.neighbors(move.to, id);
-    const enemyN = owner >= 0 ? this.neighbors(move.to, owner) : this.enemyAround(move.to, id);
-    const nearest = this.nearestResourceDist(point, id);
+  enrich(id, move, capture) {
+    const owner = this.ownerAt(move.to,capture), point = xy(move.to);
+    const ownN = this.neighbors(move.to, id,capture);
+    const enemyN = owner >= 0 ? this.neighbors(move.to, owner,capture) : this.enemyAround(move.to, id,capture);
+    const nearest = this.nearestResourceDist(point, id,capture);
+    let protectedResourceValue=0;
+    for(const [dx,dy] of DIRECTIONS){
+      const nx=point[0]+dx,ny=point[1]+dy;
+      if(!inside(nx,ny))continue;
+      const neighbor=index(nx,ny);
+      if(this.ownerAt(neighbor,capture)===id&&this.resources[neighbor]>0&&
+        this.enemyAround(neighbor,id,capture)>0)protectedResourceValue+=this.resources[neighbor];
+    }
     const rivalDist = Math.min(...this.spawns.filter((_, team) => team !== id).map(spawn => distance(point, spawn)));
     return {...move, owner, enemy: owner >= 0 && owner !== id,
       ownN, enemyN, terrain: this.terrain[move.to], resource: this.resources[move.to],
       distOwnCore: distance(point, this.spawns[id]), distRivalCore: rivalDist,
       nearestResourceDist: nearest, resourcePull: nearest >= 99 ? 0 : 12 / (1 + nearest),
-      enemyPressure: this.enemyAround(move.to, id) / 4};
+      enemyPressure: this.enemyAround(move.to, id,capture) / 4,protectedResourceValue};
   }
 
   continuations(id, move) {
@@ -167,10 +179,9 @@ export class Match {
       if (!inside(nx,ny)) continue;
       const to=index(nx,ny);
       if (to===move.from || this.owner[to]===id || this.core[to]>=0) continue;
-      const next=this.enrich(id,{from:move.to,to,dir});
-      // Under the hypothetical first-step success, the new origin becomes one
-      // additional friendly neighbor of every second-step target.
-      next.ownN=Math.min(4,next.ownN+1);
+      // A one-cell public overlay updates support, threats and resource paths
+      // consistently without mutating the simultaneous-turn map snapshot.
+      const next=this.enrich(id,{from:move.to,to,dir},{index:move.to,owner:id});
       result.push(next);
     }
     return result;
@@ -254,6 +265,7 @@ export class Match {
         leaderVpRate: leader.vpRate,
         leaderShare: leader.territory / CELL_COUNT,
         leaderResourceShare: this.resourceTotal ? leader.resources / this.resourceTotal : 0,
+        opponents: live.filter(item=>item.id!==team.id).map(item=>({...item})),
         localPressure: contested / options.length,
         options,
         width: WIDTH,

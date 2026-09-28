@@ -97,3 +97,69 @@ test('decision and major-event logs preserve AI-analysis context', () => {
   assert.ok(decision.result && typeof decision.result.success === 'boolean');
   assert.ok(match.eventLog.some(event => event.type === 'major'));
 });
+
+test('continuations remove the captured origin from enemy support without changing the live map', () => {
+  const match=new Match({...config,strategies:['strongest','random']});
+  match.owner.fill(-1);match.core.fill(-1);match.resources.fill(0);
+  match.resourceCells=[];match.resourceTotal=0;
+  const from=30*64+30,to=30*64+31,next=30*64+32;
+  match.owner[from]=0;match.owner[to]=1;match.owner[next]=1;
+  const before=match.enrich(0,{from:to,to:next,dir:[1,0]});
+  assert.equal(before.enemyN,1);assert.equal(before.enemyPressure,.25);
+  const continuation=match.continuations(0,{from,to,dir:[1,0]}).find(x=>x.to===next);
+  assert.equal(continuation.ownN,1);
+  assert.equal(continuation.enemyN,0);
+  assert.equal(continuation.enemyPressure,0);
+  assert.equal(match.owner[to],1);
+});
+
+test('every agent receives the same public rival scores and production rates', () => {
+  const match=new Match({...config,strategies:['strongest','random','bfs','mst']});
+  match.teams[0].score=20;match.teams[1].score=18;match.teams[2].score=17;
+  const seen=[];
+  for(const team of match.teams){
+    team.agent.selectAction=v=>{seen.push(v);return v.options[0];};
+  }
+  match.step(.035);
+  assert.equal(seen.length,4);
+  for(const view of seen){
+    assert.equal(view.opponents.length,3);
+    assert.ok(view.opponents.every(x=>x.id!==view.id));
+    assert.ok(view.opponents.every(x=>Number.isFinite(x.vpRate)&&Number.isFinite(x.score)));
+  }
+  assert.equal(seen[0].opponents.find(x=>x.id===1).score,18);
+  assert.equal(seen[1].opponents.find(x=>x.id===0).score,20);
+});
+
+test('public targets expose nearby threatened friendly resource value', () => {
+  const match=new Match({...config,strategies:['strongest','random']});
+  match.owner.fill(-1);match.core.fill(-1);match.resources.fill(0);
+  const from=30*64+30,to=30*64+31;
+  match.owner[from]=0;match.resources[from]=3;match.owner[to]=1;
+  const exposed=match.enrich(0,{from,to,dir:[1,0]});
+  assert.equal(exposed.protectedResourceValue,3);
+  match.owner[to]=-1;
+  assert.equal(match.enrich(0,{from,to,dir:[1,0]}).protectedResourceValue,0);
+});
+
+test('a continuation stops attracting the agent back toward the resource just captured', () => {
+  const match=new Match({...config,strategies:['strongest','random']});
+  match.owner.fill(-1);match.core.fill(-1);match.resources.fill(0);
+  const from=30*64+30,to=30*64+31,next=30*64+32;
+  match.owner[from]=0;match.resources[to]=3;match.resources[30*64+40]=1;
+  match.resourceCells=[to,30*64+40];match.resourceTotal=4;
+  const continuation=match.continuations(0,{from,to,dir:[1,0]}).find(x=>x.to===next);
+  assert.equal(continuation.nearestResourceDist,8);
+  assert.equal(match.owner[to],-1);
+});
+
+test('strongest full matches replay exactly with public forecasts and virtual capture views', () => {
+  const options={seed:'strongest-v6-replay',rotation:1,duration:25,
+    strategies:['strongest','qlearn','minimax','denial']};
+  const a=new Match(options),b=new Match(options);
+  while(!a.finished)a.step(.035);
+  while(!b.finished)b.step(.035);
+  assert.deepEqual(outcome(a),outcome(b));
+  assert.deepEqual(a.timeline,b.timeline);
+  assert.ok(a.decisionLog.every(x=>x.result&&Number.isFinite(x.vpRate)));
+});

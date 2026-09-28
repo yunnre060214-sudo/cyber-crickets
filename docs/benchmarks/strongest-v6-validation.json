@@ -1,0 +1,6231 @@
+{
+  "profile": "validation",
+  "baselineCommit": "5c4aad40bbe7edf0932e51d342a538bcf9cde9ca",
+  "step": 0.035,
+  "candidateSourceHashes": {
+    "agents.js": "612f79734aff59659d825baa31fd0c5d74db995b",
+    "match.js": "b61dfc1155625e58409248270505140eb6096114",
+    "rules.js": "6f249b74ccaa6d1bc20dbb5e9ebf81ecc732ff95"
+  },
+  "note": "Fixed-seed sample; seeds, durations and rotations are correlated. Timing is local wall-clock data.",
+  "summary": {
+    "baseline": {
+      "games": 72,
+      "wins": 51,
+      "ties": 0,
+      "meanRank": 1.5277777777777777,
+      "meanVP": 455.97246911720475,
+      "meanMargin": 105.63143050660635,
+      "meanTerritory": 415.22222222222223,
+      "meanThinkMs": 0.09948866550146632,
+      "meanP95ThinkMs": 0.1721782222238496
+    },
+    "candidate": {
+      "games": 72,
+      "wins": 68,
+      "ties": 0,
+      "meanRank": 1.0555555555555556,
+      "meanVP": 562.3252394963274,
+      "meanMargin": 235.93987829044687,
+      "meanTerritory": 501.05555555555554,
+      "meanThinkMs": 0.08919860659546174,
+      "meanP95ThinkMs": 0.15311688888474212
+    },
+    "byDuration": {
+      "90": {
+        "baseline": {
+          "games": 24,
+          "wins": 18,
+          "ties": 0,
+          "meanRank": 1.375,
+          "meanVP": 189.14602240216195,
+          "meanMargin": 108.4300703841368,
+          "meanTerritory": 417.9166666666667,
+          "meanThinkMs": 0.09540901448857303,
+          "meanP95ThinkMs": 0.16109720833474958
+        },
+        "candidate": {
+          "games": 24,
+          "wins": 23,
+          "ties": 0,
+          "meanRank": 1.0416666666666667,
+          "meanVP": 203.40108990614488,
+          "meanMargin": 129.58608246742372,
+          "meanTerritory": 454.2916666666667,
+          "meanThinkMs": 0.08115928505448208,
+          "meanP95ThinkMs": 0.13515274999252824
+        }
+      },
+      "180": {
+        "baseline": {
+          "games": 24,
+          "wins": 18,
+          "ties": 0,
+          "meanRank": 1.5,
+          "meanVP": 398.93592489189564,
+          "meanMargin": 164.5609109004162,
+          "meanTerritory": 453.375,
+          "meanThinkMs": 0.1016941572345992,
+          "meanP95ThinkMs": 0.16973945833664553
+        },
+        "candidate": {
+          "games": 24,
+          "wins": 24,
+          "ties": 0,
+          "meanRank": 1,
+          "meanVP": 457.13302039965043,
+          "meanMargin": 242.9384464578972,
+          "meanTerritory": 484.4583333333333,
+          "meanThinkMs": 0.08692882404721745,
+          "meanP95ThinkMs": 0.13734899999928984
+        }
+      },
+      "400": {
+        "baseline": {
+          "games": 24,
+          "wins": 15,
+          "ties": 0,
+          "meanRank": 1.7083333333333333,
+          "meanVP": 779.8354600575561,
+          "meanMargin": 43.90331023526596,
+          "meanTerritory": 374.375,
+          "meanThinkMs": 0.10136282478122664,
+          "meanP95ThinkMs": 0.1856980000001537
+        },
+        "candidate": {
+          "games": 24,
+          "wins": 21,
+          "ties": 0,
+          "meanRank": 1.125,
+          "meanVP": 1026.441608183188,
+          "meanMargin": 335.2951059460197,
+          "meanTerritory": 564.4166666666666,
+          "meanThinkMs": 0.09950771068468567,
+          "meanP95ThinkMs": 0.18684891666240824
+        }
+      }
+    }
+  },
+  "results": [
+    {
+      "config": {
+        "seed": "strongest-v6-eval-a",
+        "rotation": 0,
+        "duration": 90,
+        "strategies": [
+          "qlearn",
+          "strongest",
+          "minimax",
+          "random"
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 274.85517290424104,
+        "margin": 199.3644808421543,
+        "territory": 585,
+        "resources": 87,
+        "peakTerritory": 585,
+        "meanThinkMs": 0.21377069661610462,
+        "p95ThinkMs": 0.46912500000001955,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 75.49069206208672,
+            "territory": 755,
+            "resources": 8
+          },
+          {
+            "strategy": "strongest",
+            "vp": 274.85517290424104,
+            "territory": 585,
+            "resources": 87
+          },
+          {
+            "strategy": "minimax",
+            "vp": 56.67897676835056,
+            "territory": 656,
+            "resources": 3
+          },
+          {
+            "strategy": "random",
+            "vp": 56.88102175006374,
+            "territory": 652,
+            "resources": 3
+          }
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 250.39987046905784,
+        "margin": 178.28164117552802,
+        "territory": 487,
+        "resources": 87,
+        "peakTerritory": 495,
+        "meanThinkMs": 0.17450382263710043,
+        "p95ThinkMs": 0.35933299999987867,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 72.11822929352984,
+            "territory": 544,
+            "resources": 7
+          },
+          {
+            "strategy": "strongest",
+            "vp": 250.39987046905784,
+            "territory": 487,
+            "resources": 87
+          },
+          {
+            "strategy": "minimax",
+            "vp": 60.85322172277832,
+            "territory": 710,
+            "resources": 5
+          },
+          {
+            "strategy": "random",
+            "vp": 55.376819132493296,
+            "territory": 688,
+            "resources": 2
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-a",
+        "rotation": 0,
+        "duration": 90,
+        "strategies": [
+          "strongest",
+          "potential",
+          "mst",
+          "denial"
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 153.07368554928559,
+        "margin": 62.96696595915361,
+        "territory": 355,
+        "resources": 75,
+        "peakTerritory": 355,
+        "meanThinkMs": 0.15992887981330894,
+        "p95ThinkMs": 0.2935829999996713,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 153.07368554928559,
+            "territory": 355,
+            "resources": 75
+          },
+          {
+            "strategy": "potential",
+            "vp": 29.482351450005567,
+            "territory": 95,
+            "resources": 4
+          },
+          {
+            "strategy": "mst",
+            "vp": 20.504875809014912,
+            "territory": 53,
+            "resources": 0
+          },
+          {
+            "strategy": "denial",
+            "vp": 90.10671959013197,
+            "territory": 83,
+            "resources": 8
+          }
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 81.269445372351,
+        "margin": 2.1207487864874537,
+        "territory": 333,
+        "resources": 54,
+        "peakTerritory": 333,
+        "meanThinkMs": 0.14819794632437502,
+        "p95ThinkMs": 0.25570799999968585,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 81.269445372351,
+            "territory": 333,
+            "resources": 54
+          },
+          {
+            "strategy": "potential",
+            "vp": 49.56616993623979,
+            "territory": 113,
+            "resources": 15
+          },
+          {
+            "strategy": "mst",
+            "vp": 74.2215175924897,
+            "territory": 75,
+            "resources": 13
+          },
+          {
+            "strategy": "denial",
+            "vp": 79.14869658586355,
+            "territory": 84,
+            "resources": 10
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-a",
+        "rotation": 0,
+        "duration": 180,
+        "strategies": [
+          "qlearn",
+          "strongest",
+          "minimax",
+          "random"
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 583.3165032064262,
+        "margin": 324.22476512999816,
+        "territory": 597,
+        "resources": 83,
+        "peakTerritory": 715,
+        "meanThinkMs": 0.11834722112018443,
+        "p95ThinkMs": 0.2325829999999769,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 259.09173807642804,
+            "territory": 1097,
+            "resources": 13
+          },
+          {
+            "strategy": "strongest",
+            "vp": 583.3165032064262,
+            "territory": 597,
+            "resources": 83
+          },
+          {
+            "strategy": "minimax",
+            "vp": 198.76144524413385,
+            "territory": 981,
+            "resources": 7
+          },
+          {
+            "strategy": "random",
+            "vp": 193.03312569702845,
+            "territory": 1038,
+            "resources": 8
+          }
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 556.1527484713127,
+        "margin": 304.0730065169796,
+        "territory": 613,
+        "resources": 66,
+        "peakTerritory": 634,
+        "meanThinkMs": 0.11143119603268882,
+        "p95ThinkMs": 0.20241599999917526,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 252.07974195433314,
+            "territory": 1238,
+            "resources": 13
+          },
+          {
+            "strategy": "strongest",
+            "vp": 556.1527484713127,
+            "territory": 613,
+            "resources": 66
+          },
+          {
+            "strategy": "minimax",
+            "vp": 208.88916111293537,
+            "territory": 761,
+            "resources": 20
+          },
+          {
+            "strategy": "random",
+            "vp": 197.16304971083014,
+            "territory": 1062,
+            "resources": 12
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-a",
+        "rotation": 0,
+        "duration": 180,
+        "strategies": [
+          "strongest",
+          "potential",
+          "mst",
+          "denial"
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 328.68300264966314,
+        "margin": 204.42964682905716,
+        "territory": 333,
+        "resources": 25,
+        "peakTerritory": 349,
+        "meanThinkMs": 0.1463824422403796,
+        "p95ThinkMs": 0.2526670000006561,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 328.68300264966314,
+            "territory": 333,
+            "resources": 25
+          },
+          {
+            "strategy": "potential",
+            "vp": 86.18406572649488,
+            "territory": 105,
+            "resources": 12
+          },
+          {
+            "strategy": "mst",
+            "vp": 34.81661579685927,
+            "territory": 62,
+            "resources": 5
+          },
+          {
+            "strategy": "denial",
+            "vp": 124.25335582060599,
+            "territory": 73,
+            "resources": 6
+          }
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 342.83318868670636,
+        "margin": 204.15273260781788,
+        "territory": 397,
+        "resources": 69,
+        "peakTerritory": 397,
+        "meanThinkMs": 0.14778939789968287,
+        "p95ThinkMs": 0.26908300000104646,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 342.83318868670636,
+            "territory": 397,
+            "resources": 69
+          },
+          {
+            "strategy": "potential",
+            "vp": 105.70159430743591,
+            "territory": 112,
+            "resources": 13
+          },
+          {
+            "strategy": "mst",
+            "vp": 135.21813399571226,
+            "territory": 104,
+            "resources": 11
+          },
+          {
+            "strategy": "denial",
+            "vp": 138.68045607888848,
+            "territory": 75,
+            "resources": 6
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-a",
+        "rotation": 0,
+        "duration": 400,
+        "strategies": [
+          "qlearn",
+          "strongest",
+          "minimax",
+          "random"
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 1090.5230557658122,
+        "margin": 212.02682207030955,
+        "territory": 387,
+        "resources": 81,
+        "peakTerritory": 719,
+        "meanThinkMs": 0.10564341338583416,
+        "p95ThinkMs": 0.22937500000080036,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 878.4962336955026,
+            "territory": 1411,
+            "resources": 15
+          },
+          {
+            "strategy": "strongest",
+            "vp": 1090.5230557658122,
+            "territory": 387,
+            "resources": 81
+          },
+          {
+            "strategy": "minimax",
+            "vp": 783.8618084915755,
+            "territory": 1263,
+            "resources": 20
+          },
+          {
+            "strategy": "random",
+            "vp": 671.8627232147421,
+            "territory": 1035,
+            "resources": 12
+          }
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 954.2288998863595,
+        "margin": 88.99261568105351,
+        "territory": 288,
+        "resources": 70,
+        "peakTerritory": 576,
+        "meanThinkMs": 0.13068244908138735,
+        "p95ThinkMs": 0.2762089999996533,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 663.5343453467917,
+            "territory": 1171,
+            "resources": 9
+          },
+          {
+            "strategy": "strongest",
+            "vp": 954.2288998863595,
+            "territory": 288,
+            "resources": 70
+          },
+          {
+            "strategy": "minimax",
+            "vp": 865.236284205306,
+            "territory": 1368,
+            "resources": 30
+          },
+          {
+            "strategy": "random",
+            "vp": 829.9744462242272,
+            "territory": 1269,
+            "resources": 19
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-a",
+        "rotation": 0,
+        "duration": 400,
+        "strategies": [
+          "strongest",
+          "potential",
+          "mst",
+          "denial"
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 903.7061911427464,
+        "margin": 632.6851562697639,
+        "territory": 345,
+        "resources": 75,
+        "peakTerritory": 356,
+        "meanThinkMs": 0.1435158149606273,
+        "p95ThinkMs": 0.2515000000021246,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 903.7061911427464,
+            "territory": 345,
+            "resources": 75
+          },
+          {
+            "strategy": "potential",
+            "vp": 194.94780202825868,
+            "territory": 96,
+            "resources": 6
+          },
+          {
+            "strategy": "mst",
+            "vp": 114.41237199366489,
+            "territory": 94,
+            "resources": 18
+          },
+          {
+            "strategy": "denial",
+            "vp": 271.0210348729826,
+            "territory": 80,
+            "resources": 7
+          }
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 696.0761457231328,
+        "margin": 412.1131767889622,
+        "territory": 442,
+        "resources": 49,
+        "peakTerritory": 442,
+        "meanThinkMs": 0.1425756650918629,
+        "p95ThinkMs": 0.23295900000084657,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 696.0761457231328,
+            "territory": 442,
+            "resources": 49
+          },
+          {
+            "strategy": "potential",
+            "vp": 278.7401034050879,
+            "territory": 117,
+            "resources": 8
+          },
+          {
+            "strategy": "mst",
+            "vp": 283.96296893417053,
+            "territory": 110,
+            "resources": 13
+          },
+          {
+            "strategy": "denial",
+            "vp": 253.75645811203134,
+            "territory": 68,
+            "resources": 6
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-a",
+        "rotation": 1,
+        "duration": 90,
+        "strategies": [
+          "qlearn",
+          "strongest",
+          "minimax",
+          "random"
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 290.5686678873941,
+        "margin": 226.3271722914924,
+        "territory": 700,
+        "resources": 96,
+        "peakTerritory": 700,
+        "meanThinkMs": 0.11850789264880444,
+        "p95ThinkMs": 0.21099999999569263,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 57.35895804850941,
+            "territory": 738,
+            "resources": 2
+          },
+          {
+            "strategy": "strongest",
+            "vp": 290.5686678873941,
+            "territory": 700,
+            "resources": 96
+          },
+          {
+            "strategy": "minimax",
+            "vp": 59.335262939460186,
+            "territory": 781,
+            "resources": 1
+          },
+          {
+            "strategy": "random",
+            "vp": 64.2414955959017,
+            "territory": 730,
+            "resources": 4
+          }
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 282.6549119035548,
+        "margin": 216.18172975070559,
+        "territory": 702,
+        "resources": 97,
+        "peakTerritory": 702,
+        "meanThinkMs": 0.08915634305731411,
+        "p95ThinkMs": 0.14437500000349246,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 54.33342215983661,
+            "territory": 649,
+            "resources": 1
+          },
+          {
+            "strategy": "strongest",
+            "vp": 282.6549119035548,
+            "territory": 702,
+            "resources": 97
+          },
+          {
+            "strategy": "minimax",
+            "vp": 59.59718520939355,
+            "territory": 770,
+            "resources": 2
+          },
+          {
+            "strategy": "random",
+            "vp": 66.47318215284922,
+            "territory": 787,
+            "resources": 4
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-a",
+        "rotation": 1,
+        "duration": 90,
+        "strategies": [
+          "strongest",
+          "potential",
+          "mst",
+          "denial"
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 162.63999675438328,
+        "margin": 97.6978325913498,
+        "territory": 286,
+        "resources": 81,
+        "peakTerritory": 286,
+        "meanThinkMs": 0.10166074679101335,
+        "p95ThinkMs": 0.17575000000215368,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 162.63999675438328,
+            "territory": 286,
+            "resources": 81
+          },
+          {
+            "strategy": "potential",
+            "vp": 46.32436408308432,
+            "territory": 21,
+            "resources": 0
+          },
+          {
+            "strategy": "mst",
+            "vp": 40.908560372148564,
+            "territory": 44,
+            "resources": 4
+          },
+          {
+            "strategy": "denial",
+            "vp": 64.94216416303348,
+            "territory": 219,
+            "resources": 15
+          }
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 81.33482093482756,
+        "margin": 10.1364019727595,
+        "territory": 211,
+        "resources": 35,
+        "peakTerritory": 211,
+        "meanThinkMs": 0.1013923652273296,
+        "p95ThinkMs": 0.13495800000237068,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 81.33482093482756,
+            "territory": 211,
+            "resources": 35
+          },
+          {
+            "strategy": "potential",
+            "vp": 65.85528409830876,
+            "territory": 44,
+            "resources": 8
+          },
+          {
+            "strategy": "mst",
+            "vp": 71.19841896206806,
+            "territory": 53,
+            "resources": 1
+          },
+          {
+            "strategy": "denial",
+            "vp": 67.41841841634661,
+            "territory": 226,
+            "resources": 18
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-a",
+        "rotation": 1,
+        "duration": 180,
+        "strategies": [
+          "qlearn",
+          "strongest",
+          "minimax",
+          "random"
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 629.1158592608299,
+        "margin": 390.0197921417893,
+        "territory": 753,
+        "resources": 86,
+        "peakTerritory": 786,
+        "meanThinkMs": 0.11017069369895734,
+        "p95ThinkMs": 0.19937499999650754,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 187.03351990068455,
+            "territory": 903,
+            "resources": 8
+          },
+          {
+            "strategy": "strongest",
+            "vp": 629.1158592608299,
+            "territory": 753,
+            "resources": 86
+          },
+          {
+            "strategy": "minimax",
+            "vp": 239.09606711904058,
+            "territory": 1341,
+            "resources": 9
+          },
+          {
+            "strategy": "random",
+            "vp": 213.81032539532825,
+            "territory": 1082,
+            "resources": 8
+          }
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 653.354507458596,
+        "margin": 420.39511947827276,
+        "territory": 742,
+        "resources": 87,
+        "peakTerritory": 857,
+        "meanThinkMs": 0.09288166044344458,
+        "p95ThinkMs": 0.16820800000277814,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 199.61929037298404,
+            "territory": 1020,
+            "resources": 9
+          },
+          {
+            "strategy": "strongest",
+            "vp": 653.354507458596,
+            "territory": 742,
+            "resources": 87
+          },
+          {
+            "strategy": "minimax",
+            "vp": 222.5165582890616,
+            "territory": 1206,
+            "resources": 7
+          },
+          {
+            "strategy": "random",
+            "vp": 232.95938798032324,
+            "territory": 1115,
+            "resources": 8
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-a",
+        "rotation": 1,
+        "duration": 180,
+        "strategies": [
+          "strongest",
+          "potential",
+          "mst",
+          "denial"
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 268.19866171817534,
+        "margin": 61.146355105161405,
+        "territory": 381,
+        "resources": 60,
+        "peakTerritory": 381,
+        "meanThinkMs": 0.09654914294049359,
+        "p95ThinkMs": 0.1328750000029686,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 268.19866171817534,
+            "territory": 381,
+            "resources": 60
+          },
+          {
+            "strategy": "potential",
+            "vp": 106.45200512003557,
+            "territory": 48,
+            "resources": 7
+          },
+          {
+            "strategy": "mst",
+            "vp": 74.96970729705409,
+            "territory": 42,
+            "resources": 2
+          },
+          {
+            "strategy": "denial",
+            "vp": 207.05230661301394,
+            "territory": 222,
+            "resources": 15
+          }
+        ]
+      },
+      "baseline": {
+        "rank": 3,
+        "vp": 160.72105721269173,
+        "margin": -54.28033825446414,
+        "territory": 262,
+        "resources": 10,
+        "peakTerritory": 273,
+        "meanThinkMs": 0.14422178763124296,
+        "p95ThinkMs": 0.1960830000025453,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 160.72105721269173,
+            "territory": 262,
+            "resources": 10
+          },
+          {
+            "strategy": "potential",
+            "vp": 215.00139546715587,
+            "territory": 91,
+            "resources": 63
+          },
+          {
+            "strategy": "mst",
+            "vp": 107.17543241613296,
+            "territory": 50,
+            "resources": 4
+          },
+          {
+            "strategy": "denial",
+            "vp": 202.24395446779062,
+            "territory": 246,
+            "resources": 21
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-a",
+        "rotation": 1,
+        "duration": 400,
+        "strategies": [
+          "qlearn",
+          "strongest",
+          "minimax",
+          "random"
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 995.0284776633714,
+        "margin": 60.989637826286184,
+        "territory": 278,
+        "resources": 54,
+        "peakTerritory": 586,
+        "meanThinkMs": 0.10760976482934437,
+        "p95ThinkMs": 0.20679199999722186,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 702.1326411506427,
+            "territory": 940,
+            "resources": 9
+          },
+          {
+            "strategy": "strongest",
+            "vp": 995.0284776633714,
+            "territory": 278,
+            "resources": 54
+          },
+          {
+            "strategy": "minimax",
+            "vp": 815.8258826997729,
+            "territory": 1462,
+            "resources": 20
+          },
+          {
+            "strategy": "random",
+            "vp": 934.0388398370852,
+            "territory": 1416,
+            "resources": 43
+          }
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 1038.7743888065488,
+        "margin": 74.25113562502918,
+        "territory": 268,
+        "resources": 63,
+        "peakTerritory": 654,
+        "meanThinkMs": 0.09687333175846767,
+        "p95ThinkMs": 0.21054199999343837,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 672.4973801076499,
+            "territory": 990,
+            "resources": 11
+          },
+          {
+            "strategy": "strongest",
+            "vp": 1038.7743888065488,
+            "territory": 268,
+            "resources": 63
+          },
+          {
+            "strategy": "minimax",
+            "vp": 964.5232531815196,
+            "territory": 1597,
+            "resources": 29
+          },
+          {
+            "strategy": "random",
+            "vp": 785.7071986496694,
+            "territory": 1241,
+            "resources": 23
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-a",
+        "rotation": 1,
+        "duration": 400,
+        "strategies": [
+          "strongest",
+          "potential",
+          "mst",
+          "denial"
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 1183.3993583996198,
+        "margin": 849.7132225720694,
+        "territory": 1359,
+        "resources": 103,
+        "peakTerritory": 1359,
+        "meanThinkMs": 0.12958142178478327,
+        "p95ThinkMs": 0.2036660000012489,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 1183.3993583996198,
+            "territory": 1359,
+            "resources": 103
+          },
+          {
+            "strategy": "potential",
+            "vp": 165.87366087427554,
+            "territory": 100,
+            "resources": 5
+          },
+          {
+            "strategy": "mst",
+            "vp": 333.6861358275504,
+            "territory": 80,
+            "resources": 4
+          },
+          {
+            "strategy": "denial",
+            "vp": 298.36723396223414,
+            "territory": 158,
+            "resources": 7
+          }
+        ]
+      },
+      "baseline": {
+        "rank": 3,
+        "vp": 323.53325499668955,
+        "margin": -189.65395740716173,
+        "territory": 234,
+        "resources": 15,
+        "peakTerritory": 238,
+        "meanThinkMs": 0.14685261758519533,
+        "p95ThinkMs": 0.18991600000299513,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 323.53325499668955,
+            "territory": 234,
+            "resources": 15
+          },
+          {
+            "strategy": "potential",
+            "vp": 386.83914414611763,
+            "territory": 105,
+            "resources": 19
+          },
+          {
+            "strategy": "mst",
+            "vp": 203.64010086666374,
+            "territory": 50,
+            "resources": 3
+          },
+          {
+            "strategy": "denial",
+            "vp": 513.1872124038513,
+            "territory": 227,
+            "resources": 21
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-a",
+        "rotation": 2,
+        "duration": 90,
+        "strategies": [
+          "qlearn",
+          "strongest",
+          "minimax",
+          "random"
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 293.1757210478187,
+        "margin": 225.03876891373488,
+        "territory": 739,
+        "resources": 95,
+        "peakTerritory": 739,
+        "meanThinkMs": 0.10358719019849376,
+        "p95ThinkMs": 0.18808400000852998,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 68.01738451670458,
+            "territory": 744,
+            "resources": 4
+          },
+          {
+            "strategy": "strongest",
+            "vp": 293.1757210478187,
+            "territory": 739,
+            "resources": 95
+          },
+          {
+            "strategy": "minimax",
+            "vp": 68.13695213408381,
+            "territory": 786,
+            "resources": 4
+          },
+          {
+            "strategy": "random",
+            "vp": 57.00501013184301,
+            "territory": 758,
+            "resources": 2
+          }
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 278.7696780264091,
+        "margin": 210.97884832884876,
+        "territory": 693,
+        "resources": 92,
+        "peakTerritory": 693,
+        "meanThinkMs": 0.08723326721093498,
+        "p95ThinkMs": 0.11770799999067094,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 66.11306855804575,
+            "territory": 701,
+            "resources": 7
+          },
+          {
+            "strategy": "strongest",
+            "vp": 278.7696780264091,
+            "territory": 693,
+            "resources": 92
+          },
+          {
+            "strategy": "minimax",
+            "vp": 67.79082969756037,
+            "territory": 780,
+            "resources": 4
+          },
+          {
+            "strategy": "random",
+            "vp": 56.83649914551478,
+            "territory": 751,
+            "resources": 2
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-a",
+        "rotation": 2,
+        "duration": 90,
+        "strategies": [
+          "strongest",
+          "potential",
+          "mst",
+          "denial"
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 157.88075084254183,
+        "margin": 96.12465831324201,
+        "territory": 256,
+        "resources": 84,
+        "peakTerritory": 256,
+        "meanThinkMs": 0.09061935239218424,
+        "p95ThinkMs": 0.12129199999617413,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 157.88075084254183,
+            "territory": 256,
+            "resources": 84
+          },
+          {
+            "strategy": "potential",
+            "vp": 61.75609252929982,
+            "territory": 80,
+            "resources": 9
+          },
+          {
+            "strategy": "mst",
+            "vp": 35.734592579562516,
+            "territory": 66,
+            "resources": 4
+          },
+          {
+            "strategy": "denial",
+            "vp": 32.43671547085732,
+            "territory": 74,
+            "resources": 2
+          }
+        ]
+      },
+      "baseline": {
+        "rank": 3,
+        "vp": 67.35888165882184,
+        "margin": -42.69245337393373,
+        "territory": 118,
+        "resources": 26,
+        "peakTerritory": 120,
+        "meanThinkMs": 0.08824577712935931,
+        "p95ThinkMs": 0.12254199999733828,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 67.35888165882184,
+            "territory": 118,
+            "resources": 26
+          },
+          {
+            "strategy": "potential",
+            "vp": 81.33939869121782,
+            "territory": 90,
+            "resources": 17
+          },
+          {
+            "strategy": "mst",
+            "vp": 110.05133503275557,
+            "territory": 163,
+            "resources": 53
+          },
+          {
+            "strategy": "denial",
+            "vp": 30.89192761709237,
+            "territory": 73,
+            "resources": 1
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-a",
+        "rotation": 2,
+        "duration": 180,
+        "strategies": [
+          "qlearn",
+          "strongest",
+          "minimax",
+          "random"
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 526.1027019434651,
+        "margin": 184.9674227560178,
+        "territory": 643,
+        "resources": 19,
+        "peakTerritory": 720,
+        "meanThinkMs": 0.09955833138850777,
+        "p95ThinkMs": 0.18741700000828132,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 231.47198384690665,
+            "territory": 1074,
+            "resources": 15
+          },
+          {
+            "strategy": "strongest",
+            "vp": 526.1027019434651,
+            "territory": 643,
+            "resources": 19
+          },
+          {
+            "strategy": "minimax",
+            "vp": 341.13527918744734,
+            "territory": 1147,
+            "resources": 73
+          },
+          {
+            "strategy": "random",
+            "vp": 200.95555540088637,
+            "territory": 1115,
+            "resources": 6
+          }
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 573.4809402741441,
+        "margin": 235.44713324571558,
+        "territory": 759,
+        "resources": 41,
+        "peakTerritory": 924,
+        "meanThinkMs": 0.09411812018675388,
+        "p95ThinkMs": 0.15454200000385754,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 225.91921484856704,
+            "territory": 1220,
+            "resources": 5
+          },
+          {
+            "strategy": "strongest",
+            "vp": 573.4809402741441,
+            "territory": 759,
+            "resources": 41
+          },
+          {
+            "strategy": "minimax",
+            "vp": 338.03380702842855,
+            "territory": 1042,
+            "resources": 53
+          },
+          {
+            "strategy": "random",
+            "vp": 206.62752083096893,
+            "territory": 1075,
+            "resources": 6
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-a",
+        "rotation": 2,
+        "duration": 180,
+        "strategies": [
+          "strongest",
+          "potential",
+          "mst",
+          "denial"
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 377.8992901814126,
+        "margin": 268.5586747035389,
+        "territory": 294,
+        "resources": 78,
+        "peakTerritory": 298,
+        "meanThinkMs": 0.1024755204202545,
+        "p95ThinkMs": 0.12724999999045394,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 377.8992901814126,
+            "territory": 294,
+            "resources": 78
+          },
+          {
+            "strategy": "potential",
+            "vp": 109.34061547787373,
+            "territory": 74,
+            "resources": 10
+          },
+          {
+            "strategy": "mst",
+            "vp": 72.260052977866,
+            "territory": 76,
+            "resources": 7
+          },
+          {
+            "strategy": "denial",
+            "vp": 53.0093520070464,
+            "territory": 71,
+            "resources": 1
+          }
+        ]
+      },
+      "baseline": {
+        "rank": 3,
+        "vp": 142.24833692947925,
+        "margin": -43.75236559440299,
+        "territory": 139,
+        "resources": 22,
+        "peakTerritory": 145,
+        "meanThinkMs": 0.11290759918313023,
+        "p95ThinkMs": 0.14437500000349246,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 142.24833692947925,
+            "territory": 139,
+            "resources": 22
+          },
+          {
+            "strategy": "potential",
+            "vp": 159.09284854190736,
+            "territory": 95,
+            "resources": 13
+          },
+          {
+            "strategy": "mst",
+            "vp": 186.00070252388224,
+            "territory": 146,
+            "resources": 14
+          },
+          {
+            "strategy": "denial",
+            "vp": 79.91619485680896,
+            "territory": 73,
+            "resources": 6
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-a",
+        "rotation": 2,
+        "duration": 400,
+        "strategies": [
+          "qlearn",
+          "strongest",
+          "minimax",
+          "random"
+        ]
+      },
+      "baseline": {
+        "rank": 2,
+        "vp": 862.3364436887872,
+        "margin": -422.2610473908734,
+        "territory": 534,
+        "resources": 6,
+        "peakTerritory": 720,
+        "meanThinkMs": 0.08678454986884271,
+        "p95ThinkMs": 0.20324999999138527,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 756.714966478305,
+            "territory": 1186,
+            "resources": 14
+          },
+          {
+            "strategy": "strongest",
+            "vp": 862.3364436887872,
+            "territory": 534,
+            "resources": 6
+          },
+          {
+            "strategy": "minimax",
+            "vp": 1284.5974910796606,
+            "territory": 1403,
+            "resources": 103
+          },
+          {
+            "strategy": "random",
+            "vp": 604.827877711766,
+            "territory": 973,
+            "resources": 3
+          }
+        ]
+      },
+      "candidate": {
+        "rank": 2,
+        "vp": 965.4733828674086,
+        "margin": -222.5865615463697,
+        "territory": 653,
+        "resources": 27,
+        "peakTerritory": 736,
+        "meanThinkMs": 0.08498431128631007,
+        "p95ThinkMs": 0.19979199999943376,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 664.6491999525833,
+            "territory": 1149,
+            "resources": 13
+          },
+          {
+            "strategy": "strongest",
+            "vp": 965.4733828674086,
+            "territory": 653,
+            "resources": 27
+          },
+          {
+            "strategy": "minimax",
+            "vp": 1188.0599444137783,
+            "territory": 1255,
+            "resources": 83
+          },
+          {
+            "strategy": "random",
+            "vp": 646.8713852625224,
+            "territory": 1039,
+            "resources": 3
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-a",
+        "rotation": 2,
+        "duration": 400,
+        "strategies": [
+          "strongest",
+          "potential",
+          "mst",
+          "denial"
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 989.7720183762783,
+        "margin": 710.8627989875113,
+        "territory": 637,
+        "resources": 105,
+        "peakTerritory": 637,
+        "meanThinkMs": 0.11790396377937046,
+        "p95ThinkMs": 0.19933299999684095,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 989.7720183762783,
+            "territory": 637,
+            "resources": 105
+          },
+          {
+            "strategy": "potential",
+            "vp": 278.90921938876704,
+            "territory": 73,
+            "resources": 6
+          },
+          {
+            "strategy": "mst",
+            "vp": 223.82798613534862,
+            "territory": 128,
+            "resources": 11
+          },
+          {
+            "strategy": "denial",
+            "vp": 123.77954574131732,
+            "territory": 69,
+            "resources": 2
+          }
+        ]
+      },
+      "baseline": {
+        "rank": 2,
+        "vp": 501.5553556337752,
+        "margin": -18.148191831359554,
+        "territory": 281,
+        "resources": 41,
+        "peakTerritory": 287,
+        "meanThinkMs": 0.12261883175856705,
+        "p95ThinkMs": 0.16775000000779983,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 501.5553556337752,
+            "territory": 281,
+            "resources": 41
+          },
+          {
+            "strategy": "potential",
+            "vp": 519.7035474651348,
+            "territory": 181,
+            "resources": 19
+          },
+          {
+            "strategy": "mst",
+            "vp": 376.5917645664951,
+            "territory": 126,
+            "resources": 25
+          },
+          {
+            "strategy": "denial",
+            "vp": 123.17441878303377,
+            "territory": 61,
+            "resources": 0
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-a",
+        "rotation": 3,
+        "duration": 90,
+        "strategies": [
+          "qlearn",
+          "strongest",
+          "minimax",
+          "random"
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 273.3720527463645,
+        "margin": 212.57978314090764,
+        "territory": 558,
+        "resources": 88,
+        "peakTerritory": 559,
+        "meanThinkMs": 0.08433513885662175,
+        "p95ThinkMs": 0.15799999999580905,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 55.96690257592895,
+            "territory": 581,
+            "resources": 5
+          },
+          {
+            "strategy": "strongest",
+            "vp": 273.3720527463645,
+            "territory": 558,
+            "resources": 88
+          },
+          {
+            "strategy": "minimax",
+            "vp": 56.95880017090551,
+            "territory": 784,
+            "resources": 1
+          },
+          {
+            "strategy": "random",
+            "vp": 60.792269605456845,
+            "territory": 677,
+            "resources": 7
+          }
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 279.2077090705648,
+        "margin": 220.0440038296723,
+        "territory": 638,
+        "resources": 97,
+        "peakTerritory": 638,
+        "meanThinkMs": 0.06763920886798647,
+        "p95ThinkMs": 0.1043329999956768,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 58.56863197237562,
+            "territory": 718,
+            "resources": 2
+          },
+          {
+            "strategy": "strongest",
+            "vp": 279.2077090705648,
+            "territory": 638,
+            "resources": 97
+          },
+          {
+            "strategy": "minimax",
+            "vp": 59.16370524089251,
+            "territory": 781,
+            "resources": 2
+          },
+          {
+            "strategy": "random",
+            "vp": 56.70173429362617,
+            "territory": 659,
+            "resources": 3
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-a",
+        "rotation": 3,
+        "duration": 90,
+        "strategies": [
+          "strongest",
+          "potential",
+          "mst",
+          "denial"
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 184.49796889123598,
+        "margin": 97.4801528081095,
+        "territory": 287,
+        "resources": 83,
+        "peakTerritory": 287,
+        "meanThinkMs": 0.06478816219375255,
+        "p95ThinkMs": 0.09179199999198318,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 184.49796889123598,
+            "territory": 287,
+            "resources": 83
+          },
+          {
+            "strategy": "potential",
+            "vp": 87.01781608312649,
+            "territory": 246,
+            "resources": 10
+          },
+          {
+            "strategy": "mst",
+            "vp": 29.78648791982696,
+            "territory": 55,
+            "resources": 2
+          },
+          {
+            "strategy": "denial",
+            "vp": 51.54317882822106,
+            "territory": 112,
+            "resources": 5
+          }
+        ]
+      },
+      "baseline": {
+        "rank": 2,
+        "vp": 79.36118645403222,
+        "margin": -46.24625313792697,
+        "territory": 162,
+        "resources": 31,
+        "peakTerritory": 163,
+        "meanThinkMs": 0.06229153092164541,
+        "p95ThinkMs": 0.08654200000455603,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 79.36118645403222,
+            "territory": 162,
+            "resources": 31
+          },
+          {
+            "strategy": "potential",
+            "vp": 125.60743959195919,
+            "territory": 290,
+            "resources": 39
+          },
+          {
+            "strategy": "mst",
+            "vp": 53.062248037301714,
+            "territory": 65,
+            "resources": 6
+          },
+          {
+            "strategy": "denial",
+            "vp": 77.45554245892951,
+            "territory": 120,
+            "resources": 13
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-a",
+        "rotation": 3,
+        "duration": 180,
+        "strategies": [
+          "qlearn",
+          "strongest",
+          "minimax",
+          "random"
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 585.6044211062977,
+        "margin": 343.13182065891965,
+        "territory": 622,
+        "resources": 89,
+        "peakTerritory": 630,
+        "meanThinkMs": 0.0765194002333172,
+        "p95ThinkMs": 0.14674999999988358,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 184.72277778161188,
+            "territory": 870,
+            "resources": 11
+          },
+          {
+            "strategy": "strongest",
+            "vp": 585.6044211062977,
+            "territory": 622,
+            "resources": 89
+          },
+          {
+            "strategy": "minimax",
+            "vp": 242.472600447378,
+            "territory": 1463,
+            "resources": 4
+          },
+          {
+            "strategy": "random",
+            "vp": 211.46894653276303,
+            "territory": 1033,
+            "resources": 7
+          }
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 610.067181651734,
+        "margin": 376.635464741918,
+        "territory": 594,
+        "resources": 87,
+        "peakTerritory": 609,
+        "meanThinkMs": 0.07323654375721877,
+        "p95ThinkMs": 0.11562499999126885,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 191.34492287983971,
+            "territory": 881,
+            "resources": 8
+          },
+          {
+            "strategy": "strongest",
+            "vp": 610.067181651734,
+            "territory": 594,
+            "resources": 87
+          },
+          {
+            "strategy": "minimax",
+            "vp": 233.431716909816,
+            "territory": 1437,
+            "resources": 5
+          },
+          {
+            "strategy": "random",
+            "vp": 207.5793268543482,
+            "territory": 1041,
+            "resources": 11
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-a",
+        "rotation": 3,
+        "duration": 180,
+        "strategies": [
+          "strongest",
+          "potential",
+          "mst",
+          "denial"
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 356.7153885217794,
+        "margin": 122.94042243100543,
+        "territory": 264,
+        "resources": 66,
+        "peakTerritory": 277,
+        "meanThinkMs": 0.08009874387379681,
+        "p95ThinkMs": 0.11212499999965075,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 356.7153885217794,
+            "territory": 264,
+            "resources": 66
+          },
+          {
+            "strategy": "potential",
+            "vp": 233.77496609077397,
+            "territory": 354,
+            "resources": 22
+          },
+          {
+            "strategy": "mst",
+            "vp": 41.425586692259465,
+            "territory": 66,
+            "resources": 8
+          },
+          {
+            "strategy": "denial",
+            "vp": 123.84249019542405,
+            "territory": 109,
+            "resources": 9
+          }
+        ]
+      },
+      "baseline": {
+        "rank": 3,
+        "vp": 137.93653270484168,
+        "margin": -131.29568735414995,
+        "territory": 178,
+        "resources": 9,
+        "peakTerritory": 188,
+        "meanThinkMs": 0.07851936464423973,
+        "p95ThinkMs": 0.11762499999895226,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 137.93653270484168,
+            "territory": 178,
+            "resources": 9
+          },
+          {
+            "strategy": "potential",
+            "vp": 269.23222005899163,
+            "territory": 381,
+            "resources": 23
+          },
+          {
+            "strategy": "mst",
+            "vp": 151.111560816196,
+            "territory": 92,
+            "resources": 14
+          },
+          {
+            "strategy": "denial",
+            "vp": 82.0371116430624,
+            "territory": 67,
+            "resources": 7
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-a",
+        "rotation": 3,
+        "duration": 400,
+        "strategies": [
+          "qlearn",
+          "strongest",
+          "minimax",
+          "random"
+        ]
+      },
+      "baseline": {
+        "rank": 3,
+        "vp": 669.6518775370808,
+        "margin": -575.6157097387983,
+        "territory": 407,
+        "resources": 9,
+        "peakTerritory": 495,
+        "meanThinkMs": 0.07411570918636752,
+        "p95ThinkMs": 0.15591600000334438,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 610.5180544663938,
+            "territory": 544,
+            "resources": 12
+          },
+          {
+            "strategy": "strongest",
+            "vp": 669.6518775370808,
+            "territory": 407,
+            "resources": 9
+          },
+          {
+            "strategy": "minimax",
+            "vp": 1245.2675872758791,
+            "territory": 1647,
+            "resources": 90
+          },
+          {
+            "strategy": "random",
+            "vp": 879.2032640163304,
+            "territory": 1498,
+            "resources": 15
+          }
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 1015.8876964811604,
+        "margin": 157.54066341627356,
+        "territory": 282,
+        "resources": 68,
+        "peakTerritory": 580,
+        "meanThinkMs": 0.06800485091863168,
+        "p95ThinkMs": 0.13825000000360887,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 821.1437954570199,
+            "territory": 1092,
+            "resources": 29
+          },
+          {
+            "strategy": "strongest",
+            "vp": 1015.8876964811604,
+            "territory": 282,
+            "resources": 68
+          },
+          {
+            "strategy": "minimax",
+            "vp": 858.3470330648869,
+            "territory": 1462,
+            "resources": 15
+          },
+          {
+            "strategy": "random",
+            "vp": 754.3752406857569,
+            "territory": 1260,
+            "resources": 14
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-a",
+        "rotation": 3,
+        "duration": 400,
+        "strategies": [
+          "strongest",
+          "potential",
+          "mst",
+          "denial"
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 1087.2655814054967,
+        "margin": 405.0602317436386,
+        "territory": 952,
+        "resources": 97,
+        "peakTerritory": 952,
+        "meanThinkMs": 0.09069589186359177,
+        "p95ThinkMs": 0.14391600000089966,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 1087.2655814054967,
+            "territory": 952,
+            "resources": 97
+          },
+          {
+            "strategy": "potential",
+            "vp": 682.2053496618581,
+            "territory": 413,
+            "resources": 22
+          },
+          {
+            "strategy": "mst",
+            "vp": 74.30512458759992,
+            "territory": 48,
+            "resources": 1
+          },
+          {
+            "strategy": "denial",
+            "vp": 123.37748464924375,
+            "territory": 62,
+            "resources": 2
+          }
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 855.0691859104984,
+        "margin": 193.24513951100914,
+        "territory": 524,
+        "resources": 85,
+        "peakTerritory": 524,
+        "meanThinkMs": 0.08490606010481676,
+        "p95ThinkMs": 0.11545899999327958,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 855.0691859104984,
+            "territory": 524,
+            "resources": 85
+          },
+          {
+            "strategy": "potential",
+            "vp": 661.8240463994892,
+            "territory": 383,
+            "resources": 15
+          },
+          {
+            "strategy": "mst",
+            "vp": 182.2703417185819,
+            "territory": 62,
+            "resources": 1
+          },
+          {
+            "strategy": "denial",
+            "vp": 138.4917473953339,
+            "territory": 54,
+            "resources": 4
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-b",
+        "rotation": 0,
+        "duration": 90,
+        "strategies": [
+          "qlearn",
+          "strongest",
+          "minimax",
+          "random"
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 290.9435259860089,
+        "margin": 225.02809204959811,
+        "territory": 706,
+        "resources": 83,
+        "peakTerritory": 706,
+        "meanThinkMs": 0.08016428938138222,
+        "p95ThinkMs": 0.15408300000126474,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 65.91543393641079,
+            "territory": 713,
+            "resources": 5
+          },
+          {
+            "strategy": "strongest",
+            "vp": 290.9435259860089,
+            "territory": 706,
+            "resources": 83
+          },
+          {
+            "strategy": "minimax",
+            "vp": 63.956508358222045,
+            "territory": 754,
+            "resources": 4
+          },
+          {
+            "strategy": "random",
+            "vp": 62.49787563586304,
+            "territory": 746,
+            "resources": 3
+          }
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 289.6502775622148,
+        "margin": 225.11752170322154,
+        "territory": 719,
+        "resources": 86,
+        "peakTerritory": 724,
+        "meanThinkMs": 0.0705097176197005,
+        "p95ThinkMs": 0.1164590000116732,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 64.46264598188829,
+            "territory": 743,
+            "resources": 2
+          },
+          {
+            "strategy": "strongest",
+            "vp": 289.6502775622148,
+            "territory": 719,
+            "resources": 86
+          },
+          {
+            "strategy": "minimax",
+            "vp": 64.53275585899326,
+            "territory": 772,
+            "resources": 4
+          },
+          {
+            "strategy": "random",
+            "vp": 62.084633326292376,
+            "territory": 750,
+            "resources": 1
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-b",
+        "rotation": 0,
+        "duration": 90,
+        "strategies": [
+          "strongest",
+          "potential",
+          "mst",
+          "denial"
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 116.1057446806047,
+        "margin": 30.76470365645497,
+        "territory": 181,
+        "resources": 46,
+        "peakTerritory": 181,
+        "meanThinkMs": 0.0709240583430154,
+        "p95ThinkMs": 0.10079100000439212,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 116.1057446806047,
+            "territory": 181,
+            "resources": 46
+          },
+          {
+            "strategy": "potential",
+            "vp": 63.13054604444062,
+            "territory": 122,
+            "resources": 10
+          },
+          {
+            "strategy": "mst",
+            "vp": 85.34104102414973,
+            "territory": 85,
+            "resources": 24
+          },
+          {
+            "strategy": "denial",
+            "vp": 59.25590649543805,
+            "territory": 112,
+            "resources": 9
+          }
+        ]
+      },
+      "baseline": {
+        "rank": 3,
+        "vp": 81.85043664945015,
+        "margin": -5.746585874497043,
+        "territory": 144,
+        "resources": 17,
+        "peakTerritory": 147,
+        "meanThinkMs": 0.07272555425938976,
+        "p95ThinkMs": 0.09487499999522697,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 81.85043664945015,
+            "territory": 144,
+            "resources": 17
+          },
+          {
+            "strategy": "potential",
+            "vp": 65.98509383269682,
+            "territory": 122,
+            "resources": 13
+          },
+          {
+            "strategy": "mst",
+            "vp": 84.26937649503859,
+            "territory": 87,
+            "resources": 22
+          },
+          {
+            "strategy": "denial",
+            "vp": 87.59702252394719,
+            "territory": 137,
+            "resources": 17
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-b",
+        "rotation": 0,
+        "duration": 180,
+        "strategies": [
+          "qlearn",
+          "strongest",
+          "minimax",
+          "random"
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 586.6147843257141,
+        "margin": 344.49492266693574,
+        "territory": 602,
+        "resources": 43,
+        "peakTerritory": 680,
+        "meanThinkMs": 0.07057971120192566,
+        "p95ThinkMs": 0.13683299999684095,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 242.11986165877838,
+            "territory": 1221,
+            "resources": 9
+          },
+          {
+            "strategy": "strongest",
+            "vp": 586.6147843257141,
+            "territory": 602,
+            "resources": 43
+          },
+          {
+            "strategy": "minimax",
+            "vp": 226.89335152596004,
+            "territory": 1035,
+            "resources": 15
+          },
+          {
+            "strategy": "random",
+            "vp": 234.3341163390272,
+            "territory": 1232,
+            "resources": 16
+          }
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 649.4017008345448,
+        "margin": 421.1208947325691,
+        "territory": 790,
+        "resources": 60,
+        "peakTerritory": 822,
+        "meanThinkMs": 0.06286729638297461,
+        "p95ThinkMs": 0.11475000000791624,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 228.2808061019757,
+            "territory": 1079,
+            "resources": 8
+          },
+          {
+            "strategy": "strongest",
+            "vp": 649.4017008345448,
+            "territory": 790,
+            "resources": 60
+          },
+          {
+            "strategy": "minimax",
+            "vp": 210.5670497689296,
+            "territory": 1045,
+            "resources": 8
+          },
+          {
+            "strategy": "random",
+            "vp": 218.4691743994846,
+            "territory": 1177,
+            "resources": 7
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-b",
+        "rotation": 0,
+        "duration": 180,
+        "strategies": [
+          "strongest",
+          "potential",
+          "mst",
+          "denial"
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 320.5982491590997,
+        "margin": 143.96807397462464,
+        "territory": 222,
+        "resources": 42,
+        "peakTerritory": 235,
+        "meanThinkMs": 0.08745243407254688,
+        "p95ThinkMs": 0.11558300000615418,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 320.5982491590997,
+            "territory": 222,
+            "resources": 42
+          },
+          {
+            "strategy": "potential",
+            "vp": 176.63017518447504,
+            "territory": 132,
+            "resources": 23
+          },
+          {
+            "strategy": "mst",
+            "vp": 49.109833034944096,
+            "territory": 59,
+            "resources": 4
+          },
+          {
+            "strategy": "denial",
+            "vp": 139.59237269424156,
+            "territory": 122,
+            "resources": 13
+          }
+        ]
+      },
+      "baseline": {
+        "rank": 4,
+        "vp": 137.46171169705582,
+        "margin": -50.644571736663494,
+        "territory": 152,
+        "resources": 11,
+        "peakTerritory": 154,
+        "meanThinkMs": 0.085611486580943,
+        "p95ThinkMs": 0.11075000000710133,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 137.46171169705582,
+            "territory": 152,
+            "resources": 11
+          },
+          {
+            "strategy": "potential",
+            "vp": 188.1062834337193,
+            "territory": 134,
+            "resources": 22
+          },
+          {
+            "strategy": "mst",
+            "vp": 155.74629501682804,
+            "territory": 84,
+            "resources": 15
+          },
+          {
+            "strategy": "denial",
+            "vp": 158.08272475857956,
+            "territory": 131,
+            "resources": 14
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-b",
+        "rotation": 0,
+        "duration": 400,
+        "strategies": [
+          "qlearn",
+          "strongest",
+          "minimax",
+          "random"
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 983.4802650190286,
+        "margin": 59.10499780739087,
+        "territory": 212,
+        "resources": 46,
+        "peakTerritory": 684,
+        "meanThinkMs": 0.06684743359585946,
+        "p95ThinkMs": 0.1436659999890253,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 846.4355541447806,
+            "territory": 1301,
+            "resources": 11
+          },
+          {
+            "strategy": "strongest",
+            "vp": 983.4802650190286,
+            "territory": 212,
+            "resources": 46
+          },
+          {
+            "strategy": "minimax",
+            "vp": 924.3752672116377,
+            "territory": 1385,
+            "resources": 38
+          },
+          {
+            "strategy": "random",
+            "vp": 753.701391895239,
+            "territory": 1198,
+            "resources": 13
+          }
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 978.7430008099595,
+        "margin": 130.65102461382844,
+        "territory": 194,
+        "resources": 42,
+        "peakTerritory": 665,
+        "meanThinkMs": 0.06960497060374343,
+        "p95ThinkMs": 0.14179200000944547,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 848.0919761961311,
+            "territory": 1016,
+            "resources": 10
+          },
+          {
+            "strategy": "strongest",
+            "vp": 978.7430008099595,
+            "territory": 194,
+            "resources": 42
+          },
+          {
+            "strategy": "minimax",
+            "vp": 814.1513027118838,
+            "territory": 1479,
+            "resources": 44
+          },
+          {
+            "strategy": "random",
+            "vp": 826.2156077989679,
+            "territory": 1407,
+            "resources": 14
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-b",
+        "rotation": 0,
+        "duration": 400,
+        "strategies": [
+          "strongest",
+          "potential",
+          "mst",
+          "denial"
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 1328.405815388634,
+        "margin": 1042.2352765296084,
+        "territory": 1395,
+        "resources": 73,
+        "peakTerritory": 1420,
+        "meanThinkMs": 0.08534645459318614,
+        "p95ThinkMs": 0.14841699998942204,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 1328.405815388634,
+            "territory": 1395,
+            "resources": 73
+          },
+          {
+            "strategy": "potential",
+            "vp": 286.1705388590256,
+            "territory": 121,
+            "resources": 8
+          },
+          {
+            "strategy": "mst",
+            "vp": 239.67743603512255,
+            "territory": 85,
+            "resources": 12
+          },
+          {
+            "strategy": "denial",
+            "vp": 188.34944592280905,
+            "territory": 102,
+            "resources": 12
+          }
+        ]
+      },
+      "baseline": {
+        "rank": 4,
+        "vp": 331.10986084454834,
+        "margin": -89.68227084069582,
+        "territory": 192,
+        "resources": 9,
+        "peakTerritory": 203,
+        "meanThinkMs": 0.10527793044579432,
+        "p95ThinkMs": 0.1380829999980051,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 331.10986084454834,
+            "territory": 192,
+            "resources": 9
+          },
+          {
+            "strategy": "potential",
+            "vp": 420.79213168524416,
+            "territory": 156,
+            "resources": 23
+          },
+          {
+            "strategy": "mst",
+            "vp": 361.3122890973265,
+            "territory": 99,
+            "resources": 17
+          },
+          {
+            "strategy": "denial",
+            "vp": 338.56782864177575,
+            "territory": 117,
+            "resources": 12
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-b",
+        "rotation": 1,
+        "duration": 90,
+        "strategies": [
+          "qlearn",
+          "strongest",
+          "minimax",
+          "random"
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 274.6347816434903,
+        "margin": 197.62042104719515,
+        "territory": 696,
+        "resources": 84,
+        "peakTerritory": 696,
+        "meanThinkMs": 0.07852816102796564,
+        "p95ThinkMs": 0.14445900000282563,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 77.01436059629518,
+            "territory": 743,
+            "resources": 7
+          },
+          {
+            "strategy": "strongest",
+            "vp": 274.6347816434903,
+            "territory": 696,
+            "resources": 84
+          },
+          {
+            "strategy": "minimax",
+            "vp": 59.92560958040427,
+            "territory": 714,
+            "resources": 2
+          },
+          {
+            "strategy": "random",
+            "vp": 62.536248451446845,
+            "territory": 760,
+            "resources": 2
+          }
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 264.0519514475788,
+        "margin": 195.81976270934692,
+        "territory": 715,
+        "resources": 84,
+        "peakTerritory": 715,
+        "meanThinkMs": 0.062341938155768176,
+        "p95ThinkMs": 0.10470799999893643,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 68.23218873823188,
+            "territory": 697,
+            "resources": 4
+          },
+          {
+            "strategy": "strongest",
+            "vp": 264.0519514475788,
+            "territory": 715,
+            "resources": 84
+          },
+          {
+            "strategy": "minimax",
+            "vp": 64.6394481841781,
+            "territory": 772,
+            "resources": 6
+          },
+          {
+            "strategy": "random",
+            "vp": 61.369315429499636,
+            "territory": 750,
+            "resources": 1
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-b",
+        "rotation": 1,
+        "duration": 90,
+        "strategies": [
+          "strongest",
+          "potential",
+          "mst",
+          "denial"
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 97.37663553485031,
+        "margin": 26.87855156356116,
+        "territory": 113,
+        "resources": 26,
+        "peakTerritory": 124,
+        "meanThinkMs": 0.05335001983694638,
+        "p95ThinkMs": 0.06816700001945719,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 97.37663553485031,
+            "territory": 113,
+            "resources": 26
+          },
+          {
+            "strategy": "potential",
+            "vp": 70.49808397128915,
+            "territory": 151,
+            "resources": 22
+          },
+          {
+            "strategy": "mst",
+            "vp": 61.90930670431934,
+            "territory": 77,
+            "resources": 20
+          },
+          {
+            "strategy": "denial",
+            "vp": 66.43875679171244,
+            "territory": 101,
+            "resources": 12
+          }
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 119.81751238894726,
+        "margin": 32.96015654440501,
+        "territory": 173,
+        "resources": 36,
+        "peakTerritory": 180,
+        "meanThinkMs": 0.07895677713013027,
+        "p95ThinkMs": 0.10550000000512227,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 119.81751238894726,
+            "territory": 173,
+            "resources": 36
+          },
+          {
+            "strategy": "potential",
+            "vp": 86.85735584454225,
+            "territory": 154,
+            "resources": 31
+          },
+          {
+            "strategy": "mst",
+            "vp": 70.51615227912932,
+            "territory": 82,
+            "resources": 22
+          },
+          {
+            "strategy": "denial",
+            "vp": 75.32311018641181,
+            "territory": 108,
+            "resources": 11
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-b",
+        "rotation": 1,
+        "duration": 180,
+        "strategies": [
+          "qlearn",
+          "strongest",
+          "minimax",
+          "random"
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 531.4915031142423,
+        "margin": 219.6101461290233,
+        "territory": 643,
+        "resources": 23,
+        "peakTerritory": 667,
+        "meanThinkMs": 0.08104728821463257,
+        "p95ThinkMs": 0.14525000000139698,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 202.29958235630733,
+            "territory": 748,
+            "resources": 15
+          },
+          {
+            "strategy": "strongest",
+            "vp": 531.4915031142423,
+            "territory": 643,
+            "resources": 23
+          },
+          {
+            "strategy": "minimax",
+            "vp": 311.881356985219,
+            "territory": 1290,
+            "resources": 38
+          },
+          {
+            "strategy": "random",
+            "vp": 224.44595949396566,
+            "territory": 1232,
+            "resources": 7
+          }
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 514.1714580456928,
+        "margin": 233.40762632021108,
+        "territory": 508,
+        "resources": 35,
+        "peakTerritory": 513,
+        "meanThinkMs": 0.08412547957983744,
+        "p95ThinkMs": 0.11879200002294965,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 192.73740809716008,
+            "territory": 627,
+            "resources": 16
+          },
+          {
+            "strategy": "strongest",
+            "vp": 514.1714580456928,
+            "territory": 508,
+            "resources": 35
+          },
+          {
+            "strategy": "minimax",
+            "vp": 280.76383172548174,
+            "territory": 1336,
+            "resources": 24
+          },
+          {
+            "strategy": "random",
+            "vp": 238.6429715845171,
+            "territory": 1322,
+            "resources": 8
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-b",
+        "rotation": 1,
+        "duration": 180,
+        "strategies": [
+          "strongest",
+          "potential",
+          "mst",
+          "denial"
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 352.4283008626532,
+        "margin": 201.4408969726673,
+        "territory": 206,
+        "resources": 35,
+        "peakTerritory": 222,
+        "meanThinkMs": 0.08747586406075736,
+        "p95ThinkMs": 0.13429200000246055,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 352.4283008626532,
+            "territory": 206,
+            "resources": 35
+          },
+          {
+            "strategy": "potential",
+            "vp": 150.9874038899859,
+            "territory": 141,
+            "resources": 18
+          },
+          {
+            "strategy": "mst",
+            "vp": 84.9703260498134,
+            "territory": 75,
+            "resources": 13
+          },
+          {
+            "strategy": "denial",
+            "vp": 141.63524043783295,
+            "territory": 102,
+            "resources": 14
+          }
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 314.1006719502962,
+        "margin": 130.02948552510733,
+        "territory": 289,
+        "resources": 42,
+        "peakTerritory": 294,
+        "meanThinkMs": 0.10894502975544015,
+        "p95ThinkMs": 0.15354199998546392,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 314.1006719502962,
+            "territory": 289,
+            "resources": 42
+          },
+          {
+            "strategy": "potential",
+            "vp": 184.07118642518887,
+            "territory": 166,
+            "resources": 18
+          },
+          {
+            "strategy": "mst",
+            "vp": 136.97666099048922,
+            "territory": 82,
+            "resources": 12
+          },
+          {
+            "strategy": "denial",
+            "vp": 100.15341440040777,
+            "territory": 86,
+            "resources": 11
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-b",
+        "rotation": 1,
+        "duration": 400,
+        "strategies": [
+          "qlearn",
+          "strongest",
+          "minimax",
+          "random"
+        ]
+      },
+      "baseline": {
+        "rank": 2,
+        "vp": 836.8529004349622,
+        "margin": -260.7358952190335,
+        "territory": 192,
+        "resources": 16,
+        "peakTerritory": 674,
+        "meanThinkMs": 0.07347103438338294,
+        "p95ThinkMs": 0.16029199998592958,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 714.0786001196658,
+            "territory": 1121,
+            "resources": 16
+          },
+          {
+            "strategy": "strongest",
+            "vp": 836.8529004349622,
+            "territory": 192,
+            "resources": 16
+          },
+          {
+            "strategy": "minimax",
+            "vp": 1097.5887956539957,
+            "territory": 1398,
+            "resources": 51
+          },
+          {
+            "strategy": "random",
+            "vp": 827.3657156314098,
+            "territory": 1385,
+            "resources": 27
+          }
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 911.4553434391345,
+        "margin": 12.64966097758554,
+        "territory": 217,
+        "resources": 49,
+        "peakTerritory": 569,
+        "meanThinkMs": 0.09336712099758424,
+        "p95ThinkMs": 0.18425000002025627,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 769.6517742918218,
+            "territory": 1123,
+            "resources": 13
+          },
+          {
+            "strategy": "strongest",
+            "vp": 911.4553434391345,
+            "territory": 217,
+            "resources": 49
+          },
+          {
+            "strategy": "minimax",
+            "vp": 898.8056824615489,
+            "territory": 1486,
+            "resources": 28
+          },
+          {
+            "strategy": "random",
+            "vp": 877.5040102537173,
+            "territory": 1270,
+            "resources": 20
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-b",
+        "rotation": 1,
+        "duration": 400,
+        "strategies": [
+          "strongest",
+          "potential",
+          "mst",
+          "denial"
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 997.790141290563,
+        "margin": 570.2198978964199,
+        "territory": 480,
+        "resources": 75,
+        "peakTerritory": 487,
+        "meanThinkMs": 0.1754169228344788,
+        "p95ThinkMs": 0.3935829999973066,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 997.790141290563,
+            "territory": 480,
+            "resources": 75
+          },
+          {
+            "strategy": "potential",
+            "vp": 180.16786363866822,
+            "territory": 99,
+            "resources": 5
+          },
+          {
+            "strategy": "mst",
+            "vp": 160.77742453717312,
+            "territory": 62,
+            "resources": 4
+          },
+          {
+            "strategy": "denial",
+            "vp": 427.5702433941432,
+            "territory": 141,
+            "resources": 10
+          }
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 804.2189864354629,
+        "margin": 306.72841017320815,
+        "territory": 409,
+        "resources": 63,
+        "peakTerritory": 409,
+        "meanThinkMs": 0.10056780131228649,
+        "p95ThinkMs": 0.1824579999956768,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 804.2189864354629,
+            "territory": 409,
+            "resources": 63
+          },
+          {
+            "strategy": "potential",
+            "vp": 497.4905762622547,
+            "territory": 196,
+            "resources": 17
+          },
+          {
+            "strategy": "mst",
+            "vp": 278.98739584507786,
+            "territory": 78,
+            "resources": 13
+          },
+          {
+            "strategy": "denial",
+            "vp": 188.15146984013393,
+            "territory": 86,
+            "resources": 8
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-b",
+        "rotation": 2,
+        "duration": 90,
+        "strategies": [
+          "qlearn",
+          "strongest",
+          "minimax",
+          "random"
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 285.0011085160537,
+        "margin": 220.30149001595044,
+        "territory": 719,
+        "resources": 86,
+        "peakTerritory": 719,
+        "meanThinkMs": 0.08780599999974527,
+        "p95ThinkMs": 0.17370799998752773,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 64.69961850010328,
+            "territory": 742,
+            "resources": 2
+          },
+          {
+            "strategy": "strongest",
+            "vp": 285.0011085160537,
+            "territory": 719,
+            "resources": 86
+          },
+          {
+            "strategy": "minimax",
+            "vp": 61.104966308406055,
+            "territory": 771,
+            "resources": 1
+          },
+          {
+            "strategy": "random",
+            "vp": 61.7601071917594,
+            "territory": 723,
+            "resources": 5
+          }
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 262.74844245428636,
+        "margin": 191.01819288921547,
+        "territory": 697,
+        "resources": 83,
+        "peakTerritory": 697,
+        "meanThinkMs": 0.06641589498160001,
+        "p95ThinkMs": 0.10287499998230487,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 71.73024956507088,
+            "territory": 724,
+            "resources": 4
+          },
+          {
+            "strategy": "strongest",
+            "vp": 262.74844245428636,
+            "territory": 697,
+            "resources": 83
+          },
+          {
+            "strategy": "minimax",
+            "vp": 61.08830631277515,
+            "territory": 774,
+            "resources": 2
+          },
+          {
+            "strategy": "random",
+            "vp": 67.22507702403844,
+            "territory": 736,
+            "resources": 5
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-b",
+        "rotation": 2,
+        "duration": 90,
+        "strategies": [
+          "strongest",
+          "potential",
+          "mst",
+          "denial"
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 112.66426744535295,
+        "margin": 29.083701577020804,
+        "territory": 154,
+        "resources": 20,
+        "peakTerritory": 169,
+        "meanThinkMs": 0.06952693232246446,
+        "p95ThinkMs": 0.09295799999381416,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 112.66426744535295,
+            "territory": 154,
+            "resources": 20
+          },
+          {
+            "strategy": "potential",
+            "vp": 83.58056586833214,
+            "territory": 151,
+            "resources": 42
+          },
+          {
+            "strategy": "mst",
+            "vp": 49.00922370738281,
+            "territory": 72,
+            "resources": 10
+          },
+          {
+            "strategy": "denial",
+            "vp": 63.9932564171618,
+            "territory": 79,
+            "resources": 6
+          }
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 119.18257715223343,
+        "margin": 30.966077822607858,
+        "territory": 161,
+        "resources": 40,
+        "peakTerritory": 167,
+        "meanThinkMs": 0.08558402800507482,
+        "p95ThinkMs": 0.12225000001490116,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 119.18257715223343,
+            "territory": 161,
+            "resources": 40
+          },
+          {
+            "strategy": "potential",
+            "vp": 88.21649932962558,
+            "territory": 141,
+            "resources": 20
+          },
+          {
+            "strategy": "mst",
+            "vp": 62.472221083361035,
+            "territory": 83,
+            "resources": 15
+          },
+          {
+            "strategy": "denial",
+            "vp": 60.725539381658045,
+            "territory": 76,
+            "resources": 13
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-b",
+        "rotation": 2,
+        "duration": 180,
+        "strategies": [
+          "qlearn",
+          "strongest",
+          "minimax",
+          "random"
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 616.6840458622052,
+        "margin": 386.60383861041026,
+        "territory": 819,
+        "resources": 43,
+        "peakTerritory": 838,
+        "meanThinkMs": 0.09090477071187374,
+        "p95ThinkMs": 0.17904100002488121,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 230.0802072517949,
+            "territory": 1137,
+            "resources": 15
+          },
+          {
+            "strategy": "strongest",
+            "vp": 616.6840458622052,
+            "territory": 819,
+            "resources": 43
+          },
+          {
+            "strategy": "minimax",
+            "vp": 227.915438675536,
+            "territory": 1124,
+            "resources": 12
+          },
+          {
+            "strategy": "random",
+            "vp": 211.1231460671114,
+            "territory": 965,
+            "resources": 13
+          }
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 576.7095874163119,
+        "margin": 341.920823486634,
+        "territory": 577,
+        "resources": 53,
+        "peakTerritory": 593,
+        "meanThinkMs": 0.081404648191525,
+        "p95ThinkMs": 0.1335419999959413,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 197.0273250081661,
+            "territory": 1030,
+            "resources": 8
+          },
+          {
+            "strategy": "strongest",
+            "vp": 576.7095874163119,
+            "territory": 577,
+            "resources": 53
+          },
+          {
+            "strategy": "minimax",
+            "vp": 234.78876392967794,
+            "territory": 1192,
+            "resources": 11
+          },
+          {
+            "strategy": "random",
+            "vp": 218.7402074514191,
+            "territory": 1077,
+            "resources": 11
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-b",
+        "rotation": 2,
+        "duration": 180,
+        "strategies": [
+          "strongest",
+          "potential",
+          "mst",
+          "denial"
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 404.7684455702525,
+        "margin": 246.50056734216258,
+        "territory": 399,
+        "resources": 71,
+        "peakTerritory": 399,
+        "meanThinkMs": 0.08194523103831783,
+        "p95ThinkMs": 0.12424999999348074,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 404.7684455702525,
+            "territory": 399,
+            "resources": 71
+          },
+          {
+            "strategy": "potential",
+            "vp": 158.2678782280899,
+            "territory": 129,
+            "resources": 10
+          },
+          {
+            "strategy": "mst",
+            "vp": 64.51893317328975,
+            "territory": 61,
+            "resources": 3
+          },
+          {
+            "strategy": "denial",
+            "vp": 103.71725990125856,
+            "territory": 59,
+            "resources": 5
+          }
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 224.93512309522737,
+        "margin": 52.29059475130032,
+        "territory": 234,
+        "resources": 33,
+        "peakTerritory": 234,
+        "meanThinkMs": 0.10297414935877233,
+        "p95ThinkMs": 0.16483300001709722,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 224.93512309522737,
+            "territory": 234,
+            "resources": 33
+          },
+          {
+            "strategy": "potential",
+            "vp": 172.64452834392705,
+            "territory": 139,
+            "resources": 19
+          },
+          {
+            "strategy": "mst",
+            "vp": 135.32910791745428,
+            "territory": 81,
+            "resources": 12
+          },
+          {
+            "strategy": "denial",
+            "vp": 132.77158832760972,
+            "territory": 83,
+            "resources": 9
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-b",
+        "rotation": 2,
+        "duration": 400,
+        "strategies": [
+          "qlearn",
+          "strongest",
+          "minimax",
+          "random"
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 1032.1602187276465,
+        "margin": 173.67197679615606,
+        "territory": 391,
+        "resources": 61,
+        "peakTerritory": 724,
+        "meanThinkMs": 0.07913398136453687,
+        "p95ThinkMs": 0.17520800000056624,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 858.4882419314904,
+            "territory": 1535,
+            "resources": 12
+          },
+          {
+            "strategy": "strongest",
+            "vp": 1032.1602187276465,
+            "territory": 391,
+            "resources": 61
+          },
+          {
+            "strategy": "minimax",
+            "vp": 823.2258858425266,
+            "territory": 1097,
+            "resources": 24
+          },
+          {
+            "strategy": "random",
+            "vp": 782.3609479894901,
+            "territory": 1073,
+            "resources": 12
+          }
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 924.2969291881125,
+        "margin": 42.28399840992722,
+        "territory": 143,
+        "resources": 33,
+        "peakTerritory": 612,
+        "meanThinkMs": 0.08511534278238103,
+        "p95ThinkMs": 0.18070799999986775,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 821.0119980411612,
+            "territory": 1248,
+            "resources": 24
+          },
+          {
+            "strategy": "strongest",
+            "vp": 924.2969291881125,
+            "territory": 143,
+            "resources": 33
+          },
+          {
+            "strategy": "minimax",
+            "vp": 882.0129307781853,
+            "territory": 1391,
+            "resources": 32
+          },
+          {
+            "strategy": "random",
+            "vp": 850.1154715815911,
+            "territory": 1314,
+            "resources": 22
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-b",
+        "rotation": 2,
+        "duration": 400,
+        "strategies": [
+          "strongest",
+          "potential",
+          "mst",
+          "denial"
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 1099.9665894407601,
+        "margin": 757.9229115542379,
+        "territory": 784,
+        "resources": 78,
+        "peakTerritory": 784,
+        "meanThinkMs": 0.10537089816270319,
+        "p95ThinkMs": 0.16441599998506717,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 1099.9665894407601,
+            "territory": 784,
+            "resources": 78
+          },
+          {
+            "strategy": "potential",
+            "vp": 342.04367788652223,
+            "territory": 129,
+            "resources": 8
+          },
+          {
+            "strategy": "mst",
+            "vp": 162.3726225300478,
+            "territory": 57,
+            "resources": 2
+          },
+          {
+            "strategy": "denial",
+            "vp": 246.20427634654362,
+            "territory": 67,
+            "resources": 10
+          }
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 718.8543567642909,
+        "margin": 339.2369116395042,
+        "territory": 392,
+        "resources": 72,
+        "peakTerritory": 393,
+        "meanThinkMs": 0.13967148346429675,
+        "p95ThinkMs": 0.26179200000478886,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 718.8543567642909,
+            "territory": 392,
+            "resources": 72
+          },
+          {
+            "strategy": "potential",
+            "vp": 379.6174451247866,
+            "territory": 131,
+            "resources": 9
+          },
+          {
+            "strategy": "mst",
+            "vp": 302.3652475932503,
+            "territory": 87,
+            "resources": 11
+          },
+          {
+            "strategy": "denial",
+            "vp": 299.2502402802719,
+            "territory": 88,
+            "resources": 10
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-b",
+        "rotation": 3,
+        "duration": 90,
+        "strategies": [
+          "qlearn",
+          "strongest",
+          "minimax",
+          "random"
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 255.52821318774195,
+        "margin": 186.78606107235544,
+        "territory": 545,
+        "resources": 80,
+        "peakTerritory": 545,
+        "meanThinkMs": 0.0906390023333278,
+        "p95ThinkMs": 0.16262500002630986,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 52.58835383024912,
+            "territory": 598,
+            "resources": 3
+          },
+          {
+            "strategy": "strongest",
+            "vp": 255.52821318774195,
+            "territory": 545,
+            "resources": 80
+          },
+          {
+            "strategy": "minimax",
+            "vp": 68.7421521153865,
+            "territory": 702,
+            "resources": 6
+          },
+          {
+            "strategy": "random",
+            "vp": 67.38442394338901,
+            "territory": 772,
+            "resources": 5
+          }
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 244.6992925840657,
+        "margin": 165.47349114923423,
+        "territory": 691,
+        "resources": 80,
+        "peakTerritory": 691,
+        "meanThinkMs": 0.06220200466754294,
+        "p95ThinkMs": 0.09999999997671694,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 68.64852729352721,
+            "territory": 741,
+            "resources": 3
+          },
+          {
+            "strategy": "strongest",
+            "vp": 244.6992925840657,
+            "territory": 691,
+            "resources": 80
+          },
+          {
+            "strategy": "minimax",
+            "vp": 79.22580143483144,
+            "territory": 770,
+            "resources": 10
+          },
+          {
+            "strategy": "random",
+            "vp": 58.25788014506595,
+            "territory": 718,
+            "resources": 2
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-b",
+        "rotation": 3,
+        "duration": 90,
+        "strategies": [
+          "strongest",
+          "potential",
+          "mst",
+          "denial"
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 119.0910366596812,
+        "margin": 39.23389013936844,
+        "territory": 179,
+        "resources": 53,
+        "peakTerritory": 179,
+        "meanThinkMs": 0.06166936639482275,
+        "p95ThinkMs": 0.08629199999268167,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 119.0910366596812,
+            "territory": 179,
+            "resources": 53
+          },
+          {
+            "strategy": "potential",
+            "vp": 79.85714652031275,
+            "territory": 170,
+            "resources": 16
+          },
+          {
+            "strategy": "mst",
+            "vp": 66.75839454340695,
+            "territory": 64,
+            "resources": 12
+          },
+          {
+            "strategy": "denial",
+            "vp": 72.63644409761234,
+            "territory": 96,
+            "resources": 10
+          }
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 135.8295706031169,
+        "margin": 55.733628065103076,
+        "territory": 221,
+        "resources": 36,
+        "peakTerritory": 225,
+        "meanThinkMs": 0.09485571061884099,
+        "p95ThinkMs": 0.13279200001852587,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 135.8295706031169,
+            "territory": 221,
+            "resources": 36
+          },
+          {
+            "strategy": "potential",
+            "vp": 80.09594253801383,
+            "territory": 189,
+            "resources": 15
+          },
+          {
+            "strategy": "mst",
+            "vp": 65.79286257867346,
+            "territory": 68,
+            "resources": 15
+          },
+          {
+            "strategy": "denial",
+            "vp": 67.43133668293731,
+            "territory": 95,
+            "resources": 17
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-b",
+        "rotation": 3,
+        "duration": 180,
+        "strategies": [
+          "qlearn",
+          "strongest",
+          "minimax",
+          "random"
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 534.2879115462366,
+        "margin": 271.2671340093928,
+        "territory": 646,
+        "resources": 55,
+        "peakTerritory": 647,
+        "meanThinkMs": 0.0869696038506895,
+        "p95ThinkMs": 0.15441599997575395,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 197.81302922826436,
+            "territory": 888,
+            "resources": 8
+          },
+          {
+            "strategy": "strongest",
+            "vp": 534.2879115462366,
+            "territory": 646,
+            "resources": 55
+          },
+          {
+            "strategy": "minimax",
+            "vp": 263.0207775368438,
+            "territory": 1330,
+            "resources": 10
+          },
+          {
+            "strategy": "random",
+            "vp": 249.96325802451346,
+            "territory": 1201,
+            "resources": 10
+          }
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 585.4998056455889,
+        "margin": 317.22939474128964,
+        "territory": 699,
+        "resources": 63,
+        "peakTerritory": 707,
+        "meanThinkMs": 0.07433110151703164,
+        "p95ThinkMs": 0.1270000000076834,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 151.15500432199852,
+            "territory": 805,
+            "resources": 7
+          },
+          {
+            "strategy": "strongest",
+            "vp": 585.4998056455889,
+            "territory": 699,
+            "resources": 63
+          },
+          {
+            "strategy": "minimax",
+            "vp": 268.2704109042993,
+            "territory": 1401,
+            "resources": 9
+          },
+          {
+            "strategy": "random",
+            "vp": 201.3392466587331,
+            "territory": 1154,
+            "resources": 4
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-b",
+        "rotation": 3,
+        "duration": 180,
+        "strategies": [
+          "strongest",
+          "potential",
+          "mst",
+          "denial"
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 340.69022342613323,
+        "margin": 182.15146768377915,
+        "territory": 348,
+        "resources": 45,
+        "peakTerritory": 354,
+        "meanThinkMs": 0.0871793039675003,
+        "p95ThinkMs": 0.13633400000981055,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 340.69022342613323,
+            "territory": 348,
+            "resources": 45
+          },
+          {
+            "strategy": "potential",
+            "vp": 158.53875574235408,
+            "territory": 175,
+            "resources": 13
+          },
+          {
+            "strategy": "mst",
+            "vp": 136.16506852936047,
+            "territory": 76,
+            "resources": 16
+          },
+          {
+            "strategy": "denial",
+            "vp": 80.33009044552749,
+            "territory": 76,
+            "resources": 7
+          }
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 299.4843744195907,
+        "margin": 108.11218176382923,
+        "territory": 235,
+        "resources": 39,
+        "peakTerritory": 235,
+        "meanThinkMs": 0.09909057876335546,
+        "p95ThinkMs": 0.13262499999837019,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 299.4843744195907,
+            "territory": 235,
+            "resources": 39
+          },
+          {
+            "strategy": "potential",
+            "vp": 191.3721926557615,
+            "territory": 196,
+            "resources": 16
+          },
+          {
+            "strategy": "mst",
+            "vp": 134.5544426647541,
+            "territory": 74,
+            "resources": 13
+          },
+          {
+            "strategy": "denial",
+            "vp": 119.92988555788435,
+            "territory": 86,
+            "resources": 16
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-b",
+        "rotation": 3,
+        "duration": 400,
+        "strategies": [
+          "qlearn",
+          "strongest",
+          "minimax",
+          "random"
+        ]
+      },
+      "baseline": {
+        "rank": 4,
+        "vp": 699.0459114406636,
+        "margin": -269.67174225438737,
+        "territory": 143,
+        "resources": 21,
+        "peakTerritory": 471,
+        "meanThinkMs": 0.0846588939632209,
+        "p95ThinkMs": 0.14525000000139698,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 838.5143273527679,
+            "territory": 859,
+            "resources": 49
+          },
+          {
+            "strategy": "strongest",
+            "vp": 699.0459114406636,
+            "territory": 143,
+            "resources": 21
+          },
+          {
+            "strategy": "minimax",
+            "vp": 968.717653695051,
+            "territory": 1534,
+            "resources": 25
+          },
+          {
+            "strategy": "random",
+            "vp": 899.0030242587464,
+            "territory": 1559,
+            "resources": 16
+          }
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 1091.230086959025,
+        "margin": 143.12867149972885,
+        "territory": 380,
+        "resources": 75,
+        "peakTerritory": 610,
+        "meanThinkMs": 0.07099752467173931,
+        "p95ThinkMs": 0.14195799999288283,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 651.4168474933172,
+            "territory": 1057,
+            "resources": 12
+          },
+          {
+            "strategy": "strongest",
+            "vp": 1091.230086959025,
+            "territory": 380,
+            "resources": 75
+          },
+          {
+            "strategy": "minimax",
+            "vp": 948.101415459296,
+            "territory": 1592,
+            "resources": 14
+          },
+          {
+            "strategy": "random",
+            "vp": 692.8857659322746,
+            "territory": 1067,
+            "resources": 7
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-b",
+        "rotation": 3,
+        "duration": 400,
+        "strategies": [
+          "strongest",
+          "potential",
+          "mst",
+          "denial"
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 1258.213005471571,
+        "margin": 972.1445418771965,
+        "territory": 851,
+        "resources": 86,
+        "peakTerritory": 863,
+        "meanThinkMs": 0.11898355354343967,
+        "p95ThinkMs": 0.16362499998649582,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 1258.213005471571,
+            "territory": 851,
+            "resources": 86
+          },
+          {
+            "strategy": "potential",
+            "vp": 286.0684635943745,
+            "territory": 174,
+            "resources": 10
+          },
+          {
+            "strategy": "mst",
+            "vp": 185.92081377368513,
+            "territory": 58,
+            "resources": 1
+          },
+          {
+            "strategy": "denial",
+            "vp": 220.57900138674088,
+            "territory": 89,
+            "resources": 6
+          }
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 774.956572912095,
+        "margin": 209.60067441754484,
+        "territory": 389,
+        "resources": 66,
+        "peakTerritory": 390,
+        "meanThinkMs": 0.09463990682410169,
+        "p95ThinkMs": 0.1718340000079479,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 774.956572912095,
+            "territory": 389,
+            "resources": 66
+          },
+          {
+            "strategy": "potential",
+            "vp": 565.3558984945502,
+            "territory": 248,
+            "resources": 32
+          },
+          {
+            "strategy": "mst",
+            "vp": 257.7782993739515,
+            "territory": 67,
+            "resources": 9
+          },
+          {
+            "strategy": "denial",
+            "vp": 160.41815566496413,
+            "territory": 73,
+            "resources": 5
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-c",
+        "rotation": 0,
+        "duration": 90,
+        "strategies": [
+          "qlearn",
+          "strongest",
+          "minimax",
+          "random"
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 270.3490343201294,
+        "margin": 194.05685375339664,
+        "territory": 646,
+        "resources": 99,
+        "peakTerritory": 646,
+        "meanThinkMs": 0.07895871995347976,
+        "p95ThinkMs": 0.1436249999969732,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 76.2921805667328,
+            "territory": 749,
+            "resources": 5
+          },
+          {
+            "strategy": "strongest",
+            "vp": 270.3490343201294,
+            "territory": 646,
+            "resources": 99
+          },
+          {
+            "strategy": "minimax",
+            "vp": 61.19645569247287,
+            "territory": 685,
+            "resources": 7
+          },
+          {
+            "strategy": "random",
+            "vp": 57.59639659209137,
+            "territory": 757,
+            "resources": 4
+          }
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 264.583291131334,
+        "margin": 187.7927346383029,
+        "territory": 660,
+        "resources": 104,
+        "peakTerritory": 660,
+        "meanThinkMs": 0.059538991831898064,
+        "p95ThinkMs": 0.09254199999850243,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 76.79055649303112,
+            "territory": 754,
+            "resources": 5
+          },
+          {
+            "strategy": "strongest",
+            "vp": 264.583291131334,
+            "territory": 660,
+            "resources": 104
+          },
+          {
+            "strategy": "minimax",
+            "vp": 59.684774425238494,
+            "territory": 674,
+            "resources": 3
+          },
+          {
+            "strategy": "random",
+            "vp": 60.34786915499364,
+            "territory": 765,
+            "resources": 4
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-c",
+        "rotation": 0,
+        "duration": 90,
+        "strategies": [
+          "strongest",
+          "potential",
+          "mst",
+          "denial"
+        ]
+      },
+      "candidate": {
+        "rank": 2,
+        "vp": 115.44391739764906,
+        "margin": -8.202337637679392,
+        "territory": 188,
+        "resources": 62,
+        "peakTerritory": 190,
+        "meanThinkMs": 0.05913176079394237,
+        "p95ThinkMs": 0.07999999998719431,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 115.44391739764906,
+            "territory": 188,
+            "resources": 62
+          },
+          {
+            "strategy": "potential",
+            "vp": 123.64625503532845,
+            "territory": 181,
+            "resources": 32
+          },
+          {
+            "strategy": "mst",
+            "vp": 36.247122757191825,
+            "territory": 64,
+            "resources": 4
+          },
+          {
+            "strategy": "denial",
+            "vp": 48.04160793420106,
+            "territory": 105,
+            "resources": 8
+          }
+        ]
+      },
+      "baseline": {
+        "rank": 2,
+        "vp": 87.61517760115109,
+        "margin": -32.68159935820745,
+        "territory": 140,
+        "resources": 25,
+        "peakTerritory": 147,
+        "meanThinkMs": 0.07581747491302539,
+        "p95ThinkMs": 0.10008299999753945,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 87.61517760115109,
+            "territory": 140,
+            "resources": 25
+          },
+          {
+            "strategy": "potential",
+            "vp": 120.29677695935854,
+            "territory": 195,
+            "resources": 43
+          },
+          {
+            "strategy": "mst",
+            "vp": 57.730088749474334,
+            "territory": 86,
+            "resources": 13
+          },
+          {
+            "strategy": "denial",
+            "vp": 61.185482490830154,
+            "territory": 100,
+            "resources": 19
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-c",
+        "rotation": 0,
+        "duration": 180,
+        "strategies": [
+          "qlearn",
+          "strongest",
+          "minimax",
+          "random"
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 557.7117270124609,
+        "margin": 287.860751562671,
+        "territory": 712,
+        "resources": 41,
+        "peakTerritory": 799,
+        "meanThinkMs": 0.07540599066499092,
+        "p95ThinkMs": 0.14400000000023283,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 269.85097544978987,
+            "territory": 1128,
+            "resources": 22
+          },
+          {
+            "strategy": "strongest",
+            "vp": 557.7117270124609,
+            "territory": 712,
+            "resources": 41
+          },
+          {
+            "strategy": "minimax",
+            "vp": 208.37985372272675,
+            "territory": 995,
+            "resources": 12
+          },
+          {
+            "strategy": "random",
+            "vp": 227.8403658708442,
+            "territory": 1246,
+            "resources": 10
+          }
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 522.0888660502528,
+        "margin": 276.225005855654,
+        "territory": 735,
+        "resources": 54,
+        "peakTerritory": 738,
+        "meanThinkMs": 0.06318701692025029,
+        "p95ThinkMs": 0.11337500001536682,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 245.8638601945988,
+            "territory": 888,
+            "resources": 14
+          },
+          {
+            "strategy": "strongest",
+            "vp": 522.0888660502528,
+            "territory": 735,
+            "resources": 54
+          },
+          {
+            "strategy": "minimax",
+            "vp": 192.60750582837602,
+            "territory": 973,
+            "resources": 6
+          },
+          {
+            "strategy": "random",
+            "vp": 232.3094905677266,
+            "territory": 1252,
+            "resources": 13
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-c",
+        "rotation": 0,
+        "duration": 180,
+        "strategies": [
+          "strongest",
+          "potential",
+          "mst",
+          "denial"
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 278.2966848262981,
+        "margin": 6.253138077726646,
+        "territory": 197,
+        "resources": 53,
+        "peakTerritory": 201,
+        "meanThinkMs": 0.08087131913629854,
+        "p95ThinkMs": 0.10662499998579733,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 278.2966848262981,
+            "territory": 197,
+            "resources": 53
+          },
+          {
+            "strategy": "potential",
+            "vp": 272.04354674857143,
+            "territory": 193,
+            "resources": 22
+          },
+          {
+            "strategy": "mst",
+            "vp": 72.9643307856124,
+            "territory": 66,
+            "resources": 6
+          },
+          {
+            "strategy": "denial",
+            "vp": 96.17836376997558,
+            "territory": 91,
+            "resources": 7
+          }
+        ]
+      },
+      "baseline": {
+        "rank": 2,
+        "vp": 256.09146108695387,
+        "margin": -28.830788402264034,
+        "territory": 276,
+        "resources": 47,
+        "peakTerritory": 281,
+        "meanThinkMs": 0.11453317327876146,
+        "p95ThinkMs": 0.16749999998137355,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 256.09146108695387,
+            "territory": 276,
+            "resources": 47
+          },
+          {
+            "strategy": "potential",
+            "vp": 284.9222494892179,
+            "territory": 201,
+            "resources": 44
+          },
+          {
+            "strategy": "mst",
+            "vp": 82.60908957835188,
+            "territory": 64,
+            "resources": 3
+          },
+          {
+            "strategy": "denial",
+            "vp": 105.03748979469728,
+            "territory": 93,
+            "resources": 6
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-c",
+        "rotation": 0,
+        "duration": 400,
+        "strategies": [
+          "qlearn",
+          "strongest",
+          "minimax",
+          "random"
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 1209.768413429977,
+        "margin": 342.1864196122799,
+        "territory": 549,
+        "resources": 54,
+        "peakTerritory": 789,
+        "meanThinkMs": 0.08649984173220185,
+        "p95ThinkMs": 0.20941700000548735,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 867.5819938176971,
+            "territory": 1600,
+            "resources": 11
+          },
+          {
+            "strategy": "strongest",
+            "vp": 1209.768413429977,
+            "territory": 549,
+            "resources": 54
+          },
+          {
+            "strategy": "minimax",
+            "vp": 684.3598794729372,
+            "territory": 645,
+            "resources": 17
+          },
+          {
+            "strategy": "random",
+            "vp": 746.2782303521569,
+            "territory": 1302,
+            "resources": 10
+          }
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 1149.9878160043431,
+        "margin": 371.8826389172772,
+        "territory": 282,
+        "resources": 64,
+        "peakTerritory": 703,
+        "meanThinkMs": 0.06741587690296498,
+        "p95ThinkMs": 0.14783400000305846,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 778.105177087066,
+            "territory": 1295,
+            "resources": 14
+          },
+          {
+            "strategy": "strongest",
+            "vp": 1149.9878160043431,
+            "territory": 282,
+            "resources": 64
+          },
+          {
+            "strategy": "minimax",
+            "vp": 705.8651360163508,
+            "territory": 1288,
+            "resources": 8
+          },
+          {
+            "strategy": "random",
+            "vp": 739.5062285981402,
+            "territory": 1231,
+            "resources": 7
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-c",
+        "rotation": 0,
+        "duration": 400,
+        "strategies": [
+          "strongest",
+          "potential",
+          "mst",
+          "denial"
+        ]
+      },
+      "candidate": {
+        "rank": 2,
+        "vp": 599.8461756233484,
+        "margin": -428.932949326468,
+        "territory": 636,
+        "resources": 37,
+        "peakTerritory": 654,
+        "meanThinkMs": 0.10245772624676167,
+        "p95ThinkMs": 0.13979099999414757,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 599.8461756233484,
+            "territory": 636,
+            "resources": 37
+          },
+          {
+            "strategy": "potential",
+            "vp": 1028.7791249498164,
+            "territory": 283,
+            "resources": 51
+          },
+          {
+            "strategy": "mst",
+            "vp": 95.1625011555163,
+            "territory": 47,
+            "resources": 7
+          },
+          {
+            "strategy": "denial",
+            "vp": 110.8155546220571,
+            "territory": 65,
+            "resources": 4
+          }
+        ]
+      },
+      "baseline": {
+        "rank": 2,
+        "vp": 585.6427577390992,
+        "margin": -234.17042075936308,
+        "territory": 391,
+        "resources": 43,
+        "peakTerritory": 399,
+        "meanThinkMs": 0.09228467217836286,
+        "p95ThinkMs": 0.14587499998742715,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 585.6427577390992,
+            "territory": 391,
+            "resources": 43
+          },
+          {
+            "strategy": "potential",
+            "vp": 819.8131784984623,
+            "territory": 227,
+            "resources": 54
+          },
+          {
+            "strategy": "mst",
+            "vp": 121.57205904874112,
+            "territory": 50,
+            "resources": 1
+          },
+          {
+            "strategy": "denial",
+            "vp": 268.1011245960184,
+            "territory": 116,
+            "resources": 12
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-c",
+        "rotation": 1,
+        "duration": 90,
+        "strategies": [
+          "qlearn",
+          "strongest",
+          "minimax",
+          "random"
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 286.8545781274176,
+        "margin": 213.93452978597048,
+        "territory": 619,
+        "resources": 109,
+        "peakTerritory": 620,
+        "meanThinkMs": 0.09070934772431957,
+        "p95ThinkMs": 0.16899999999441206,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 42.04296074362807,
+            "territory": 438,
+            "resources": 4
+          },
+          {
+            "strategy": "strongest",
+            "vp": 286.8545781274176,
+            "territory": 619,
+            "resources": 109
+          },
+          {
+            "strategy": "minimax",
+            "vp": 57.73350952149149,
+            "territory": 793,
+            "resources": 1
+          },
+          {
+            "strategy": "random",
+            "vp": 72.92004834144713,
+            "territory": 791,
+            "resources": 5
+          }
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 274.6533629054875,
+        "margin": 201.73331456404037,
+        "territory": 652,
+        "resources": 109,
+        "peakTerritory": 652,
+        "meanThinkMs": 0.06631796265974159,
+        "p95ThinkMs": 0.10329199998523109,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 48.16072019091372,
+            "territory": 576,
+            "resources": 2
+          },
+          {
+            "strategy": "strongest",
+            "vp": 274.6533629054875,
+            "territory": 652,
+            "resources": 109
+          },
+          {
+            "strategy": "minimax",
+            "vp": 58.02877732221543,
+            "territory": 787,
+            "resources": 2
+          },
+          {
+            "strategy": "random",
+            "vp": 72.92004834144713,
+            "territory": 791,
+            "resources": 5
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-c",
+        "rotation": 1,
+        "duration": 90,
+        "strategies": [
+          "strongest",
+          "potential",
+          "mst",
+          "denial"
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 205.5105395986714,
+        "margin": 151.70267600865304,
+        "territory": 480,
+        "resources": 89,
+        "peakTerritory": 480,
+        "meanThinkMs": 0.06344372462065588,
+        "p95ThinkMs": 0.11029199999757111,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 205.5105395986714,
+            "territory": 480,
+            "resources": 89
+          },
+          {
+            "strategy": "potential",
+            "vp": 48.579433849062475,
+            "territory": 134,
+            "resources": 5
+          },
+          {
+            "strategy": "mst",
+            "vp": 45.46148537230839,
+            "territory": 60,
+            "resources": 8
+          },
+          {
+            "strategy": "denial",
+            "vp": 53.807863590018336,
+            "territory": 113,
+            "resources": 12
+          }
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 173.66132847207854,
+        "margin": 115.32785140693437,
+        "territory": 327,
+        "resources": 77,
+        "peakTerritory": 327,
+        "meanThinkMs": 0.08571977246249918,
+        "p95ThinkMs": 0.12758299999404699,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 173.66132847207854,
+            "territory": 327,
+            "resources": 77
+          },
+          {
+            "strategy": "potential",
+            "vp": 49.37155593373885,
+            "territory": 140,
+            "resources": 14
+          },
+          {
+            "strategy": "mst",
+            "vp": 58.33347706514417,
+            "territory": 83,
+            "resources": 10
+          },
+          {
+            "strategy": "denial",
+            "vp": 53.95121814603529,
+            "territory": 126,
+            "resources": 8
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-c",
+        "rotation": 1,
+        "duration": 180,
+        "strategies": [
+          "qlearn",
+          "strongest",
+          "minimax",
+          "random"
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 555.7741614057207,
+        "margin": 277.4130887984576,
+        "territory": 594,
+        "resources": 49,
+        "peakTerritory": 639,
+        "meanThinkMs": 0.09039552391987199,
+        "p95ThinkMs": 0.15399999998044223,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 175.14155359877287,
+            "territory": 710,
+            "resources": 15
+          },
+          {
+            "strategy": "strongest",
+            "vp": 555.7741614057207,
+            "territory": 594,
+            "resources": 49
+          },
+          {
+            "strategy": "minimax",
+            "vp": 222.40545925505904,
+            "territory": 1185,
+            "resources": 6
+          },
+          {
+            "strategy": "random",
+            "vp": 278.36107260726317,
+            "territory": 1283,
+            "resources": 15
+          }
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 553.9397633605747,
+        "margin": 268.7202494724448,
+        "territory": 657,
+        "resources": 52,
+        "peakTerritory": 657,
+        "meanThinkMs": 0.07536924154021019,
+        "p95ThinkMs": 0.12495800000033341,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 146.82177427704065,
+            "territory": 689,
+            "resources": 12
+          },
+          {
+            "strategy": "strongest",
+            "vp": 553.9397633605747,
+            "territory": 657,
+            "resources": 52
+          },
+          {
+            "strategy": "minimax",
+            "vp": 227.63056615440988,
+            "territory": 1310,
+            "resources": 7
+          },
+          {
+            "strategy": "random",
+            "vp": 285.21951388812994,
+            "territory": 1307,
+            "resources": 14
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-c",
+        "rotation": 1,
+        "duration": 180,
+        "strategies": [
+          "strongest",
+          "potential",
+          "mst",
+          "denial"
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 341.8519837656488,
+        "margin": 235.58890847888338,
+        "territory": 238,
+        "resources": 34,
+        "peakTerritory": 269,
+        "meanThinkMs": 0.08013343874007424,
+        "p95ThinkMs": 0.1103329999896232,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 341.8519837656488,
+            "territory": 238,
+            "resources": 34
+          },
+          {
+            "strategy": "potential",
+            "vp": 106.26307528676543,
+            "territory": 129,
+            "resources": 5
+          },
+          {
+            "strategy": "mst",
+            "vp": 90.57977594119156,
+            "territory": 92,
+            "resources": 37
+          },
+          {
+            "strategy": "denial",
+            "vp": 100.58546945555086,
+            "territory": 105,
+            "resources": 9
+          }
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 352.4737494366314,
+        "margin": 219.31590952296585,
+        "territory": 460,
+        "resources": 41,
+        "peakTerritory": 462,
+        "meanThinkMs": 0.08023900116679095,
+        "p95ThinkMs": 0.14449999999487773,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 352.4737494366314,
+            "territory": 460,
+            "resources": 41
+          },
+          {
+            "strategy": "potential",
+            "vp": 124.51601267758748,
+            "territory": 145,
+            "resources": 14
+          },
+          {
+            "strategy": "mst",
+            "vp": 108.79933923967361,
+            "territory": 73,
+            "resources": 18
+          },
+          {
+            "strategy": "denial",
+            "vp": 133.15783991366555,
+            "territory": 130,
+            "resources": 12
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-c",
+        "rotation": 1,
+        "duration": 400,
+        "strategies": [
+          "qlearn",
+          "strongest",
+          "minimax",
+          "random"
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 981.4084690937607,
+        "margin": 76.72706443221307,
+        "territory": 214,
+        "resources": 34,
+        "peakTerritory": 562,
+        "meanThinkMs": 0.08848048556460682,
+        "p95ThinkMs": 0.17979200000991113,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 727.9743289017736,
+            "territory": 1147,
+            "resources": 39
+          },
+          {
+            "strategy": "strongest",
+            "vp": 981.4084690937607,
+            "territory": 214,
+            "resources": 34
+          },
+          {
+            "strategy": "minimax",
+            "vp": 828.0328208609789,
+            "territory": 1249,
+            "resources": 6
+          },
+          {
+            "strategy": "random",
+            "vp": 904.6814046615476,
+            "territory": 1486,
+            "resources": 14
+          }
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 1145.2240861000448,
+        "margin": 270.8763498263694,
+        "territory": 471,
+        "resources": 64,
+        "peakTerritory": 579,
+        "meanThinkMs": 0.07680554724382598,
+        "p95ThinkMs": 0.1597909999836702,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 554.1408008218071,
+            "territory": 788,
+            "resources": 10
+          },
+          {
+            "strategy": "strongest",
+            "vp": 1145.2240861000448,
+            "territory": 471,
+            "resources": 64
+          },
+          {
+            "strategy": "minimax",
+            "vp": 832.2674557425242,
+            "territory": 1457,
+            "resources": 8
+          },
+          {
+            "strategy": "random",
+            "vp": 874.3477362736754,
+            "territory": 1378,
+            "resources": 8
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-c",
+        "rotation": 1,
+        "duration": 400,
+        "strategies": [
+          "strongest",
+          "potential",
+          "mst",
+          "denial"
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 1073.1534434000725,
+        "margin": 819.0787806092645,
+        "territory": 856,
+        "resources": 73,
+        "peakTerritory": 857,
+        "meanThinkMs": 0.08396855301832203,
+        "p95ThinkMs": 0.1345419999852311,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 1073.1534434000725,
+            "territory": 856,
+            "resources": 73
+          },
+          {
+            "strategy": "potential",
+            "vp": 202.34921837526826,
+            "territory": 125,
+            "resources": 2
+          },
+          {
+            "strategy": "mst",
+            "vp": 79.34671260436933,
+            "territory": 44,
+            "resources": 0
+          },
+          {
+            "strategy": "denial",
+            "vp": 254.07466279080802,
+            "territory": 112,
+            "resources": 8
+          }
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 985.4590045909943,
+        "margin": 648.6160987862484,
+        "territory": 772,
+        "resources": 74,
+        "peakTerritory": 772,
+        "meanThinkMs": 0.08095827480296701,
+        "p95ThinkMs": 0.15191699998104014,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 985.4590045909943,
+            "territory": 772,
+            "resources": 74
+          },
+          {
+            "strategy": "potential",
+            "vp": 336.84290580474595,
+            "territory": 149,
+            "resources": 16
+          },
+          {
+            "strategy": "mst",
+            "vp": 197.83678524810912,
+            "territory": 67,
+            "resources": 14
+          },
+          {
+            "strategy": "denial",
+            "vp": 278.69191979064794,
+            "territory": 120,
+            "resources": 13
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-c",
+        "rotation": 2,
+        "duration": 90,
+        "strategies": [
+          "qlearn",
+          "strongest",
+          "minimax",
+          "random"
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 257.09342729957115,
+        "margin": 185.53067049713536,
+        "territory": 647,
+        "resources": 98,
+        "peakTerritory": 649,
+        "meanThinkMs": 0.09147864293989393,
+        "p95ThinkMs": 0.15900000001420267,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 65.19269733504403,
+            "territory": 635,
+            "resources": 5
+          },
+          {
+            "strategy": "strongest",
+            "vp": 257.09342729957115,
+            "territory": 647,
+            "resources": 98
+          },
+          {
+            "strategy": "minimax",
+            "vp": 71.5627568024358,
+            "territory": 786,
+            "resources": 6
+          },
+          {
+            "strategy": "random",
+            "vp": 58.7960996381049,
+            "territory": 742,
+            "resources": 6
+          }
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 241.68278658999978,
+        "margin": 170.30945788815023,
+        "territory": 720,
+        "resources": 98,
+        "peakTerritory": 720,
+        "meanThinkMs": 0.09407235122537903,
+        "p95ThinkMs": 0.2413339999911841,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 70.02918013031153,
+            "territory": 728,
+            "resources": 6
+          },
+          {
+            "strategy": "strongest",
+            "vp": 241.68278658999978,
+            "territory": 720,
+            "resources": 98
+          },
+          {
+            "strategy": "minimax",
+            "vp": 71.37332870184954,
+            "territory": 774,
+            "resources": 5
+          },
+          {
+            "strategy": "random",
+            "vp": 67.72130783979465,
+            "territory": 773,
+            "resources": 9
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-c",
+        "rotation": 2,
+        "duration": 90,
+        "strategies": [
+          "strongest",
+          "potential",
+          "mst",
+          "denial"
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 184.20358163473372,
+        "margin": 145.03873924505558,
+        "territory": 272,
+        "resources": 65,
+        "peakTerritory": 285,
+        "meanThinkMs": 0.12938433489130588,
+        "p95ThinkMs": 0.2517909999587573,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 184.20358163473372,
+            "territory": 272,
+            "resources": 65
+          },
+          {
+            "strategy": "potential",
+            "vp": 39.16484238967814,
+            "territory": 109,
+            "resources": 20
+          },
+          {
+            "strategy": "mst",
+            "vp": 29.367744675182323,
+            "territory": 37,
+            "resources": 7
+          },
+          {
+            "strategy": "denial",
+            "vp": 32.07578417410462,
+            "territory": 126,
+            "resources": 7
+          }
+        ]
+      },
+      "baseline": {
+        "rank": 2,
+        "vp": 92.8459088773115,
+        "margin": -2.8168562506363912,
+        "territory": 154,
+        "resources": 34,
+        "peakTerritory": 157,
+        "meanThinkMs": 0.1089392858801916,
+        "p95ThinkMs": 0.19062499998835847,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 92.8459088773115,
+            "territory": 154,
+            "resources": 34
+          },
+          {
+            "strategy": "potential",
+            "vp": 95.66276512794789,
+            "territory": 143,
+            "resources": 30
+          },
+          {
+            "strategy": "mst",
+            "vp": 39.41967684876889,
+            "territory": 70,
+            "resources": 13
+          },
+          {
+            "strategy": "denial",
+            "vp": 39.71516936657889,
+            "territory": 139,
+            "resources": 13
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-c",
+        "rotation": 2,
+        "duration": 180,
+        "strategies": [
+          "qlearn",
+          "strongest",
+          "minimax",
+          "random"
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 472.6505852789975,
+        "margin": 170.4988845297554,
+        "territory": 512,
+        "resources": 30,
+        "peakTerritory": 580,
+        "meanThinkMs": 0.12745818903102174,
+        "p95ThinkMs": 0.2213750000228174,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 216.5407435772503,
+            "territory": 924,
+            "resources": 10
+          },
+          {
+            "strategy": "strongest",
+            "vp": 472.6505852789975,
+            "territory": 512,
+            "resources": 30
+          },
+          {
+            "strategy": "minimax",
+            "vp": 302.1517007492421,
+            "territory": 1055,
+            "resources": 29
+          },
+          {
+            "strategy": "random",
+            "vp": 239.33489625451,
+            "territory": 1214,
+            "resources": 16
+          }
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 535.9883592491052,
+        "margin": 254.83835036125726,
+        "territory": 760,
+        "resources": 42,
+        "peakTerritory": 764,
+        "meanThinkMs": 0.09539144165775072,
+        "p95ThinkMs": 0.18033399997511879,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 218.85608386638643,
+            "territory": 1166,
+            "resources": 7
+          },
+          {
+            "strategy": "strongest",
+            "vp": 535.9883592491052,
+            "territory": 760,
+            "resources": 42
+          },
+          {
+            "strategy": "minimax",
+            "vp": 281.15000888784795,
+            "territory": 1044,
+            "resources": 23
+          },
+          {
+            "strategy": "random",
+            "vp": 216.4168620732833,
+            "territory": 1083,
+            "resources": 13
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-c",
+        "rotation": 2,
+        "duration": 180,
+        "strategies": [
+          "strongest",
+          "potential",
+          "mst",
+          "denial"
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 391.5523996401318,
+        "margin": 270.88129842173333,
+        "territory": 399,
+        "resources": 61,
+        "peakTerritory": 405,
+        "meanThinkMs": 0.10391182205376928,
+        "p95ThinkMs": 0.1654170000110753,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 391.5523996401318,
+            "territory": 399,
+            "resources": 61
+          },
+          {
+            "strategy": "potential",
+            "vp": 120.67110121839845,
+            "territory": 110,
+            "resources": 8
+          },
+          {
+            "strategy": "mst",
+            "vp": 97.55638630664208,
+            "territory": 44,
+            "resources": 9
+          },
+          {
+            "strategy": "denial",
+            "vp": 77.56244677564275,
+            "territory": 126,
+            "resources": 5
+          }
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 230.73231201549171,
+        "margin": 9.429994919574455,
+        "territory": 265,
+        "resources": 36,
+        "peakTerritory": 265,
+        "meanThinkMs": 0.16689313360617053,
+        "p95ThinkMs": 0.2996250000433065,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 230.73231201549171,
+            "territory": 265,
+            "resources": 36
+          },
+          {
+            "strategy": "potential",
+            "vp": 221.30231709591726,
+            "territory": 162,
+            "resources": 26
+          },
+          {
+            "strategy": "mst",
+            "vp": 91.09334119198613,
+            "territory": 12,
+            "resources": 0
+          },
+          {
+            "strategy": "denial",
+            "vp": 111.86013115766016,
+            "territory": 177,
+            "resources": 18
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-c",
+        "rotation": 2,
+        "duration": 400,
+        "strategies": [
+          "qlearn",
+          "strongest",
+          "minimax",
+          "random"
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 904.0151394961454,
+        "margin": 5.569047715451234,
+        "territory": 726,
+        "resources": 18,
+        "peakTerritory": 798,
+        "meanThinkMs": 0.08287203595791748,
+        "p95ThinkMs": 0.18962499999906868,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 898.4460917806941,
+            "territory": 1012,
+            "resources": 40
+          },
+          {
+            "strategy": "strongest",
+            "vp": 904.0151394961454,
+            "territory": 726,
+            "resources": 18
+          },
+          {
+            "strategy": "minimax",
+            "vp": 806.0767050797161,
+            "territory": 1018,
+            "resources": 19
+          },
+          {
+            "strategy": "random",
+            "vp": 777.1791262158877,
+            "territory": 1340,
+            "resources": 15
+          }
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 1047.3679868975846,
+        "margin": 203.34249290638434,
+        "territory": 301,
+        "resources": 53,
+        "peakTerritory": 740,
+        "meanThinkMs": 0.08716317060425831,
+        "p95ThinkMs": 0.20383299997774884,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 844.0254939912003,
+            "territory": 1491,
+            "resources": 8
+          },
+          {
+            "strategy": "strongest",
+            "vp": 1047.3679868975846,
+            "territory": 301,
+            "resources": 53
+          },
+          {
+            "strategy": "minimax",
+            "vp": 823.2232099878585,
+            "territory": 1172,
+            "resources": 17
+          },
+          {
+            "strategy": "random",
+            "vp": 749.0161020912642,
+            "territory": 1132,
+            "resources": 12
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-c",
+        "rotation": 2,
+        "duration": 400,
+        "strategies": [
+          "strongest",
+          "potential",
+          "mst",
+          "denial"
+        ]
+      },
+      "candidate": {
+        "rank": 2,
+        "vp": 878.5976398014557,
+        "margin": -294.9444916955906,
+        "territory": 905,
+        "resources": 96,
+        "peakTerritory": 912,
+        "meanThinkMs": 0.14959585249335064,
+        "p95ThinkMs": 0.2781669999822043,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 878.5976398014557,
+            "territory": 905,
+            "resources": 96
+          },
+          {
+            "strategy": "potential",
+            "vp": 1173.5421314970463,
+            "territory": 608,
+            "resources": 18
+          },
+          {
+            "strategy": "mst",
+            "vp": 38.04137871635469,
+            "territory": 23,
+            "resources": 2
+          },
+          {
+            "strategy": "denial",
+            "vp": 74.33465391153007,
+            "territory": 68,
+            "resources": 1
+          }
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 539.9926430255678,
+        "margin": 91.95740620925551,
+        "territory": 303,
+        "resources": 37,
+        "peakTerritory": 303,
+        "meanThinkMs": 0.20446153884518922,
+        "p95ThinkMs": 0.40058300003875047,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 539.9926430255678,
+            "territory": 303,
+            "resources": 37
+          },
+          {
+            "strategy": "potential",
+            "vp": 448.03523681631225,
+            "territory": 162,
+            "resources": 30
+          },
+          {
+            "strategy": "mst",
+            "vp": 180.0929364013256,
+            "territory": 33,
+            "resources": 7
+          },
+          {
+            "strategy": "denial",
+            "vp": 400.79122049959767,
+            "territory": 171,
+            "resources": 15
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-c",
+        "rotation": 3,
+        "duration": 90,
+        "strategies": [
+          "qlearn",
+          "strongest",
+          "minimax",
+          "random"
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 290.6237665553091,
+        "margin": 231.24591542363828,
+        "territory": 591,
+        "resources": 105,
+        "peakTerritory": 593,
+        "meanThinkMs": 0.09699625437561686,
+        "p95ThinkMs": 0.16229100001510233,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 55.65038516774553,
+            "territory": 667,
+            "resources": 5
+          },
+          {
+            "strategy": "strongest",
+            "vp": 290.6237665553091,
+            "territory": 591,
+            "resources": 105
+          },
+          {
+            "strategy": "minimax",
+            "vp": 59.37785113167081,
+            "territory": 783,
+            "resources": 2
+          },
+          {
+            "strategy": "random",
+            "vp": 58.074031902644435,
+            "territory": 677,
+            "resources": 7
+          }
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 249.3841905980553,
+        "margin": 176.13539945317086,
+        "territory": 635,
+        "resources": 105,
+        "peakTerritory": 635,
+        "meanThinkMs": 0.06558139206464766,
+        "p95ThinkMs": 0.10666599997784942,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 52.72184152641179,
+            "territory": 693,
+            "resources": 1
+          },
+          {
+            "strategy": "strongest",
+            "vp": 249.3841905980553,
+            "territory": 635,
+            "resources": 105
+          },
+          {
+            "strategy": "minimax",
+            "vp": 73.24879114488445,
+            "territory": 781,
+            "resources": 10
+          },
+          {
+            "strategy": "random",
+            "vp": 55.551516017546206,
+            "territory": 674,
+            "resources": 3
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-c",
+        "rotation": 3,
+        "duration": 90,
+        "strategies": [
+          "strongest",
+          "potential",
+          "mst",
+          "denial"
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 90.65226801587976,
+        "margin": 2.410346914442556,
+        "territory": 143,
+        "resources": 31,
+        "peakTerritory": 151,
+        "meanThinkMs": 0.05788260793454387,
+        "p95ThinkMs": 0.07733299996471033,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 90.65226801587976,
+            "territory": 143,
+            "resources": 31
+          },
+          {
+            "strategy": "potential",
+            "vp": 81.13500203574023,
+            "territory": 270,
+            "resources": 43
+          },
+          {
+            "strategy": "mst",
+            "vp": 88.2419211014372,
+            "territory": 78,
+            "resources": 24
+          },
+          {
+            "strategy": "denial",
+            "vp": 51.848235113048105,
+            "territory": 88,
+            "resources": 7
+          }
+        ]
+      },
+      "baseline": {
+        "rank": 3,
+        "vp": 76.37764126602575,
+        "margin": -32.55366621734157,
+        "territory": 135,
+        "resources": 26,
+        "peakTerritory": 143,
+        "meanThinkMs": 0.0716087887981361,
+        "p95ThinkMs": 0.09787499997764826,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 76.37764126602575,
+            "territory": 135,
+            "resources": 26
+          },
+          {
+            "strategy": "potential",
+            "vp": 76.76857615237265,
+            "territory": 251,
+            "resources": 19
+          },
+          {
+            "strategy": "mst",
+            "vp": 108.93130748336732,
+            "territory": 95,
+            "resources": 31
+          },
+          {
+            "strategy": "denial",
+            "vp": 48.59785076047297,
+            "territory": 95,
+            "resources": 8
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-c",
+        "rotation": 3,
+        "duration": 180,
+        "strategies": [
+          "qlearn",
+          "strongest",
+          "minimax",
+          "random"
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 609.9520195156424,
+        "margin": 359.4120547148773,
+        "territory": 667,
+        "resources": 56,
+        "peakTerritory": 709,
+        "meanThinkMs": 0.08057230105097221,
+        "p95ThinkMs": 0.1447080000070855,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 209.8469831734114,
+            "territory": 959,
+            "resources": 12
+          },
+          {
+            "strategy": "strongest",
+            "vp": 609.9520195156424,
+            "territory": 667,
+            "resources": 56
+          },
+          {
+            "strategy": "minimax",
+            "vp": 250.53996480076515,
+            "territory": 1363,
+            "resources": 10
+          },
+          {
+            "strategy": "random",
+            "vp": 205.903213311731,
+            "territory": 1037,
+            "resources": 7
+          }
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 613.205646473819,
+        "margin": 358.9836994477587,
+        "territory": 706,
+        "resources": 66,
+        "peakTerritory": 761,
+        "meanThinkMs": 0.07071977596313099,
+        "p95ThinkMs": 0.12529200001154095,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 191.70711247845915,
+            "territory": 1063,
+            "resources": 4
+          },
+          {
+            "strategy": "strongest",
+            "vp": 613.205646473819,
+            "territory": 706,
+            "resources": 66
+          },
+          {
+            "strategy": "minimax",
+            "vp": 254.22194702606035,
+            "territory": 1283,
+            "resources": 9
+          },
+          {
+            "strategy": "random",
+            "vp": 207.9556438798061,
+            "territory": 1034,
+            "resources": 6
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-c",
+        "rotation": 3,
+        "duration": 180,
+        "strategies": [
+          "strongest",
+          "potential",
+          "mst",
+          "denial"
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 265.449294338683,
+        "margin": 77.66649656848861,
+        "territory": 206,
+        "resources": 51,
+        "peakTerritory": 210,
+        "meanThinkMs": 0.07275299241621255,
+        "p95ThinkMs": 0.09979099995689467,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 265.449294338683,
+            "territory": 206,
+            "resources": 51
+          },
+          {
+            "strategy": "potential",
+            "vp": 187.78279777019438,
+            "territory": 286,
+            "resources": 12
+          },
+          {
+            "strategy": "mst",
+            "vp": 153.20354096137532,
+            "territory": 73,
+            "resources": 9
+          },
+          {
+            "strategy": "denial",
+            "vp": 98.5771388346416,
+            "territory": 84,
+            "resources": 10
+          }
+        ]
+      },
+      "baseline": {
+        "rank": 3,
+        "vp": 186.1374545922906,
+        "margin": -24.569907846909558,
+        "territory": 184,
+        "resources": 38,
+        "peakTerritory": 185,
+        "meanThinkMs": 0.09100604667490628,
+        "p95ThinkMs": 0.12745800003176555,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 186.1374545922906,
+            "territory": 184,
+            "resources": 38
+          },
+          {
+            "strategy": "potential",
+            "vp": 203.1934677833033,
+            "territory": 268,
+            "resources": 16
+          },
+          {
+            "strategy": "mst",
+            "vp": 210.70736243920015,
+            "territory": 96,
+            "resources": 24
+          },
+          {
+            "strategy": "denial",
+            "vp": 92.72073273569231,
+            "territory": 96,
+            "resources": 8
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-c",
+        "rotation": 3,
+        "duration": 400,
+        "strategies": [
+          "qlearn",
+          "strongest",
+          "minimax",
+          "random"
+        ]
+      },
+      "baseline": {
+        "rank": 4,
+        "vp": 750.8160770276102,
+        "margin": -173.14886486404635,
+        "territory": 354,
+        "resources": 8,
+        "peakTerritory": 467,
+        "meanThinkMs": 0.07482751338578286,
+        "p95ThinkMs": 0.15270899998722598,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 923.9649418916565,
+            "territory": 944,
+            "resources": 44
+          },
+          {
+            "strategy": "strongest",
+            "vp": 750.8160770276102,
+            "territory": 354,
+            "resources": 8
+          },
+          {
+            "strategy": "minimax",
+            "vp": 877.246499574476,
+            "territory": 1300,
+            "resources": 26
+          },
+          {
+            "strategy": "random",
+            "vp": 849.5481296988015,
+            "territory": 1498,
+            "resources": 15
+          }
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 1233.4285206642703,
+        "margin": 420.1349316522509,
+        "territory": 429,
+        "resources": 65,
+        "peakTerritory": 690,
+        "meanThinkMs": 0.06658574960728023,
+        "p95ThinkMs": 0.1512499999953434,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 667.216355464717,
+            "territory": 1007,
+            "resources": 3
+          },
+          {
+            "strategy": "strongest",
+            "vp": 1233.4285206642703,
+            "territory": 429,
+            "resources": 65
+          },
+          {
+            "strategy": "minimax",
+            "vp": 813.2935890120194,
+            "territory": 1441,
+            "resources": 15
+          },
+          {
+            "strategy": "random",
+            "vp": 751.8442101755398,
+            "territory": 1219,
+            "resources": 9
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "strongest-v6-eval-c",
+        "rotation": 3,
+        "duration": 400,
+        "strategies": [
+          "strongest",
+          "potential",
+          "mst",
+          "denial"
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 778.3844985520099,
+        "margin": 317.8895437074823,
+        "territory": 438,
+        "resources": 36,
+        "peakTerritory": 475,
+        "meanThinkMs": 0.08774775669326715,
+        "p95ThinkMs": 0.12720899999840185,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 778.3844985520099,
+            "territory": 438,
+            "resources": 36
+          },
+          {
+            "strategy": "potential",
+            "vp": 460.49495484452757,
+            "territory": 310,
+            "resources": 37
+          },
+          {
+            "strategy": "mst",
+            "vp": 268.3629500380496,
+            "territory": 63,
+            "resources": 14
+          },
+          {
+            "strategy": "denial",
+            "vp": 232.66065814897965,
+            "territory": 100,
+            "resources": 19
+          }
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 584.4956674803445,
+        "margin": 154.9937621662827,
+        "territory": 269,
+        "resources": 40,
+        "peakTerritory": 277,
+        "meanThinkMs": 0.1069483551181018,
+        "p95ThinkMs": 0.14683400001376867,
+        "teams": [
+          {
+            "strategy": "strongest",
+            "vp": 584.4956674803445,
+            "territory": 269,
+            "resources": 40
+          },
+          {
+            "strategy": "potential",
+            "vp": 424.8227980142238,
+            "territory": 265,
+            "resources": 25
+          },
+          {
+            "strategy": "mst",
+            "vp": 429.50190531406184,
+            "territory": 92,
+            "resources": 24
+          },
+          {
+            "strategy": "denial",
+            "vp": 188.40195524084874,
+            "territory": 94,
+            "resources": 7
+          }
+        ]
+      }
+    }
+  ]
+}

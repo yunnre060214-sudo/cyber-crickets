@@ -16,7 +16,7 @@ export const AGENT_META={
   turtle:{name:'Turtle 堡垒',desc:'高邻接密度推进，保持紧凑领地并降低暴露面。',tier:'防守型'},
   denial:{name:'Resource Denial',desc:'优先夺走敌占资源，其次封锁高价值节点。',tier:'压制型'},
   momentum:{name:'Momentum 变速器',desc:'原创策略：根据面积、敌压和赛程阶段动态切换节奏。',tier:'自适应型'},
-  strongest:{name:'最强',desc:'阶段化 VP 规划器：高质量前沿抢占 + 比分感知攻守 + Beam 前瞻 + 资源阻断 + 终局爆发。',tier:'规划型'}
+  strongest:{name:'最强',desc:'VP 预测规划器：长局前沿投资 + 资源保有与护点 + 紧凑边界回收 + 去重 Beam 前瞻。',tier:'规划型'}
 };
 
 const pickBest=(arr,score)=>{
@@ -225,8 +225,6 @@ class StrongestAgent extends BaseAgent{
     this.recentTargets=new Int32Array(14).fill(-1);
     this.recentCursor=0;
     this.failures=new Map();
-    this.successEMA=.72;
-    this.attackEMA=.5;
     this.peakShare=0;
     this.lastShare=null;
     this.shareLossEMA=0;
@@ -247,7 +245,7 @@ class StrongestAgent extends BaseAgent{
     this.shareLossEMA=this.shareLossEMA*.9+normalizedLoss*.1;
     this.pressureEMA=this.pressureEMA*.92+clamp(v.localPressure??0,0,1)*.08;
 
-    const leaderRate=Math.max(.12,v.leaderVpRate??v.vpRate??.12);
+    const leaderRate=this.scoreOutlook(v).rivalRate;
     const rateDeficit=clamp((leaderRate-(v.vpRate??0))/leaderRate,0,1.5);
     this.rateDeficitEMA=this.rateDeficitEMA*.9+rateDeficit*.1;
 
@@ -256,7 +254,10 @@ class StrongestAgent extends BaseAgent{
       :0;
     const pressure=Math.max(clamp(v.localPressure??0,0,1),this.pressureEMA);
     const deficit=Math.max(rateDeficit,this.rateDeficitEMA);
-    const leaderGap=Math.max(0,(v.leaderShare??share)-share);
+    const rivalShare=v.opponents?.length
+      ?Math.max(...v.opponents.map(o=>o.territory/this.size))
+      :v.leaderShare??share;
+    const leaderGap=Math.max(0,rivalShare-share);
     const collapse=clamp(
       drawdown*.95+
       Math.max(0,pressure-.42)*1.25+
@@ -278,36 +279,46 @@ class StrongestAgent extends BaseAgent{
     return 'final';
   }
 
+  scoreOutlook(v){
+    const remaining=Number.isFinite(v.remaining)?Math.max(0,v.remaining):
+      Math.max(0,(v.duration??90)*(1-v.progress));
+    const rate=Math.max(0,v.vpRate??0), score=v.score??0;
+    const rivals=v.opponents||[];
+    const rivalRate=rivals.length?Math.max(.12,...rivals.map(o=>o.vpRate)):
+      Math.max(.12,v.leaderVpRate??rate);
+    const rivalProjection=rivals.length?
+      Math.max(...rivals.map(o=>o.score+o.vpRate*remaining)):
+      score+(v.rank===1?-(v.leadMargin??0):(v.scoreGap??0))+rivalRate*remaining;
+    return {remaining,rivalRate,projectedMargin:score+rate*remaining-rivalProjection};
+  }
+
   posture(v){
-    const remaining=Math.max(1,v.remaining);
-    const baseline=Math.max(.12,v.leaderVpRate);
-    const catchup=v.rank>1
-      ?clamp(v.scoreGap/(remaining*baseline+1),0,1.6)
-      :0;
+    const outlook=this.scoreOutlook(v);
+    const remaining=Math.max(1,outlook.remaining), baseline=outlook.rivalRate;
+    const catchup=clamp(Math.max(v.scoreGap??0,-outlook.projectedMargin)/
+      (remaining*baseline+1),0,1.6);
     const cushion=v.rank===1
-      ?clamp(v.leadMargin/(remaining*Math.max(.12,v.vpRate)+1),0,1.4)
+      ?clamp(outlook.projectedMargin/(remaining*Math.max(.12,v.vpRate??0)+1),0,1.4)
       :0;
     const liveDeficit=clamp(
-      (Math.max(.12,v.leaderVpRate)-Math.max(0,v.vpRate))/
-      Math.max(.12,v.leaderVpRate),
+      (baseline-Math.max(0,v.vpRate??0))/baseline,
       0,1.5
     );
     const state=this.strategyState||{collapse:0,fortify:0,rateDeficit:0};
     const danger=state.collapse||0;
     const fortify=state.fortify||0;
     const productionDeficit=Math.max(liveDeficit,state.rateDeficit||0);
-    const urgency=v.rank>1
-      ?clamp(catchup*.58+productionDeficit*.72,0,1.4)
-      :0;
+    const urgency=clamp(catchup*.58+productionDeficit*.72,0,1.4);
     const risk=clamp(
       .5+catchup*.38+urgency*.18-cushion*.3-fortify*.42,
       .16,1.18
     );
     const mode=fortify>.42?'fortify':
-      v.rank===1&&(cushion>.18||danger>.28)?'control':
+      v.rank===1&&(cushion>.18||danger>.28||outlook.projectedMargin<0)?'control':
       v.rank>1&&(catchup>.12||productionDeficit>.16)?'chase':
       'balanced';
-    return {catchup,cushion,risk,danger,fortify,productionDeficit,mode};
+    return {catchup,cushion,risk,danger,fortify,productionDeficit,mode,
+      projectedMargin:outlook.projectedMargin};
   }
 
   estimatedChance(o,overclock){
@@ -315,7 +326,6 @@ class StrongestAgent extends BaseAgent{
       ? .93-(o.terrain-1)*.12
       : .39+o.ownN*.105-o.enemyN*.075-(o.terrain-1)*.05;
     if(overclock)p+=.075;
-    p=.88*p+.12*this.successEMA;
     return clamp(p,.12,.93);
   }
 
@@ -333,15 +343,16 @@ class StrongestAgent extends BaseAgent{
     const forward=clamp((o.distOwnCore-o.distRivalCore)/18,-1.2,1.2);
     const neutral=o.owner<0?1:0;
     const fortify=posture.fortify;
+    const growthHorizon=o.enemy?1:clamp((v.remaining??90)/90,1,4);
 
     if(phase==='opening'){
-      return neutral*(branches*1.55+openness*1.35+reach*1.05)
-        +(o.nearestResourceDist<=4?(4-o.nearestResourceDist)*1.05:0);
+      return (neutral*(branches*1.55+openness*1.35+reach*1.05)
+        +(o.nearestResourceDist<=4?(4-o.nearestResourceDist)*1.05:0))*growthHorizon;
     }
     if(phase==='expansion'){
-      return neutral*(branches*1.12+openness*.82+reach*.68)
+      return (neutral*(branches*1.12+openness*.82+reach*.68)
         +forward*.72+(o.nearestResourceDist<=3?(4-o.nearestResourceDist)*.8:0)
-        +fortify*(o.ownN*1.25-o.enemyPressure*1.6);
+        +fortify*(o.ownN*1.25-o.enemyPressure*1.6))*growthHorizon;
     }
     if(phase==='contest'){
       return branches*.34+forward*.48
@@ -353,25 +364,33 @@ class StrongestAgent extends BaseAgent{
       +fortify*(neutral*1.35+o.ownN*1.95-o.enemyN*1.45-o.enemyPressure*2.9);
   }
 
-  staticValue(o,v,{continuation=false}={}){
-    const phase=this.phase(v), final=phase==='final';
-    const posture=this.posture(v);
+  staticValue(o,v,{continuation=false,context}={}){
+    const phase=context?.phase??this.phase(v), final=phase==='final';
+    const posture=context?.posture??this.posture(v);
     const remaining=Math.max(0,1-v.progress);
     const p=this.estimatedChance(o,final);
     const horizon=(continuation?.22:.34)+remaining*(continuation?1.18:1.72);
     const fortify=posture.fortify;
 
-    const resourceWeight={
+    const fallbackResourceWeight={
       opening:6.9,
       expansion:4.6,
       contest:6.4,
       final:8.2
     }[phase];
+    // In area-score units, one resource unit has the exact marginal VP ratio
+    // 3.5 / resourceTotal : 6.5 / cellCount. Holding time remains a heuristic.
+    const resourceWeight=v.resourceTotal>0?3.5*this.size/v.resourceTotal:fallbackResourceWeight;
+    const contacts=o.enemyPressure*4;
+    const holdHorizon=Math.min(18,Math.max(.105,v.remaining??90*(1-v.progress)));
+    const holdSeconds=contacts>0?
+      (1.5+o.ownN*2.5)/(contacts*(.5+contacts*.5+(final?.3:0))):holdHorizon;
+    const retention=clamp(holdSeconds/holdHorizon,0,1);
     const area=6.5;
-    const resource=o.resource*resourceWeight*(o.enemy?1.42:1)*(1-fortify*.28);
+    const resource=o.resource*resourceWeight*retention*(1-fortify*.28);
     const denial=o.enemy
       ?((phase==='final'?6.1:phase==='contest'?4.9:3.7)
-        +(o.resource>0?o.resource*(4.6+posture.catchup*2.2):0))*(1-fortify*.55)
+        +resource*.6)*(1-fortify*.55)
       :0;
     const direct=horizon*(area+resource+denial);
 
@@ -402,25 +421,30 @@ class StrongestAgent extends BaseAgent{
       o.ownN*3.15-o.enemyN*2.75-o.enemyPressure*4.6+
       (o.owner<0?1.45:0)+(o.enemy&&o.ownN>=3?1.2:0)
     );
+    const assetProtection=(o.protectedResourceValue||0)*resourceWeight*.075*(2+fortify*2);
+    // Under contact, multiple friendly edges both close holes and improve the
+    // next countercapture. Keep this separate from open-frontier investment.
+    const contact=clamp(((v.localPressure??0)-.2)/.5,0,1);
+    const boundaryControl=8*contact*o.ownN*(o.ownN-1);
 
     return {
       p,
-      utility:p*(direct+path+pull+cohesion+quality+attack+leadControl+comeback+stability)
+      utility:p*(direct+path+pull+cohesion+quality+attack+leadControl+comeback+stability+assetProtection+boundaryControl)
         -friction-pressure-retry
     };
   }
 
-  continuationValue(o,v){
+  continuationValue(o,v,context){
     const next=o.continuations||[];
     if(!next.length)return 0;
-    const scored=next.map(n=>this.staticValue(n,v,{continuation:true}).utility)
+    const scored=next.map(n=>this.staticValue(n,v,{continuation:true,context}).utility)
       .sort((x,y)=>y-x).slice(0,3);
     const best=scored[0]||0, second=scored[1]??best, third=scored[2]??second;
     return .66*best+.23*second+.11*third;
   }
 
-  opponentRisk(o,v){
-    const phase=this.phase(v), posture=this.posture(v);
+  opponentRisk(o,v,context){
+    const phase=context?.phase??this.phase(v), posture=context?.posture??this.posture(v);
     const pressure=clamp((v.localPressure??0)*.58+o.enemyPressure*.42,0,1);
     const contact=pressure*3.15+o.enemyN*.7;
     const exposure=Math.max(0,2-o.ownN)*(o.enemy?1.08:.66);
@@ -435,8 +459,12 @@ class StrongestAgent extends BaseAgent{
     if(!v.options.length)return null;
     this.observe(v);
     const phase=this.phase(v), posture=this.posture(v);
-    const ranked=v.options.map(o=>{
-      const now=this.staticValue(o,v);
+    const context={phase,posture};
+    // Multiple friendly origins do not create different capture outcomes.
+    // Reserve beam slots and tie-break draws for unique targets.
+    const targets=[...new Map(v.options.map(o=>[o.to,o])).values()];
+    const ranked=targets.map(o=>{
+      const now=this.staticValue(o,v,{context});
       return {o,now,pre:now.utility};
     }).sort((x,y)=>y.pre-x.pre);
 
@@ -461,8 +489,8 @@ class StrongestAgent extends BaseAgent{
 
     let best=null,bestScore=-Infinity,bestFuture=0,bestP=0;
     for(const item of beam){
-      const future=this.continuationValue(item.o,v);
-      const risk=this.opponentRisk(item.o,v);
+      const future=this.continuationValue(item.o,v,context);
+      const risk=this.opponentRisk(item.o,v,context);
       const lookahead=item.now.p*future*lookaheadWeight;
       const riskAversion=clamp(1.22-posture.risk+posture.fortify*.92,.18,1.72);
       const score=item.now.utility+lookahead-risk*riskAversion+this.rng.next()*.02;
@@ -477,6 +505,7 @@ class StrongestAgent extends BaseAgent{
       this.recentCursor=(this.recentCursor+1)%this.recentTargets.length;
       const motive=posture.mode==='fortify'&&best.owner<0?'收紧边界':
         posture.mode==='fortify'&&best.ownN>=3?'局部反推':
+        best.protectedResourceValue>0?'保护资源支点':
         best.enemy&&best.resource>0?'夺取敌方资源':
         best.resource>0?'高价值资源':
         best.enemy?'主动翻色':
@@ -486,7 +515,7 @@ class StrongestAgent extends BaseAgent{
       const stance={fortify:'止损',control:'控场',chase:'追分',balanced:'均衡'}[posture.mode];
       this.thought='阶段化 VP 规划：'+motive+'；'+stance+'；首步成功率 '+Math.round(bestP*100)+
         '%；后续价值 '+bestFuture.toFixed(1)+'；崩盘风险 '+Math.round(clamp(posture.danger,0,1)*100)+
-        '%；阶段 '+phase;
+        '%；静态终局差 '+posture.projectedMargin.toFixed(1)+' VP；阶段 '+phase;
     }
     return best;
   }
@@ -495,9 +524,6 @@ class StrongestAgent extends BaseAgent{
     super.onResult(r);
     if(!r?.move)return;
     const key=r.move.to;
-    const success=r.success?1:0;
-    this.successEMA=this.successEMA*.94+success*.06;
-    if(r.move.enemy)this.attackEMA=this.attackEMA*.92+success*.08;
     if(r.success)this.failures.delete(key);
     else this.failures.set(key,Math.min(5,(this.failures.get(key)||0)+1));
     if(this.failures.size>96)this.failures.delete(this.failures.keys().next().value);
@@ -507,8 +533,6 @@ class StrongestAgent extends BaseAgent{
     this.recentTargets.fill(-1);
     this.recentCursor=0;
     this.failures.clear();
-    this.successEMA=.72;
-    this.attackEMA=.5;
     this.peakShare=0;
     this.lastShare=null;
     this.shareLossEMA=0;

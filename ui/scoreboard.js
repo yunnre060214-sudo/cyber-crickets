@@ -1,8 +1,8 @@
-import {AGENT_META} from '../agents.js?v=20260928-ui-refactor-v1';
-import {CELL_COUNT} from '../match.js?v=20260928-ui-refactor-v1';
-import {vpRate} from '../rules.js?v=20260928-ui-refactor-v1';
-import {COLORS} from './constants.js?v=20260928-ui-refactor-v1';
-import {renderLiveChart} from './chart.js?v=20260928-ui-refactor-v1';
+import {AGENT_META} from '../agents.js?v=20260928-strongest-v6';
+import {CELL_COUNT} from '../match.js?v=20260928-strongest-v6';
+import {vpRate} from '../rules.js?v=20260928-strongest-v6';
+import {COLORS} from './constants.js?v=20260928-strongest-v6';
+import {renderLiveChart} from './chart.js?v=20260928-strongest-v6';
 
 export function currentWinProbabilities(match) {
   const teams=match.teams;

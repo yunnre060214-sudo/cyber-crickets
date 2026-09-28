@@ -1,7 +1,7 @@
-import {AGENT_META} from '../agents.js?v=20260928-ui-refactor-v1';
-import {CELL_COUNT} from '../match.js?v=20260928-ui-refactor-v1';
-import {TEAM_NAMES} from './constants.js?v=20260928-ui-refactor-v1';
-import {chartSvg} from './chart.js?v=20260928-ui-refactor-v1';
+import {AGENT_META} from '../agents.js?v=20260928-strongest-v6';
+import {CELL_COUNT} from '../match.js?v=20260928-strongest-v6';
+import {TEAM_NAMES} from './constants.js?v=20260928-strongest-v6';
+import {chartSvg} from './chart.js?v=20260928-strongest-v6';
 
 function averageMetrics(match, teamId) {
   const samples = match.timeline.length || 1;

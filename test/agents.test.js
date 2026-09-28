@@ -147,3 +147,95 @@ test('strongest treats final overclock as extra exposure risk when already surro
   assert.equal(move?.to,1101);
   assert.ok(agent.opponentRisk(exposed,finalView)>agent.opponentRisk({...exposed,enemyPressure:.2},finalView));
 });
+
+test('strongest uses the rule probability even after an unrelated run of successful moves', () => {
+  const agent=createAgent('strongest',0,4096,createRng('exact-chance'));
+  const target={...options[0],owner:1,enemy:true,terrain:1,ownN:1,enemyN:3};
+  // .39 + .105 - 3*.075 = .27; overclock adds .075.
+  assert.ok(Math.abs(agent.estimatedChance(target,false)-.27)<1e-12);
+  for(let i=0;i<20;i++)agent.onResult({move:{...target,to:1500+i},success:true});
+  assert.ok(Math.abs(agent.estimatedChance(target,false)-.27)<1e-12);
+  assert.ok(Math.abs(agent.estimatedChance(target,true)-.345)<1e-12);
+  assert.equal(agent.estimatedChance({...target,owner:-1,enemy:false,terrain:1},true),.93);
+});
+
+test('strongest sees a projected overtake while it still holds the score lead', () => {
+  const agent=createAgent('strongest',0,4096,createRng('overtake-warning'));
+  const leading={...view,progress:.55,remaining:180,rank:1,score:200,scoreGap:0,
+    leadMargin:20,vpRate:2,leaderVpRate:2,share:.25,leaderShare:.25,
+    opponents:[{id:1,score:180,vpRate:3,territory:1300,resources:12},
+      {id:2,score:170,vpRate:1.5,territory:600,resources:8}]};
+  agent.observe(leading);
+  const posture=agent.posture(leading);
+  assert.ok(posture.productionDeficit>.3);
+  assert.equal(posture.mode,'control');
+});
+
+test('multiple legal sources for one target do not alter strongest target selection or random budget', () => {
+  const a=createAgent('strongest',0,4096,createRng('deduplicate-targets'));
+  const b=createAgent('strongest',0,4096,createRng('deduplicate-targets'));
+  const target={...options[1],to:1701,owner:-1,enemy:false,terrain:1,resource:0,
+    ownN:3,enemyN:0,enemyPressure:0,continuations:[]};
+  const other={...target,to:1702,ownN:1};
+  const complete={...view,remaining:40,rank:2,score:30,scoreGap:3,leadMargin:0,
+    vpRate:.8,leaderVpRate:1,leaderShare:.12};
+  const unique=a.selectAction({...complete,options:[target,other]});
+  const repeated=b.selectAction({...complete,options:[target,{...target,from:79},
+    {...target,from:81},{...target,from:16},other]});
+  assert.equal(unique.to,repeated.to);
+  assert.equal(a.rng.next(),b.rng.next());
+});
+
+test('strongest countercaptures a bridge that shields a threatened friendly resource', () => {
+  const agent=createAgent('strongest',0,4096,createRng('protect-income'));
+  const plain={...options[1],to:1801,owner:1,enemy:true,terrain:1,resource:0,
+    ownN:3,enemyN:1,nearestResourceDist:8,resourcePull:1,enemyPressure:.25,
+    protectedResourceValue:0,continuations:[]};
+  const shield={...plain,to:1802,ownN:2,protectedResourceValue:3};
+  const situation={...view,progress:.6,remaining:160,rank:1,score:200,scoreGap:0,
+    leadMargin:25,vpRate:2.5,leaderVpRate:2.5,resourceTotal:90,
+    options:[plain,shield]};
+  assert.equal(agent.selectAction(situation)?.to,1802);
+});
+
+test('strongest changes a risky resource raid when the resource denominator dilutes its VP value', () => {
+  const safe={...options[1],to:1901,owner:-1,enemy:false,terrain:1,resource:0,
+    ownN:3,enemyN:0,nearestResourceDist:7,resourcePull:1,enemyPressure:0,continuations:[]};
+  const raid={...safe,to:1902,owner:1,enemy:true,resource:3,ownN:1,enemyN:3,
+    nearestResourceDist:0,resourcePull:12,enemyPressure:.75};
+  const situation={...view,progress:.55,remaining:180,rank:2,score:150,scoreGap:10,
+    vpRate:2,leaderVpRate:2.2,leaderShare:.25,localPressure:.3,options:[safe,raid]};
+  const scarce=createAgent('strongest',0,4096,createRng('vp-denominator'));
+  const abundant=createAgent('strongest',0,4096,createRng('vp-denominator'));
+  assert.equal(scarce.selectAction({...situation,resourceTotal:10})?.to,1902);
+  assert.equal(abundant.selectAction({...situation,resourceTotal:1000})?.to,1901);
+});
+
+test('strongest fills a hole in its fighting line before opening an isolated resource foothold', () => {
+  const agent=createAgent('strongest',0,4096,createRng('compact-contact'));
+  const hole={...options[1],to:2001,owner:-1,enemy:false,terrain:1,resource:0,
+    ownN:4,enemyN:0,nearestResourceDist:7,resourcePull:1,enemyPressure:0,continuations:[]};
+  const exposed={...hole,to:2002,resource:1,ownN:1,enemyN:2,
+    nearestResourceDist:0,resourcePull:12,enemyPressure:.5};
+  const situation={...view,progress:.55,remaining:180,rank:2,score:150,scoreGap:10,
+    vpRate:2,leaderVpRate:2.2,leaderShare:.22,share:.20,resourceTotal:90,
+    localPressure:.5,options:[hole,exposed]};
+  assert.equal(agent.selectAction(situation)?.to,2001);
+});
+
+test('strongest invests more in an open frontier when hundreds of seconds remain', () => {
+  const base={...options[1],owner:-1,enemy:false,terrain:1,resource:0,ownN:1,
+    enemyN:0,distOwnCore:10,distRivalCore:40,nearestResourceDist:99,
+    resourcePull:0,enemyPressure:0,continuations:[]};
+  const frontier={...base,to:2101,continuations:[
+    {...base,from:2101,to:2102},{...base,from:2101,to:2103},{...base,from:2101,to:2104}
+  ]};
+  const nearResource={...base,to:2105,ownN:2,nearestResourceDist:2,resourcePull:4};
+  const situation={...view,progress:.25,rank:1,score:100,scoreGap:0,leadMargin:0,
+    vpRate:1,leaderVpRate:1,leaderShare:.15,share:.15,resourceTotal:90,
+    options:[frontier,nearResource]};
+  const short=createAgent('strongest',0,4096,createRng('time-horizon'));
+  const long=createAgent('strongest',0,4096,createRng('time-horizon'));
+  assert.equal(short.selectAction({...situation,remaining:30})?.to,2105);
+  assert.equal(long.selectAction({...situation,remaining:300})?.to,2101);
+});

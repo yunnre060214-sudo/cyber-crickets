@@ -1,0 +1,403 @@
+{
+  "profile": "regression",
+  "baselineCommit": "5c4aad40bbe7edf0932e51d342a538bcf9cde9ca",
+  "step": 0.035,
+  "candidateSourceHashes": {
+    "agents.js": "612f79734aff59659d825baa31fd0c5d74db995b",
+    "match.js": "b61dfc1155625e58409248270505140eb6096114",
+    "rules.js": "6f249b74ccaa6d1bc20dbb5e9ebf81ecc732ff95"
+  },
+  "note": "Fixed-seed sample; seeds, durations and rotations are correlated. Timing is local wall-clock data.",
+  "summary": {
+    "baseline": {
+      "games": 4,
+      "wins": 1,
+      "ties": 0,
+      "meanRank": 2,
+      "meanVP": 917.4984123142194,
+      "meanMargin": -69.85921716805993,
+      "meanTerritory": 344.25,
+      "meanThinkMs": 0.11795240643045626,
+      "meanP95ThinkMs": 0.2571045000004233
+    },
+    "candidate": {
+      "games": 4,
+      "wins": 3,
+      "ties": 0,
+      "meanRank": 1.25,
+      "meanVP": 1047.3816784014957,
+      "meanMargin": 74.16270638021811,
+      "meanTerritory": 362,
+      "meanThinkMs": 0.11526203877952891,
+      "meanP95ThinkMs": 0.25476049999929273
+    },
+    "byDuration": {
+      "400": {
+        "baseline": {
+          "games": 4,
+          "wins": 1,
+          "ties": 0,
+          "meanRank": 2,
+          "meanVP": 917.4984123142194,
+          "meanMargin": -69.85921716805993,
+          "meanTerritory": 344.25,
+          "meanThinkMs": 0.11795240643045626,
+          "meanP95ThinkMs": 0.2571045000004233
+        },
+        "candidate": {
+          "games": 4,
+          "wins": 3,
+          "ties": 0,
+          "meanRank": 1.25,
+          "meanVP": 1047.3816784014957,
+          "meanMargin": 74.16270638021811,
+          "meanTerritory": 362,
+          "meanThinkMs": 0.11526203877952891,
+          "meanP95ThinkMs": 0.25476049999929273
+        }
+      }
+    }
+  },
+  "results": [
+    {
+      "config": {
+        "seed": "RW2GG2",
+        "rotation": 0,
+        "duration": 400,
+        "strategies": [
+          "qlearn",
+          "strongest",
+          "minimax",
+          "random"
+        ]
+      },
+      "baseline": {
+        "rank": 2,
+        "vp": 829.663204334867,
+        "margin": -247.31078854876728,
+        "territory": 463,
+        "resources": 43,
+        "peakTerritory": 644,
+        "meanThinkMs": 0.1412179086614164,
+        "p95ThinkMs": 0.29025000000001455,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 771.9242721439722,
+            "territory": 856,
+            "resources": 9
+          },
+          {
+            "strategy": "strongest",
+            "vp": 829.663204334867,
+            "territory": 463,
+            "resources": 43
+          },
+          {
+            "strategy": "minimax",
+            "vp": 1076.9739928836343,
+            "territory": 1541,
+            "resources": 42
+          },
+          {
+            "strategy": "random",
+            "vp": 723.692857711925,
+            "territory": 1236,
+            "resources": 4
+          }
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 1076.917506388998,
+        "margin": 89.15784529266364,
+        "territory": 482,
+        "resources": 69,
+        "peakTerritory": 689,
+        "meanThinkMs": 0.12044047532808416,
+        "p95ThinkMs": 0.2857500000000073,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 987.7596610963343,
+            "territory": 1515,
+            "resources": 17
+          },
+          {
+            "strategy": "strongest",
+            "vp": 1076.917506388998,
+            "territory": 482,
+            "resources": 69
+          },
+          {
+            "strategy": "minimax",
+            "vp": 750.0643890958759,
+            "territory": 1030,
+            "resources": 17
+          },
+          {
+            "strategy": "random",
+            "vp": 638.9109805696428,
+            "territory": 1069,
+            "resources": 3
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "RW2GG2",
+        "rotation": 1,
+        "duration": 400,
+        "strategies": [
+          "qlearn",
+          "strongest",
+          "minimax",
+          "random"
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 1073.8898448542982,
+        "margin": 148.73324913085128,
+        "territory": 272,
+        "resources": 61,
+        "peakTerritory": 735,
+        "meanThinkMs": 0.11034655564305641,
+        "p95ThinkMs": 0.25083400000039546,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 654.9926627894772,
+            "territory": 1212,
+            "resources": 9
+          },
+          {
+            "strategy": "strongest",
+            "vp": 1073.8898448542982,
+            "territory": 272,
+            "resources": 61
+          },
+          {
+            "strategy": "minimax",
+            "vp": 925.1565957234469,
+            "territory": 1568,
+            "resources": 14
+          },
+          {
+            "strategy": "random",
+            "vp": 829.2536439027518,
+            "territory": 1044,
+            "resources": 14
+          }
+        ]
+      },
+      "baseline": {
+        "rank": 1,
+        "vp": 1007.0835934513208,
+        "margin": 86.93281231060837,
+        "territory": 315,
+        "resources": 57,
+        "peakTerritory": 692,
+        "meanThinkMs": 0.10465828503936868,
+        "p95ThinkMs": 0.25991699999940465,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 706.2978967063112,
+            "territory": 1131,
+            "resources": 11
+          },
+          {
+            "strategy": "strongest",
+            "vp": 1007.0835934513208,
+            "territory": 315,
+            "resources": 57
+          },
+          {
+            "strategy": "minimax",
+            "vp": 920.1507811407124,
+            "territory": 1606,
+            "resources": 17
+          },
+          {
+            "strategy": "random",
+            "vp": 849.6736995915915,
+            "territory": 1044,
+            "resources": 13
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "RW2GG2",
+        "rotation": 2,
+        "duration": 400,
+        "strategies": [
+          "qlearn",
+          "strongest",
+          "minimax",
+          "random"
+        ]
+      },
+      "baseline": {
+        "rank": 3,
+        "vp": 864.2942533688534,
+        "margin": -117.0135553590211,
+        "territory": 296,
+        "resources": 39,
+        "peakTerritory": 640,
+        "meanThinkMs": 0.12204663070868436,
+        "p95ThinkMs": 0.2594169999993028,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 637.65554102669,
+            "territory": 989,
+            "resources": 4
+          },
+          {
+            "strategy": "strongest",
+            "vp": 864.2942533688534,
+            "territory": 296,
+            "resources": 39
+          },
+          {
+            "strategy": "minimax",
+            "vp": 981.3078087278745,
+            "territory": 1151,
+            "resources": 34
+          },
+          {
+            "strategy": "random",
+            "vp": 952.9346896332146,
+            "territory": 1660,
+            "resources": 29
+          }
+        ]
+      },
+      "candidate": {
+        "rank": 1,
+        "vp": 1054.1421751851944,
+        "margin": 67.55458687074349,
+        "territory": 374,
+        "resources": 55,
+        "peakTerritory": 678,
+        "meanThinkMs": 0.11495852913383792,
+        "p95ThinkMs": 0.2481659999994008,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 569.5585442577617,
+            "territory": 1149,
+            "resources": 6
+          },
+          {
+            "strategy": "strongest",
+            "vp": 1054.1421751851944,
+            "territory": 374,
+            "resources": 55
+          },
+          {
+            "strategy": "minimax",
+            "vp": 986.587588314451,
+            "territory": 1171,
+            "resources": 28
+          },
+          {
+            "strategy": "random",
+            "vp": 806.207486162701,
+            "territory": 1402,
+            "resources": 9
+          }
+        ]
+      }
+    },
+    {
+      "config": {
+        "seed": "RW2GG2",
+        "rotation": 3,
+        "duration": 400,
+        "strategies": [
+          "qlearn",
+          "strongest",
+          "minimax",
+          "random"
+        ]
+      },
+      "candidate": {
+        "rank": 2,
+        "vp": 984.5771871774923,
+        "margin": -8.794855773385962,
+        "territory": 320,
+        "resources": 38,
+        "peakTerritory": 660,
+        "meanThinkMs": 0.11530259501313717,
+        "p95ThinkMs": 0.23429199999736738,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 773.8892880803668,
+            "territory": 1071,
+            "resources": 32
+          },
+          {
+            "strategy": "strongest",
+            "vp": 984.5771871774923,
+            "territory": 320,
+            "resources": 38
+          },
+          {
+            "strategy": "minimax",
+            "vp": 993.3720429508783,
+            "territory": 1542,
+            "resources": 20
+          },
+          {
+            "strategy": "random",
+            "vp": 696.8691936286901,
+            "territory": 1163,
+            "resources": 8
+          }
+        ]
+      },
+      "baseline": {
+        "rank": 2,
+        "vp": 968.9525981018367,
+        "margin": -2.045337075059706,
+        "territory": 303,
+        "resources": 25,
+        "peakTerritory": 559,
+        "meanThinkMs": 0.10388680131235563,
+        "p95ThinkMs": 0.21883400000297115,
+        "teams": [
+          {
+            "strategy": "qlearn",
+            "vp": 735.8663951046653,
+            "territory": 1095,
+            "resources": 30
+          },
+          {
+            "strategy": "strongest",
+            "vp": 968.9525981018367,
+            "territory": 303,
+            "resources": 25
+          },
+          {
+            "strategy": "minimax",
+            "vp": 970.9979351768964,
+            "territory": 1487,
+            "resources": 34
+          },
+          {
+            "strategy": "random",
+            "vp": 737.5802368784487,
+            "territory": 1211,
+            "resources": 9
+          }
+        ]
+      }
+    }
+  ]
+}
