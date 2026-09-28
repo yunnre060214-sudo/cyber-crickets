@@ -168,19 +168,40 @@ https://yunnre060214-sudo.github.io/cyber-crickets/?seed=20260927&rotation=1&age
 ## 11. 项目结构
 
 ```text
-index.html             页面结构
-styles.css             UI 与响应式布局
-app.js                 单局控件、实时渲染、胜率估计、日志导出和赛后分析
-match.js               地图、候选动作、公开前瞻视图、同步决策和比赛流程
-rules.js               PRNG、出生轮换、VP 与冲突结算
-agents.js              18 个内置 Agent
-tournament.js          循环、淘汰、小组、瑞士轮等赛制与统计
-tournament-ui.js       赛事侧边抽屉、报告和浏览器保存
-tournament-worker.js   赛事后台快速模拟
-test/                  Node 内置测试
-docs/                  规则与实现文档
-.github/workflows/     GitHub Pages 部署
+index.html               页面结构与静态入口
+styles.css               CSS 入口，只负责按稳定顺序组合样式模块
+css/
+  components.css         基础组件与通用视觉
+  layout.css             主工作区与桌面布局
+  match.css              实时对局、趋势图与赛后基础样式
+  tournament.css         赛事视图
+  responsive.css         布局响应式覆盖
+  match-report.css       排名、导出与赛后报告组件
+  mobile-base.css        早期移动端兼容层
+  mobile.css             当前移动端布局与抽屉
+  settings.css           自定义时长 / 倍速控件
+app.js                   单局生命周期与事件编排
+ui/
+  constants.js           阵营颜色与名称
+  settings.js            URL 参数、阵容和比赛设置
+  chart.js               实时 VP 图与赛后 SVG 图表
+  scoreboard.js          实时排名与当前胜率
+  map-renderer.js        Canvas 战场绘制与思考覆盖层
+  report.js              赛后结算与解释性报告
+export/
+  markdown.js            AI 可读完整 Markdown 日志
+match.js                 地图、候选动作、公开前瞻视图、同步决策和比赛流程
+rules.js                 PRNG、出生轮换、VP 与冲突结算
+agents.js                18 个内置 Agent
+tournament.js            循环、淘汰、小组、瑞士轮等赛制与统计
+tournament-ui.js         赛事侧边抽屉、报告和浏览器保存
+tournament-worker.js     赛事后台快速模拟
+test/                    Node 内置测试
+docs/                    规则与实现文档
+.github/workflows/       GitHub Pages 部署
 ```
+
+UI 继续保持 **vanilla ES modules + 零前端框架**。核心模拟仍沿用 `rules.js → match.js → agents.js → tournament.js` 的职责边界；`app.js` 只负责编排单局状态和 UI 模块，不再承载具体绘图、榜单、报告和导出实现。
 
 ## 12. 本地运行与测试
 
