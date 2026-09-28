@@ -33,7 +33,7 @@ test('the page exposes its shareable seed, rotation and VP scoring', async () =>
     '#tournamentClose', '#tournamentContent', '#tournamentStatus'
   ]);
   globalThis.document = {
-    querySelector: selector => tournamentSelectors.has(selector) ? null : element(selector),
+    querySelector: selector => tournamentSelectors.has(selector) || selector === '#exportDialog' ? null : element(selector),
     createElement: () => ({
       innerHTML: '', className: '', textContent: '', parts: [],
       appendChild(child) { this.parts.push(child.textContent); },

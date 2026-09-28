@@ -18,7 +18,7 @@ test('UI entrypoint uses canonical app.js and modular CSS', () => {
 
 test('app.js delegates heavy UI responsibilities', () => {
   const app = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
-  for (const modulePath of ['./ui/settings.js','./ui/scoreboard.js','./ui/map-renderer.js','./ui/report.js','./export/markdown.js']) {
+  for (const modulePath of ['./ui/settings.js','./ui/scoreboard.js','./ui/map-renderer.js','./ui/report.js','./ui/export.js']) {
     assert.ok(app.includes(modulePath), modulePath + ' should be imported');
   }
   assert.doesNotMatch(app, /function renderLiveChart\s*\(/);
@@ -28,7 +28,7 @@ test('app.js delegates heavy UI responsibilities', () => {
 });
 
 test('refactored UI modules are valid JavaScript syntax', () => {
-  for (const file of ['app.js','ui/constants.js','ui/settings.js','ui/chart.js','ui/scoreboard.js','ui/map-renderer.js','ui/report.js','export/markdown.js']) {
+  for (const file of ['app.js','ui/constants.js','ui/settings.js','ui/chart.js','ui/scoreboard.js','ui/map-renderer.js','ui/report.js','ui/export.js','export/markdown.js','export/model.js','export/html.js','export/download.js']) {
     execFileSync(process.execPath, ['--check', path.join(root, file)], {stdio:'pipe'});
   }
 });

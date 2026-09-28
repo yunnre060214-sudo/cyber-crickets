@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#f4f5f7" />
   <title>赛博斗蛐蛐 · 算法争夺战</title>
-  <link rel="stylesheet" href="./styles.css?v=20260928-ui-refactor-v1" />
+  <link rel="stylesheet" href="./styles.css?v=20260928-export-v2" />
 </head>
 <body>
   <main class="app-shell">
@@ -112,7 +112,7 @@
               <p class="eyebrow">SCOREBOARD</p>
               <h2>实时排名</h2>
             </div>
-            <button id="exportLogBtn" type="button" class="score-export-btn">导出 MD 日志</button>
+            <button id="exportLogBtn" type="button" class="score-export-btn">导出战报</button>
           </div>
           <div id="scoreboard" class="scoreboard"></div>
         </section>
@@ -172,7 +172,7 @@
           <h2 id="winnerTitle">回合结束</h2>
           <p id="winnerSummary" class="result-summary"></p>
         </div>
-        <button id="resultExportBtn" class="result-export" type="button">导出 MD 日志</button>
+        <button id="resultExportBtn" class="result-export" type="button" aria-label="导出战报">导出战报</button>
       </header>
       <section class="result-section">
         <div class="result-section-title"><span>FINAL STANDINGS</span><strong>最终排名</strong></div>
@@ -193,6 +193,32 @@
     </div>
   </dialog>
 
-  <script type="module" src="./app.js?v=20260928-strongest-v6"></script>
+  <dialog id="exportDialog" class="export-dialog" aria-labelledby="exportTitle">
+    <form class="export-card">
+      <header class="export-header">
+        <div><p class="eyebrow">MATCH EXPORT</p><h2 id="exportTitle">导出战报</h2></div>
+        <button id="exportCloseBtn" type="button" aria-label="关闭导出">关闭</button>
+      </header>
+      <p id="exportInfo" class="export-info"></p>
+      <div class="export-formats">
+        <label class="export-format"><input type="radio" name="exportFormat" value="html" checked />
+          <span><strong>可视化战报 <small>推荐 · HTML</small></strong><em>排名、战场、曲线与阶段摘要。用浏览器打开，离线也能阅读。</em></span>
+        </label>
+        <label class="export-format"><input type="radio" name="exportFormat" value="markdown" />
+          <span><strong>精简摘要 <small>Markdown</small></strong><em>适合复制、做笔记或发给 AI 分析；保留关键数字和决策编号。</em></span>
+        </label>
+        <label class="export-format"><input type="radio" name="exportFormat" value="data" />
+          <span><strong>完整数据 <small>压缩 JSON</small></strong><em>保留全部逐秒快照与逐步决策，需要细查算法时再解压使用。</em></span>
+        </label>
+      </div>
+      <p id="exportDataFallback" class="export-note" hidden>当前浏览器不支持压缩，将下载保留全部记录的普通 JSON。</p>
+      <p class="export-note">战报与摘要会汇总全部动作，精选每个算法最多 6 条决策；完整记录始终可选。</p>
+      <footer class="export-footer"><p id="exportStatus" role="status" aria-live="polite"></p>
+        <button id="exportDownloadBtn" type="submit" class="primary">下载可视化战报</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <script type="module" src="./app.js?v=20260928-export-v2"></script>
 </body>
 </html>

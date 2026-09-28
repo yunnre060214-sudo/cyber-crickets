@@ -5,7 +5,7 @@ import {createSettingsController} from './ui/settings.js?v=20260928-strongest-v6
 import {renderScoreboard} from './ui/scoreboard.js?v=20260928-strongest-v6';
 import {drawArena} from './ui/map-renderer.js?v=20260928-strongest-v6';
 import {renderMatchResult} from './ui/report.js?v=20260928-strongest-v6';
-import {exportMarkdownLog} from './export/markdown.js?v=20260928-strongest-v6';
+import {createExportController} from './ui/export.js?v=20260928-export-v2';
 
 const $ = selector => document.querySelector(selector);
 const canvas = $('#arena'), ctx = canvas.getContext('2d');
@@ -109,8 +109,11 @@ function finish() {
   el.dialog.showModal();
 }
 function exportCurrentLog() {
-  exportMarkdownLog({match, running, speedValue: settings.selectedSpeed(), log});
+  exporter.open();
 }
+
+const exporter = createExportController({dialog: $('#exportDialog'),
+  getContext: () => ({match, running, speedValue: settings.selectedSpeed()}), log});
 
 el.start.onclick = start;
 el.pause.onclick = pause;
