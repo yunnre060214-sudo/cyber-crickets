@@ -516,7 +516,7 @@ el.newSeed.onclick = () => { el.seed.value = makeSeed(); reset(); };
 el.exportLog.onclick = exportMarkdownLog;
 el.resultExport.onclick = exportMarkdownLog;
 if (el.setupClose) el.setupClose.onclick = () => { el.setupMenu.open = false; };
-if (el.setupMenu) el.setupMenu.addEventListener('toggle', () => {
+if (el.setupMenu?.addEventListener) el.setupMenu.addEventListener('toggle', () => {
   if (el.setupMenu.open) {
     const drawer = el.setupMenu.querySelector('.setup-popover');
     if (drawer) drawer.scrollTop = 0;
