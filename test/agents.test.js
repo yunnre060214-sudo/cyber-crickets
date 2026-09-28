@@ -109,3 +109,41 @@ test('strongest risk posture becomes more aggressive when trailing and more cons
   assert.ok(leading.cushion>0);
   assert.ok(trailing.risk>leading.risk);
 });
+
+
+test('strongest enters stop-loss mode after territory collapse under heavy pressure', () => {
+  const agent=createAgent('strongest',0,4096,createRng('strongest-collapse-v5'));
+  const base={...options[1],owner:-1,enemy:false,terrain:1,resource:0,ownN:2,enemyN:0,
+    nearestResourceDist:6,resourcePull:1.5,enemyPressure:.1,continuations:[]};
+  agent.selectAction({...view,progress:.45,remaining:220,rank:1,scoreGap:0,leadMargin:28,
+    leaderVpRate:2.6,vpRate:2.7,leaderShare:.29,share:.30,localPressure:.22,options:[base]});
+
+  const safe={...base,to:1001,owner:-1,enemy:false,resource:0,ownN:3,enemyN:0,
+    nearestResourceDist:5,resourcePull:2,enemyPressure:.05};
+  const raid={...base,to:1002,owner:2,enemy:true,resource:3,ownN:1,enemyN:3,
+    nearestResourceDist:0,resourcePull:12,enemyPressure:.75};
+  const crisis={...view,progress:.59,remaining:164,rank:2,scoreGap:4,leadMargin:0,
+    leaderVpRate:2.9,vpRate:1.75,leaderShare:.27,share:.12,localPressure:.82,options:[safe,raid]};
+  const move=agent.selectAction(crisis);
+  assert.equal(agent.posture(crisis).mode,'fortify');
+  assert.equal(move?.to,1001);
+  assert.match(agent.thought,/止损/);
+});
+
+test('strongest treats final overclock as extra exposure risk when already surrounded', () => {
+  const agent=createAgent('strongest',0,4096,createRng('strongest-final-defense-v5'));
+  const base={...options[1],owner:-1,enemy:false,terrain:1,resource:0,ownN:2,enemyN:0,
+    nearestResourceDist:5,resourcePull:2,enemyPressure:.1,continuations:[]};
+  agent.selectAction({...view,progress:.7,remaining:120,rank:1,scoreGap:0,leadMargin:18,
+    leaderVpRate:2.5,vpRate:2.55,leaderShare:.25,share:.27,localPressure:.3,options:[base]});
+
+  const compact={...base,to:1101,owner:-1,enemy:false,ownN:3,enemyN:0,enemyPressure:.05};
+  const exposed={...base,to:1102,owner:1,enemy:true,resource:3,ownN:1,enemyN:3,
+    nearestResourceDist:0,resourcePull:12,enemyPressure:.75};
+  const finalView={...view,progress:.9,remaining:40,rank:3,scoreGap:16,leadMargin:0,
+    leaderVpRate:3.0,vpRate:1.4,leaderShare:.31,share:.09,localPressure:.88,options:[compact,exposed]};
+  const move=agent.selectAction(finalView);
+  assert.equal(agent.posture(finalView).mode,'fortify');
+  assert.equal(move?.to,1101);
+  assert.ok(agent.opponentRisk(exposed,finalView)>agent.opponentRisk({...exposed,enemyPressure:.2},finalView));
+});
