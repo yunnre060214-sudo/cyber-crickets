@@ -1,14 +1,16 @@
-import {AGENT_META} from './agents.js?v=20260928-strongest-v4';
-import {Match, WIDTH, HEIGHT, CELL_COUNT} from './match.js?v=20260928-strongest-v4';
-import {vpRate} from './rules.js?v=20260928-strongest-v4';
-import {initTournamentUI} from './tournament-ui.js?v=20260928-strongest-v4';
+import {AGENT_META} from './agents.js?v=20260928-custom-controls-v1';
+import {Match, WIDTH, HEIGHT, CELL_COUNT} from './match.js?v=20260928-custom-controls-v1';
+import {vpRate} from './rules.js?v=20260928-custom-controls-v1';
+import {initTournamentUI} from './tournament-ui.js?v=20260928-custom-controls-v1';
 
 const $ = selector => document.querySelector(selector);
 const canvas = $('#arena'), ctx = canvas.getContext('2d');
 const el = {
   timer: $('#timer'), state: $('#statePill'), start: $('#startBtn'),
   pause: $('#pauseBtn'), reset: $('#resetBtn'), duration: $('#duration'),
-  speed: $('#speed'), cfg: $('#teamConfig'), score: $('#scoreboard'),
+  durationCustom: $('#durationCustom'), durationCustomGroup: $('#durationCustomGroup'),
+  speed: $('#speed'), speedCustom: $('#speedCustom'), speedCustomGroup: $('#speedCustomGroup'),
+  cfg: $('#teamConfig'), score: $('#scoreboard'),
   feed: $('#feed'), banner: $('#eventBanner'), dialog: $('#resultDialog'),
   title: $('#winnerTitle'), summary: $('#winnerSummary'), results: $('#resultList'),
   insights: $('#resultInsights'), charts: $('#resultCharts'),
@@ -24,12 +26,43 @@ const TEAM_NAMES = ['红方', '蓝方', '绿方', '紫方'];
 const lineup = ['aco', 'minimax', 'qlearn', 'voronoi'];
 const params = new URLSearchParams(location.search);
 const makeSeed = () => crypto.getRandomValues(new Uint32Array(1))[0].toString(36).toUpperCase();
+const DURATION_PRESETS = new Set([60, 90, 120, 180]);
+const SPEED_PRESETS = new Set([1, 2, 4]);
+const normalizeDuration = value => {
+  const number = Number(value);
+  return Math.min(1800, Math.max(10, Math.round(Number.isFinite(number) ? number : 90)));
+};
+const normalizeSpeed = value => {
+  const number = Number(value);
+  const clamped = Math.min(20, Math.max(.25, Number.isFinite(number) ? number : 1));
+  return Math.round(clamped * 4) / 4;
+};
+const selectedDuration = () => el.duration.value === 'custom'
+  ? normalizeDuration(el.durationCustom.value) : normalizeDuration(el.duration.value);
+const selectedSpeed = () => el.speed.value === 'custom'
+  ? normalizeSpeed(el.speedCustom.value) : normalizeSpeed(el.speed.value);
+function syncCustomSettingVisibility() {
+  if (el.durationCustomGroup) el.durationCustomGroup.hidden = el.duration.value !== 'custom';
+  if (el.speedCustomGroup) el.speedCustomGroup.hidden = el.speed.value !== 'custom';
+}
 el.seed.value = params.get('seed')?.trim().slice(0, 64) || makeSeed();
 const requestedAgents = params.get('agents')?.split(',');
 if (requestedAgents?.length === 4 && requestedAgents.every(key => Object.hasOwn(AGENT_META, key))) {
   lineup.splice(0, 4, ...requestedAgents);
 }
-if (['60', '90', '120'].includes(params.get('duration'))) el.duration.value = params.get('duration');
+const requestedDuration = Number(params.get('duration'));
+if (Number.isFinite(requestedDuration) && requestedDuration >= 10 && requestedDuration <= 1800) {
+  const duration = normalizeDuration(requestedDuration);
+  if (DURATION_PRESETS.has(duration)) el.duration.value = String(duration);
+  else { el.duration.value = 'custom'; el.durationCustom.value = String(duration); }
+}
+const requestedSpeed = Number(params.get('speed'));
+if (Number.isFinite(requestedSpeed) && requestedSpeed >= .25 && requestedSpeed <= 20) {
+  const speed = normalizeSpeed(requestedSpeed);
+  if (SPEED_PRESETS.has(speed)) el.speed.value = String(speed);
+  else { el.speed.value = 'custom'; el.speedCustom.value = String(speed); }
+}
+syncCustomSettingVisibility();
 const initialRotation = Number(params.get('rotation'));
 el.rotation.value = Number.isInteger(initialRotation) && initialRotation >= 0 && initialRotation < 4
   ? String(initialRotation) : '0';
@@ -46,7 +79,8 @@ function syncUrl() {
   query.set('seed', el.seed.value);
   query.set('rotation', el.rotation.value);
   query.set('agents', lineup.join(','));
-  query.set('duration', el.duration.value);
+  query.set('duration', String(selectedDuration()));
+  query.set('speed', String(selectedSpeed()));
   history.replaceState(null, '', location.pathname + '?' + query.toString());
 }
 
@@ -75,16 +109,20 @@ function config() {
 function reset() {
   running = false; accumulator = 0; lastFrame = performance.now();
   el.seed.value = el.seed.value.trim().slice(0, 64) || makeSeed();
+  const duration = selectedDuration(), speed = selectedSpeed();
+  if (el.duration.value === 'custom') el.durationCustom.value = String(duration);
+  if (el.speed.value === 'custom') el.speedCustom.value = String(speed);
+  syncCustomSettingVisibility();
   syncUrl();
   match = new Match({
     seed: el.seed.value, rotation: +el.rotation.value,
-    duration: +el.duration.value, strategies: [...lineup]
+    duration, strategies: [...lineup]
   });
   el.feed.innerHTML = '';
   log('种子 ' + match.seed + '，出生轮换 ' + (+el.rotation.value + 1) + '/4。');
   el.state.textContent = '待机';
-  el.durationSummary.textContent = el.duration.value + 's';
-  el.speedSummary.textContent = el.speed.value + '×';
+  el.durationSummary.textContent = duration + 's';
+  el.speedSummary.textContent = speed + '×';
   el.start.textContent = '开始比赛'; el.start.disabled = false;
   el.pause.textContent = '暂停'; el.pause.disabled = true;
   ui(); draw();
@@ -115,7 +153,7 @@ function loop(timestamp) {
   const dt = Math.min(.1, (timestamp - lastFrame) / 1000 || 0);
   lastFrame = timestamp;
   if (running) {
-    accumulator += dt * (+el.speed.value);
+    accumulator += dt * selectedSpeed();
     while (accumulator >= .035 && running) {
       for (const event of match.step(.035)) {
         banner(event.banner); log(event.log);
@@ -141,12 +179,17 @@ function renderLiveChart() {
   const current={time:match.time,teams:match.teams.map(team=>({id:team.id,score:team.score}))};
   const data=snapshots.at(-1)?.time===match.time?snapshots:[...snapshots,current];
 
-  // Y 轴按实际对局量级标定：参考 120 秒完整局约 300 VP 的上沿。
-  // 播放速度只影响现实观看速度，不改变模拟时间和 VP 产出，因此不参与坐标轴计算。
-  // 一局内部保持固定坐标，历史点不会因为后续得分而移动。
-  const yAxisMaxByDuration={60:150,90:225,120:300};
-  const maxVP=yAxisMaxByDuration[match.duration] ?? match.duration*2.5;
+  // Y 轴按模拟时长线性标定：120 秒 = 300 VP，180 秒 = 450 VP。
+  // 自定义时长沿用同一比例；播放倍速只改变现实观看速度，不改变模拟时间或 VP 产出。
+  // 一局内部坐标固定，避免曲线随实时得分重新缩放而产生视觉漂移。
+  const maxVP=Math.max(25,match.duration*2.5);
   const x=time=>left+(width-left-right)*(time/match.duration);
+  const timeTickLabel=seconds=>{
+    const rounded=Math.round(seconds);
+    if(match.duration<300)return rounded+'s';
+    const minutes=Math.floor(rounded/60),rest=rounded%60;
+    return rest?minutes+':'+String(rest).padStart(2,'0'):minutes+'m';
+  };
   const y=value=>top+(height-top-bottom)*(1-Math.min(value,maxVP)/maxVP);
   const ticks=[0,.25,.5,.75,1];
 
@@ -158,7 +201,7 @@ function renderLiveChart() {
     ticks.map(t=>'<line x1="'+x(match.duration*t).toFixed(1)+'" y1="'+top+'" x2="'+
       x(match.duration*t).toFixed(1)+'" y2="'+(height-bottom)+'" stroke="#f0f2f6" stroke-width="1"/>'+
       '<text x="'+x(match.duration*t).toFixed(1)+'" y="'+(height-9)+
-      '" text-anchor="middle" fill="#8b96a8" font-size="10">'+Math.round(match.duration*t)+'s</text>').join('');
+      '" text-anchor="middle" fill="#8b96a8" font-size="10">'+timeTickLabel(match.duration*t)+'</text>').join('');
 
   el.liveLines.innerHTML=match.teams.map(team=>{
     const points=data.map(point=>{
@@ -508,10 +551,26 @@ function drawThinking(cw, ch) {
 el.start.onclick = start;
 el.pause.onclick = pause;
 el.reset.onclick = reset;
-el.duration.onchange = () => { el.durationSummary.textContent = el.duration.value + 's'; if (!running) reset(); };
+el.duration.onchange = () => {
+  syncCustomSettingVisibility();
+  if (!running) reset(); else syncUrl();
+};
+el.durationCustom.onchange = () => {
+  el.durationCustom.value = String(selectedDuration());
+  if (!running) reset(); else syncUrl();
+};
 el.seed.onchange = reset;
 el.rotation.onchange = reset;
-el.speed.onchange = () => { el.speedSummary.textContent = el.speed.value + '×'; };
+el.speed.onchange = () => {
+  syncCustomSettingVisibility();
+  el.speedSummary.textContent = selectedSpeed() + '×';
+  syncUrl();
+};
+el.speedCustom.onchange = () => {
+  el.speedCustom.value = String(selectedSpeed());
+  el.speedSummary.textContent = selectedSpeed() + '×';
+  syncUrl();
+};
 el.newSeed.onclick = () => { el.seed.value = makeSeed(); reset(); };
 el.exportLog.onclick = exportMarkdownLog;
 el.resultExport.onclick = exportMarkdownLog;
