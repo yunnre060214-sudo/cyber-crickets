@@ -1,6 +1,6 @@
-import {AGENT_META} from './agents.js?v=20260928-strongest-v4';
-import {Match} from './match.js?v=20260928-strongest-v4';
-import {createRng, deriveSeed} from './rules.js?v=20260928-strongest-v4';
+import {AGENT_META} from './agents.js?v=20260928-custom-controls-v1';
+import {Match} from './match.js?v=20260928-custom-controls-v1';
+import {createRng, deriveSeed} from './rules.js?v=20260928-custom-controls-v1';
 
 export const FORMAT_NAMES = {
   round_robin: '单循环',
@@ -51,7 +51,7 @@ function validate(config) {
       new Set(config.entrants).size !== 8 ||
       config.entrants.some(key => !Object.hasOwn(AGENT_META, key)))
     throw new Error('请选择八种不同的 Agent');
-  if (![60, 90, 120, 1].includes(config.duration)) throw new Error('比赛时长无效');
+  if (!(config.duration === 1 || (Number.isInteger(config.duration) && config.duration >= 10 && config.duration <= 1800))) throw new Error('比赛时长无效：请输入 10～1800 秒的整数');
   if (typeof config.seed !== 'string' || !config.seed.trim() || config.seed.length > 64)
     throw new Error('赛事种子无效');
 }
