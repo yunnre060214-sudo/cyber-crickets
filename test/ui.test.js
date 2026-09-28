@@ -16,6 +16,8 @@ test('the page exposes its shareable seed, rotation and VP scoring', async () =>
   };
   element('#duration').value = '90';
   element('#speed').value = '1';
+  element('#durationCustom').value = '150';
+  element('#speedCustom').value = '1.5';
   element('#overlayToggle').checked = false;
   const oldDocument = globalThis.document;
   const oldLocation = globalThis.location;
@@ -55,6 +57,7 @@ test('the page exposes its shareable seed, rotation and VP scoring', async () =>
     assert.match(urls.at(-1), /seed=abc&rotation=1/);
     assert.match(urls.at(-1), /agents=dfs%2Cgreedy%2Crandom%2Cpid/);
     assert.match(urls.at(-1), /duration=60/);
+    assert.match(urls.at(-1), /speed=1/);
     const malicious = '<img src=x onerror=alert(1)>';
     element('#seedInput').value = malicious;
     element('#resetBtn').onclick();
