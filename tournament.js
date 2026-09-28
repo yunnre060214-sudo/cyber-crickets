@@ -1,5 +1,5 @@
-import {AGENT_META} from './agents.js?v=20260928-custom-controls-v1';
-import {Match} from './match.js?v=20260928-custom-controls-v1';
+import {AGENT_META} from './agents.js?v=20260928-strongest-v5';
+import {Match} from './match.js?v=20260928-strongest-v5';
 import {createRng, deriveSeed} from './rules.js?v=20260928-custom-controls-v1';
 
 export const FORMAT_NAMES = {
