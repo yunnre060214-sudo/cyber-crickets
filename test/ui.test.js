@@ -53,6 +53,7 @@ test('the page exposes its shareable seed, rotation and VP scoring', async () =>
     assert.equal(element('#rotation').value, '1');
     assert.equal(element('#duration').value, '60');
     assert.match(element('#scoreboard').innerHTML, /VP/);
+    assert.match(element('#liveChartLegend').innerHTML, /红方·ACO 风格蚁道/);
     element('#resetBtn').onclick();
     assert.match(urls.at(-1), /seed=abc&rotation=1/);
     assert.match(urls.at(-1), /agents=dfs%2Cgreedy%2Crandom%2Cpid/);
