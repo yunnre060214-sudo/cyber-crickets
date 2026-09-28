@@ -2582,3 +2582,82 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated;background
   .feed{height:110px}
 }
 
+/* Mobile settings drawer v2: expand below the toolbar instead of covering controls/content. */
+@media (max-width:700px){
+  .command-tools{
+    position:relative;
+    display:block;
+    width:100%;
+    min-width:0;
+    margin:0;
+    padding-top:44px;
+    border-top:0;
+  }
+  .command-tools>.setup-menu{
+    position:static;
+    display:block;
+    width:100%;
+    margin:0;
+  }
+  .command-tools>.setup-menu>summary,
+  .command-tools>.league-shortcut{
+    position:absolute;
+    top:0;
+    width:50%;
+    min-height:44px;
+    height:44px;
+    margin:0;
+    border-bottom:0;
+  }
+  .command-tools>.setup-menu>summary{
+    left:0;
+    border-left:0;
+    border-right:1px solid var(--sep);
+  }
+  .command-tools>.league-shortcut{
+    right:0;
+    border-right:0!important;
+  }
+  .command-tools>.setup-menu[open]>summary{
+    background:rgba(0,113,227,.055);
+    color:var(--blue);
+  }
+  .command-tools .setup-popover{
+    position:static;
+    inset:auto;
+    width:100%;
+    max-width:none;
+    max-height:none;
+    margin:0;
+    padding:14px 12px 16px;
+    overflow:visible;
+    overscroll-behavior:auto;
+    border:0;
+    border-top:1px solid var(--sep);
+    border-radius:0;
+    background:var(--surface-alt);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.75);
+    -webkit-backdrop-filter:none;
+    backdrop-filter:none;
+  }
+  .setup-menu[open] .setup-popover{
+    animation:mobile-settings-drop .18s ease-out;
+    transform-origin:top center;
+  }
+}
+@media (max-width:460px){
+  .command-tools{padding-top:46px}
+  .command-tools>.setup-menu>summary,
+  .command-tools>.league-shortcut{
+    min-height:46px;
+    height:46px;
+  }
+}
+@keyframes mobile-settings-drop{
+  from{opacity:0;transform:translateY(-6px)}
+  to{opacity:1;transform:translateY(0)}
+}
+@media (prefers-reduced-motion:reduce){
+  .setup-menu[open] .setup-popover{animation:none!important}
+}
+
