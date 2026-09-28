@@ -12,6 +12,9 @@ test('creation form offers all six formats and eight entrant slots', () => {
   for (const format of ['单循环', '双循环', '淘汰赛', '小组赛', '瑞士轮', '小组＋淘汰'])
     assert.ok(html.includes(format));
   assert.equal((html.match(/data-entry=/g) || []).length, 8);
+  assert.ok(html.includes('180 秒'));
+  assert.ok(html.includes('自定义单局时长'));
+  assert.ok(html.includes('value="custom"'));
 });
 
 test('report shows actual rounds, two-leg scores and champion while escaping tournament names', () => {
