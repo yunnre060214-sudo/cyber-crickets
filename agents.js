@@ -421,7 +421,7 @@ class StrongestAgent extends BaseAgent{
 
   opponentRisk(o,v){
     const phase=this.phase(v), posture=this.posture(v);
-    const pressure=Math.max(o.enemyPressure,v.localPressure??0);
+    const pressure=clamp((v.localPressure??0)*.58+o.enemyPressure*.42,0,1);
     const contact=pressure*3.15+o.enemyN*.7;
     const exposure=Math.max(0,2-o.ownN)*(o.enemy?1.08:.66);
     const stage=phase==='final'
