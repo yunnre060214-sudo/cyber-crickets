@@ -3,6 +3,14 @@ import assert from 'node:assert/strict';
 import {Tournament, runDuel} from '../tournament.js';
 
 const entrants = ['aco', 'minimax', 'qlearn', 'voronoi', 'bfs', 'dfs', 'greedy', 'random'];
+
+test('competition duration accepts 180 seconds and custom values within 10–1800 seconds', () => {
+  assert.doesNotThrow(() => new Tournament({id:'d180',name:'180',format:'knockout',seed:'d180',duration:180,entrants}));
+  assert.doesNotThrow(() => new Tournament({id:'d240',name:'240',format:'knockout',seed:'d240',duration:240,entrants}));
+  assert.throws(() => new Tournament({id:'d9',name:'9',format:'knockout',seed:'d9',duration:9,entrants}), /比赛时长无效/);
+  assert.throws(() => new Tournament({id:'d1801',name:'1801',format:'knockout',seed:'d1801',duration:1801,entrants}), /比赛时长无效/);
+});
+
 const config = format => ({id: 'league-1', name: '算法联赛', format,
   seed: '20260927', duration: 1, entrants});
 const pairKey = fixture => [...fixture.entrants].sort().join(':');
