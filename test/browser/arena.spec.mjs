@@ -1,4 +1,57 @@
 import { test, expect, arenaURL, nav } from "./helpers.mjs";
+test("an old pending capture cannot be saved under a newly started match", async ({
+  page,
+}) => {
+  await page.goto(arenaURL);
+  const ids = await page.evaluate(async () => {
+    const info = await (await fetch("/build-info.json")).json(),
+      base = "/assets/" + info.buildHash + "/";
+    const { createArena } = await import(base + "ui/arena.js"),
+      { ArenaStore } = await import(base + "ui/store.js"),
+      { createMatch } = await import(base + "engine/factory.js");
+    const root = document.createElement("div"),
+      store = new ArenaStore({ durationMs: 10000 }),
+      calls = [],
+      clients = [];
+    document.body.append(root);
+    let resolveCapture;
+    const arena = createArena({
+      root,
+      store,
+      onCapture: (_cap, id) => calls.push(id),
+      clientFactory: () => {
+        const c = {
+          matchId: "run-" + clients.length,
+          subscribe(f) {
+            this.notify = f;
+          },
+          async start() {},
+          async dispose() {},
+          async setSpeed() {},
+          capture: () => new Promise((r) => (resolveCapture = r)),
+        };
+        clients.push(c);
+        return c;
+      },
+    });
+    await arena.run();
+    const m = createMatch(store.activeConfig);
+    m.advance(250);
+    const pending = clients[0].notify({
+      type: "snapshot",
+      payload: m.getSnapshot(),
+    });
+    await arena.run();
+    resolveCapture({
+      snapshot: m.getSnapshot(),
+      checkpoint: m.captureCheckpoint(),
+    });
+    await pending;
+    root.remove();
+    return calls;
+  });
+  expect(ids).not.toContain("run-1");
+});
 for (const [width, height] of [
   [360, 800],
   [390, 844],
