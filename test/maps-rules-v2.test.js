@@ -1,4 +1,100 @@
-import test from 'node:test';import assert from 'node:assert/strict';import {testConfig} from './support/factories.js';
-test('maps preserve symmetry and every traversable cell connects all cores',async()=>{const {generateMap}=await import('../engine/maps.js');for(const mapPreset of ['plain','basin','canyon','ring'])for(let s=0;s<20;s++){const {board:b}=generateMap(testConfig({mapPreset,seed:String(s)}));const seen=new Set([b.spawns[0][1]*64+b.spawns[0][0]]),q=[...seen];for(let j=0;j<q.length;j++){const i=q[j],ns=[i%64>0?i-1:-1,i%64<63?i+1:-1,i>=64?i-64:-1,i<4032?i+64:-1];for(const n of ns)if(n>=0&&!b.blocked[n]&&!seen.has(n)){seen.add(n);q.push(n);}}assert.equal(seen.size,b.playableCellCount);for(let i=0;i<4096;i++){const r=(i%64)*64+(63-Math.floor(i/64));assert.equal(b.terrain[i],b.terrain[r]);assert.equal(b.resources[i],b.resources[r]);assert.equal(b.blocked[i],b.blocked[r]);}}});
-test('resource event totals are exactly 48 60 96 or a constant 72',async()=>{const {generateMap}=await import('../engine/maps.js'),{applyDueEvents}=await import('../engine/events.js');for(const mode of ['standard','migration']){const {board,eventPlan}=generateMap(testConfig({mode})),ids=new Set(),total=()=>[...board.resources].reduce((a,b)=>a+b,0);assert.equal(total(),mode==='standard'?48:72);applyDueEvents(board,eventPlan,3300,ids);assert.equal(total(),mode==='standard'?60:72);applyDueEvents(board,eventPlan,6200,ids);assert.equal(total(),mode==='standard'?96:72);const n=applyDueEvents(board,eventPlan,10000,ids);assert.equal(applyDueEvents(board,eventPlan,10000,ids).length,0);}});
-test('simultaneous actions reject cores and blocked cells and preserve proposal-order invariance',async()=>{const {resolveActions,vpRate}=await import('../engine/rules.js');const b={width:3,height:3,owner:new Int8Array([0,-1,1,-1,-1,-1,-1,-1,-1]),terrain:new Uint8Array(9).fill(1),resources:new Uint8Array(9),core:new Int8Array(9).fill(-1),blocked:new Uint8Array(9)};const p=[{seat:0,participantId:'a',move:{from:0,to:1}},{seat:1,participantId:'b',move:{from:2,to:1}}];const a=structuredClone(b),c=structuredClone(b);assert.deepEqual(resolveActions(a,p,{seed:'s',tick:5}),resolveActions(c,[...p].reverse(),{seed:'s',tick:5}));assert.equal(a.owner[1],c.owner[1]);a.core[3]=0;assert.equal(resolveActions(a,[{...p[0],move:{from:0,to:3}}],{seed:'s',tick:5})[0].success,false);assert.equal(vpRate({area:100,playableCellCount:100,resourceValue:3,resourceTotal:3}),10);assert.equal(vpRate({area:100,playableCellCount:100,resourceValue:0,resourceTotal:0}),6.5);});
+import test from "node:test";
+import assert from "node:assert/strict";
+import { testConfig } from "./support/factories.js";
+test("maps preserve symmetry and every traversable cell connects all cores", async () => {
+  const { generateMap } = await import("../engine/maps.js");
+  for (const mapPreset of ["plain", "basin", "canyon", "ring"])
+    for (let s = 0; s < 20; s++) {
+      const { board: b } = generateMap(
+        testConfig({ mapPreset, seed: String(s) }),
+      );
+      const seen = new Set([b.spawns[0][1] * 64 + b.spawns[0][0]]),
+        q = [...seen];
+      for (let j = 0; j < q.length; j++) {
+        const i = q[j],
+          ns = [
+            i % 64 > 0 ? i - 1 : -1,
+            i % 64 < 63 ? i + 1 : -1,
+            i >= 64 ? i - 64 : -1,
+            i < 4032 ? i + 64 : -1,
+          ];
+        for (const n of ns)
+          if (n >= 0 && !b.blocked[n] && !seen.has(n)) {
+            seen.add(n);
+            q.push(n);
+          }
+      }
+      assert.equal(seen.size, b.playableCellCount);
+      for (let i = 0; i < 4096; i++) {
+        const r = (i % 64) * 64 + (63 - Math.floor(i / 64));
+        assert.equal(b.terrain[i], b.terrain[r]);
+        assert.equal(b.resources[i], b.resources[r]);
+        assert.equal(b.blocked[i], b.blocked[r]);
+      }
+    }
+});
+test("resource event totals are exactly 48 60 96 or a constant 72", async () => {
+  const { generateMap } = await import("../engine/maps.js"),
+    { applyDueEvents } = await import("../engine/events.js");
+  for (const mode of ["standard", "migration"]) {
+    const { board, eventPlan } = generateMap(testConfig({ mode })),
+      ids = new Set(),
+      total = () => [...board.resources].reduce((a, b) => a + b, 0);
+    assert.equal(total(), mode === "standard" ? 48 : 72);
+    applyDueEvents(board, eventPlan, 3300, ids);
+    assert.equal(total(), mode === "standard" ? 60 : 72);
+    applyDueEvents(board, eventPlan, 6200, ids);
+    assert.equal(total(), mode === "standard" ? 96 : 72);
+    const n = applyDueEvents(board, eventPlan, 10000, ids);
+    assert.equal(applyDueEvents(board, eventPlan, 10000, ids).length, 0);
+  }
+});
+test("simultaneous actions reject cores and blocked cells and preserve proposal-order invariance", async () => {
+  const { resolveActions, vpRate } = await import("../engine/rules.js");
+  const b = {
+    width: 3,
+    height: 3,
+    owner: new Int8Array([0, -1, 1, -1, -1, -1, -1, -1, -1]),
+    terrain: new Uint8Array(9).fill(1),
+    resources: new Uint8Array(9),
+    core: new Int8Array(9).fill(-1),
+    blocked: new Uint8Array(9),
+  };
+  const p = [
+    { seat: 0, participantId: "a", move: { from: 0, to: 1 } },
+    { seat: 1, participantId: "b", move: { from: 2, to: 1 } },
+  ];
+  const a = structuredClone(b),
+    c = structuredClone(b);
+  assert.deepEqual(
+    resolveActions(a, p, { seed: "s", tick: 5 }),
+    resolveActions(c, [...p].reverse(), { seed: "s", tick: 5 }),
+  );
+  assert.equal(a.owner[1], c.owner[1]);
+  a.core[3] = 0;
+  assert.equal(
+    resolveActions(a, [{ ...p[0], move: { from: 0, to: 3 } }], {
+      seed: "s",
+      tick: 5,
+    })[0].success,
+    false,
+  );
+  assert.equal(
+    vpRate({
+      area: 100,
+      playableCellCount: 100,
+      resourceValue: 3,
+      resourceTotal: 3,
+    }),
+    10,
+  );
+  assert.equal(
+    vpRate({
+      area: 100,
+      playableCellCount: 100,
+      resourceValue: 0,
+      resourceTotal: 0,
+    }),
+    6.5,
+  );
+});
