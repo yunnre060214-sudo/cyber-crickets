@@ -9,6 +9,44 @@ import { createExperimentController } from "../runtime/experiment-jobs.js";
 import { createJobExport } from "../export/jobs.js";
 import { importPackage } from "../export/import.js";
 import { createQueueWorkerService } from "../workers/queue-worker.js";
+import { buildReplayPackage } from "../replay/ledger.js";
+test("classic resource holding follows its original post-action integration", () => {
+  const m = createMatch(testConfig({ mode: "classic" })),
+    expected = [0, 0, 0, 0];
+  while (!m.getSnapshot().finished) {
+    const before = m.getSnapshot().timeMs;
+    m.advance(1);
+    const after = m.getSnapshot();
+    after.teams.forEach(
+      (t, i) => (expected[i] += (t.resources * (after.timeMs - before)) / 1000),
+    );
+  }
+  const replay = buildReplayPackage({
+    checkpoint: m.captureCheckpoint(),
+    initialBoard: m.getInitialBoard(),
+    ledger: m.readLedger().records,
+    snapshot: m.getSnapshot(),
+  });
+  replay.summary.teams.forEach((t, i) =>
+    assert.ok(Math.abs(t.resourceValueSeconds - expected[i]) < 1e-8),
+  );
+});
+test("decision observations are measured separately from reproducible results", () => {
+  for (const mode of ["standard", "classic"]) {
+    const m = createMatch(testConfig({ mode }));
+    m.advance(500);
+    const observations = m.getObservations();
+    assert.equal(observations.length, 4);
+    for (const o of observations) {
+      assert.ok(o.samples > 0);
+      assert.ok(o.meanThinkMs >= 0 && Number.isFinite(o.meanThinkMs));
+      assert.ok(o.meanBudgetUsed >= 0 && o.meanBudgetUsed <= 8192);
+    }
+    assert.ok(
+      m.getResult().teams.every((t) => !Object.hasOwn(t, "meanThinkMs")),
+    );
+  }
+});
 test("classic canonical results and checkpoints exclude wall-clock observations", () => {
   const config = testConfig({ mode: "classic" }),
     a = createMatch(config),

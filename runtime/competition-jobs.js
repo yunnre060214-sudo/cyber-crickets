@@ -108,7 +108,7 @@ export function createCompetitionController({ store, queue } = {}) {
       pkg,
     );
     await s.putTaskResult(id, job.jobId, {
-      ...compactResult(result),
+      ...compactResult(result, job.observations),
       replayId,
     });
     await enqueue(id);

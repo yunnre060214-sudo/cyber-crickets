@@ -29,6 +29,7 @@ export async function executeMatchJob(
     }
     await new Promise((r) => schedule(r));
   }
+  controls.progress?.({ observations: match.getObservations() });
   return match.getResult();
 }
 export function createQueueWorkerService({ emit, schedule, now }) {

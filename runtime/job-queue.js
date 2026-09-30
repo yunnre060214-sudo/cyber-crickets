@@ -58,7 +58,10 @@ export class JobQueue {
         get cancelled() {
           return queue.disposed || job.status === "cancelled";
         },
-        progress: (p) => this.onProgress([...this.jobs.values()], job, p),
+        progress: (p) => {
+          if (p?.observations) job.observations = p.observations;
+          this.onProgress([...this.jobs.values()], job, p);
+        },
       };
       Promise.resolve()
         .then(() => this.execute(job, controls))

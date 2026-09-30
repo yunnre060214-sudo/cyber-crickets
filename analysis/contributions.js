@@ -22,6 +22,12 @@ export function summarizeMatch(pkg) {
     leadChanges = [];
   let leader = null;
   for (const r of pkg.tickRecords) {
+    const applyResources = () => {
+      for (const e of r.resourceChanges) board.resources[e.index] = e.value;
+    };
+    const nextOwner = board.owner.slice();
+    for (const e of r.ownershipChanges) nextOwner[e.index] = e.owner;
+    if (c.mode === "classic") applyResources();
     const phase = Math.min(
       3,
       [0.33, 0.62, 0.82].filter(
@@ -36,12 +42,15 @@ export function summarizeMatch(pkg) {
       t.phases[phase] += d.areaVP + d.resourceVP;
     }
     for (let i = 0; i < 4096; i++)
-      if (board.resources[i] && board.owner[i] >= 0) {
-        const t = teams[board.owner[i]];
+      if (
+        board.resources[i] &&
+        (c.mode === "classic" ? nextOwner[i] : board.owner[i]) >= 0
+      ) {
+        const t = teams[c.mode === "classic" ? nextOwner[i] : board.owner[i]];
         t.resourceHoldingSeconds += r.elapsedMs / 1000;
         t.resourceValueSeconds += (board.resources[i] * r.elapsedMs) / 1000;
       }
-    for (const e of r.resourceChanges) board.resources[e.index] = e.value;
+    if (c.mode !== "classic") applyResources();
     for (const e of r.ownershipChanges) {
       if (e.previousOwner >= 0) {
         teams[e.owner].captures++;

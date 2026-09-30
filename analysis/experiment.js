@@ -135,7 +135,7 @@ export function aggregateExperiment(results, config) {
                 .map((x) => x.score),
             ),
         );
-        a.budget.push(t.budgetUsed ?? 0);
+        a.budget.push(t.meanBudgetUsed ?? t.budgetUsed ?? 0);
         if (Number.isFinite(t.meanThinkMs)) a.thinkMs.push(t.meanThinkMs);
         teamRows.set(key, a);
       }

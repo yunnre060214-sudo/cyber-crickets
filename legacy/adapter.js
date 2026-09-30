@@ -254,4 +254,20 @@ export class LegacyMatchAdapter {
       ledger: this.readLedger().records,
     });
   }
+  getObservations() {
+    return this.rawMatch.teams.map((t) => {
+      const decisions = this.rawMatch.decisionLog.filter(
+        (d) => d.teamId === t.id && Number.isFinite(d.thinkMs),
+      );
+      return {
+        participantId:
+          this.config.entrants?.[t.id]?.participantId ?? String(t.id),
+        samples: decisions.length,
+        meanThinkMs: decisions.length
+          ? decisions.reduce((n, d) => n + d.thinkMs, 0) / decisions.length
+          : null,
+        meanBudgetUsed: 0,
+      };
+    });
+  }
 }

@@ -35,7 +35,7 @@ export function createExperimentController({ store, queue } = {}) {
       resultReplay(job, result),
     );
     await s.putTaskResult(id, job.jobId, {
-      ...compactResult(result),
+      ...compactResult(result, job.observations),
       replayId,
     });
     const data = await load(id);

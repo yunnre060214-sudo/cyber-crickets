@@ -25,6 +25,12 @@ export class MatchEngine {
     this.boardCheckpoints = [];
     this.latestCheckpoint = null;
     this.finished = false;
+    this.observations = config.entrants.map((e) => ({
+      participantId: e.participantId,
+      samples: 0,
+      thinkMs: 0,
+      budgetUsed: 0,
+    }));
     this.frontier = new FrontierIndex(board);
     this.agents = config.entrants.map((e, seat) =>
       createAgent(e.strategyId, {
@@ -139,6 +145,10 @@ export class MatchEngine {
             team = this.teams[seat];
           team.thinkMs = performance.now() - start;
           team.budgetUsed = budget.used;
+          const observation = this.observations[seat];
+          observation.samples++;
+          observation.thinkMs += team.thinkMs;
+          observation.budgetUsed += budget.used;
           team.thought = this.agents[seat].thought;
           if (move)
             proposals.push({ participantId: team.participantId, seat, move });
@@ -263,5 +273,13 @@ export class MatchEngine {
       events: structuredClone(this.events),
       ledger: structuredClone(this.ledger),
     });
+  }
+  getObservations() {
+    return this.observations.map((o) => ({
+      participantId: o.participantId,
+      samples: o.samples,
+      meanThinkMs: o.samples ? o.thinkMs / o.samples : null,
+      meanBudgetUsed: o.samples ? o.budgetUsed / o.samples : 0,
+    }));
   }
 }

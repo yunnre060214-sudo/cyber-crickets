@@ -10,10 +10,22 @@ export function resultReplay(job, result) {
     boardCheckpoints: [],
   });
 }
-export const compactResult = (result) => ({
+export const compactResult = (result, observations = []) => ({
   config: result.config,
   timeMs: result.timeMs,
   finished: result.finished,
-  teams: result.teams.map(({ lastMove, thought, thinkMs, ...t }) => t),
+  teams: result.teams.map(({ lastMove, thought, thinkMs, ...t }) => {
+    const o = observations.find((o) => o.participantId === t.participantId);
+    return {
+      ...t,
+      ...(o
+        ? {
+            meanThinkMs: o.meanThinkMs,
+            meanBudgetUsed: o.meanBudgetUsed,
+            observationSamples: o.samples,
+          }
+        : {}),
+    };
+  }),
   integrityHash: result.integrityHash,
 });

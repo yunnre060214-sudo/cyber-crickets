@@ -71,6 +71,10 @@ export function createWorkerJobQueue(callbacks) {
         const own = jobs.get(j.jobId);
         if (own) own.status = j.status;
       }
+      if (m.payload.progress?.observations) {
+        const job = jobs.get(m.jobId);
+        if (job) job.observations = m.payload.progress.observations;
+      }
       q.onProgress?.(m.payload.jobs, jobs.get(m.jobId), m.payload.progress);
     }
   };
