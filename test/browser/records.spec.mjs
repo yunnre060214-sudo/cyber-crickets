@@ -111,6 +111,11 @@ test("hidden page pauses and requires an explicit return", async ({
   // Disable that override to test the browser's actual tab visibility events.
   const session = await context.newCDPSession(page);
   await session.send("Emulation.setFocusEmulationEnabled", { enabled: false });
+  const { windowId } = await session.send("Browser.getWindowForTarget");
+  await session.send("Browser.setWindowBounds", {
+    windowId,
+    bounds: { windowState: "minimized" },
+  });
   await other.bringToFront();
   await expect
     .poll(() => page.evaluate(() => document.visibilityState))
@@ -118,6 +123,10 @@ test("hidden page pauses and requires an explicit return", async ({
   await expect(page.locator("#arena .tag").first()).toHaveText("后台已暂停");
   const before = await page.locator("#arena .metrics").textContent();
   await page.waitForTimeout(200);
+  await session.send("Browser.setWindowBounds", {
+    windowId,
+    bounds: { windowState: "normal" },
+  });
   await page.bringToFront();
   expect(await page.locator("#arena .metrics").textContent()).toBe(before);
   await expect(

@@ -1,9 +1,9 @@
-import { randomBytes, createHash } from "node:crypto";
+import { randomBytes } from "node:crypto";
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { createMatch } from "../engine/factory.js";
+import { runAcceptanceJobs } from "./acceptance-pool.mjs";
 import { createMatchConfig } from "../engine/config.js";
 import { buildSite } from "./build.mjs";
 const strategies = ["strongest", "pathfinder", "boundary", "ucb"];
@@ -93,57 +93,28 @@ export async function runAcceptance() {
     games: [],
     failures: [],
   };
-  for (const job of createAcceptanceMatrix(seeds)) {
-    const start = performance.now();
-    try {
-      const match = createMatch(job.config);
-      while (!match.getSnapshot().finished) match.advance(250);
-      const result = match.getResult();
-      for (const t of result.teams) {
-        const total = result.ledger.reduce((n, r) => {
-          const d = r.scoreDeltas.find(
-            (d) => d.participantId === t.participantId,
-          );
-          return n + d.areaVP + d.resourceVP;
-        }, 0);
-        if (Math.abs(total - t.score) > 1e-7) throw Error("VP_LEDGER_MISMATCH");
-      }
-      const canonicalJSON = JSON.stringify({
-        ...result,
-        teams: result.teams.map(({ thinkMs, ...t }) => t),
-      });
-      const ordered = [...result.teams].sort((a, b) => b.score - a.score),
-        top = ordered[0].score;
-      report.games.push({
-        id: job.id,
-        category: job.category,
-        config: job.config,
-        canonicalHash: result.integrityHash,
-        sha256: createHash("sha256").update(canonicalJSON).digest("hex"),
-        timeMs: result.timeMs,
-        ticks: result.ledger.length,
-        decisions: result.ledger.reduce((n, r) => n + r.proposals.length, 0),
-        elapsedMs: performance.now() - start,
-        winners: ordered
-          .filter((t) => Math.abs(t.score - top) < 1e-9)
-          .map((t) => t.strategyId),
-        teams: ordered.map(({ lastMove, thought, ...t }) => t),
-      });
-    } catch (e) {
-      report.failures.push({
-        id: job.id,
-        config: job.config,
-        error: e.stack ?? e.message,
-      });
-    }
-    await writeFile(
-      path.join(out, "v2-acceptance.json"),
-      JSON.stringify(report, null, 2) + "\n",
-    );
-    console.log(
-      `${report.games.length + report.failures.length}/148 ${job.id} ${Math.round(performance.now() - start)}ms`,
-    );
-  }
+  const jobs = createAcceptanceMatrix(seeds);
+  const order = new Map(jobs.map((job, i) => [job.id, i]));
+  report.environment.acceptanceConcurrency = 4;
+  let persist = Promise.resolve();
+  await runAcceptanceJobs(jobs, {
+    concurrency: 4,
+    onComplete: async (record) => {
+      if (record.game) report.games.push(record.game);
+      else report.failures.push(record.failure);
+      report.games.sort((a, b) => order.get(a.id) - order.get(b.id));
+      report.failures.sort((a, b) => order.get(a.id) - order.get(b.id));
+      const checkpoint = JSON.stringify(report, null, 2) + "\n";
+      persist = persist.then(() =>
+        writeFile(path.join(out, "v2-acceptance.json"), checkpoint),
+      );
+      await persist;
+      const completed = record.game ?? record.failure;
+      console.log(
+        `${report.games.length + report.failures.length}/148 ${completed.id} ${Math.round(record.game?.elapsedMs ?? 0)}ms`,
+      );
+    },
+  });
   report.finishedAt = new Date().toISOString();
   report.passed = report.games.length === 148 && report.failures.length === 0;
   await writeFile(
