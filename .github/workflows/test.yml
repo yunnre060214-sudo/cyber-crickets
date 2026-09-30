@@ -1,0 +1,58 @@
+name: Test v2
+on:
+  pull_request:
+  push:
+    branches: ['v2/**']
+permissions:
+  contents: read
+concurrency:
+  group: test-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+      - run: npm run verify:dist
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-ubuntu24-1.62.1
+      - run: npx playwright install --with-deps chromium webkit
+      - run: sudo apt-get install -y openbox
+      - run: xvfb-run -a -s '-screen 0 1920x1200x24' sh -c 'openbox >/tmp/openbox.log 2>&1 & npm run test:browser'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: browser-acceptance
+          path: |
+            playwright-report
+            test-results
+          retention-days: 7
+  preserve-baseline:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/v2/platform-design-20260930'
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Preserve the verified 1.0 restore point
+        env:
+          BASELINE_SHA: eff46735655b1237622b2095fed7553baa6f0df3
+        run: |
+          if git show-ref --verify --quiet refs/tags/v1.0.0; then
+            test "$(git rev-parse 'v1.0.0^{commit}')" = "$BASELINE_SHA"
+          else
+            git tag v1.0.0 "$BASELINE_SHA"
+            git push origin refs/tags/v1.0.0
+          fi

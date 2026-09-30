@@ -1,224 +1,42 @@
 <!doctype html>
-<html lang="zh-CN">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#f4f5f7" />
-  <title>赛博斗蛐蛐 · 算法争夺战</title>
-  <link rel="stylesheet" href="./styles.css?v=20260928-export-v2" />
-</head>
-<body>
-  <main class="app-shell">
-    <header class="topbar">
-      <div>
-        <p class="eyebrow">CYBER CRICKETS</p>
-        <h1>赛博斗蛐蛐</h1>
-        <p class="subtitle">让算法自己抢色块。你只负责选阵容，然后看它们打。</p>
-      </div>
-      <div class="round-meta">
-        <div class="time-box">
-          <span>剩余时间</span>
-          <strong id="timer">01:30</strong>
-        </div>
-        <div class="state-pill" id="statePill">待机</div>
-      </div>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#f5f4ef" />
+    <meta
+      name="description"
+      content="Cyber Crickets 2.0：可复现的算法竞技、赛事、回放与策略实验平台。"
+    />
+    <title>Cyber Crickets · 算法竞技平台</title>
+    <link rel="stylesheet" href="./styles.css?v=2.0.0" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="./">CYBER <span>CRICKETS</span><b>2.0</b></a
+      ><span class="brand-description">算法竞技平台</span
+      ><span id="buildVersion" class="version">2.0.0</span>
     </header>
-
-    <section class="command-bar panel">
-      <div class="command-main">
-        <button id="startBtn" class="primary command-primary">开始比赛</button>
-        <button id="pauseBtn" disabled>暂停</button>
-      </div>
-      <div class="command-summary">
-        <span><b id="durationSummary">90s</b> 回合</span>
-        <span><b id="speedSummary">1×</b> 速度</span>
-        <span><b>4</b> Agent</span>
-      </div>
-      <div class="command-tools">
-      <details class="setup-menu" id="setupMenu">
-        <summary>比赛设置</summary>
-        <div class="setup-popover">
-          <div class="setup-drawer-head"><strong>比赛设置</strong><button id="setupCloseBtn" type="button">收起</button></div>
-          <div class="setup-grid">
-            <div class="control-group">
-              <label for="duration">回合时长</label>
-              <select id="duration"><option value="60">60 秒</option><option value="90" selected>90 秒</option><option value="120">120 秒</option><option value="180">180 秒</option><option value="custom">自定义…</option></select>
-            </div>
-            <div class="control-group">
-              <label for="speed">模拟速度</label>
-              <select id="speed"><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option><option value="custom">自定义…</option></select>
-            </div>
-            <div class="control-group custom-setting" id="durationCustomGroup" hidden>
-              <label for="durationCustom">自定义时长（秒）</label>
-              <input id="durationCustom" type="number" min="10" max="1800" step="1" value="150" inputmode="numeric" />
-            </div>
-            <div class="control-group custom-setting" id="speedCustomGroup" hidden>
-              <label for="speedCustom">自定义倍速（×）</label>
-              <input id="speedCustom" type="number" min="0.25" max="20" step="0.25" value="1.5" inputmode="decimal" />
-            </div>
-            <div class="control-group seed-control">
-              <label for="seedInput">地图种子</label>
-              <input id="seedInput" type="text" maxlength="64" spellcheck="false" aria-label="地图种子" />
-            </div>
-            <div class="control-group">
-              <label for="rotation">出生轮换</label>
-              <select id="rotation"><option value="0">第 1 轮</option><option value="1">第 2 轮</option><option value="2">第 3 轮</option><option value="3">第 4 轮</option></select>
-            </div>
-          </div>
-          <label class="check-row setup-check"><input id="overlayToggle" type="checkbox" checked /> 显示决策痕迹</label>
-          <div class="setup-actions">
-            <button id="resetBtn">同种子重开</button>
-            <button id="newSeedBtn">生成新地图</button>
-          </div>
-          <div class="setup-lineup">
-            <div class="setup-lineup-head"><span>算法阵容</span><small>修改后自动重开</small></div>
-            <div id="teamConfig" class="team-config"></div>
-          </div>
-        </div>
-      </details>
-      <button id="tournamentOpen" class="league-shortcut">赛事</button>
-      </div>
-    </section>
-
-    <section class="battle-layout">
-      <article class="arena panel">
-        <div class="arena-header">
-          <div>
-            <p class="eyebrow">LIVE MAP</p>
-            <h2>实时战场</h2>
-          </div>
-          <div class="legend">
-            <span><i class="resource-dot"></i>资源节点</span>
-            <span><i class="core-dot"></i>核心区</span><span><i class="decision-dot"></i>决策落点</span>
-          </div>
-        </div>
-        <div class="arena-stage">
-          <div class="canvas-wrap">
-            <canvas id="arena" width="720" height="720" aria-label="算法色块争夺战场"></canvas>
-            <div class="event-banner" id="eventBanner"></div>
-          </div>
-          <section class="live-chart-panel" aria-label="实时比赛趋势">
-            <div class="live-chart-head"><div><p class="eyebrow">LIVE TREND</p><h3>实时 VP 曲线</h3></div><span>X：时间 · Y：累计 VP</span></div>
-            <svg id="liveChart" viewBox="0 0 720 360" role="img" aria-label="各阵营累计 VP 随比赛时间变化"><g id="liveChartGrid"></g><g id="liveChartLines"></g></svg>
-            <div id="liveChartLegend" class="live-chart-legend"></div>
-          </section>
-        </div>
-      </article>
-
-      <aside class="sidebar">
-        <section class="panel score-panel">
-          <div class="section-heading compact">
-            <div>
-              <p class="eyebrow">SCOREBOARD</p>
-              <h2>实时排名</h2>
-            </div>
-            <button id="exportLogBtn" type="button" class="score-export-btn">导出战报</button>
-          </div>
-          <div id="scoreboard" class="scoreboard"></div>
-        </section>
-
-        <section class="panel feed-panel">
-          <div class="section-heading compact">
-            <div>
-              <p class="eyebrow">MATCH FEED</p>
-              <h2>战况</h2>
-            </div>
-          </div>
-          <div id="feed" class="feed"></div>
-        </section>
-      </aside>
-    </section>
-
-    <details class="rules-disclosure panel">
-      <summary>查看比赛规则</summary>
-      <div class="rule-intro">
-        <strong>核心目标</strong>
-        <p>四个 Agent 在同一张 64×64、共 4096 格的地图上自动争夺控制权。比赛没有血量与淘汰机制，每方的 3×3 核心区永久受保护。时间归零时，比较整局累计 VP，而不是只比较终局占地。</p>
-      </div>
-      <div class="rule-grid">
-        <div><strong>持续积分</strong><span>VP/s = 10 ×（0.65 × 领地占比 + 0.35 × 资源价值占比）。一个格子或资源越早拿到、保持越久，对累计 VP 的贡献通常越大。</span></div>
-        <div><strong>领地与资源</strong><span>领地占比按己方控制格数 ÷ 4096 计算；资源占比按己方当前控制的资源价值 ÷ 地图当前资源总价值计算。资源价值有 1 和 3 两档。</span></div>
-        <div><strong>合法行动</strong><span>Agent 每次只能从己方控制格向上下左右四邻格扩张；目标必须是非己方格，并且不能是任何阵营的受保护核心。</span></div>
-        <div><strong>同步行动</strong><span>各方基于同一个决策前快照独立选择动作，随后统一结算。某一方不会因为代码执行顺序更靠前而先占格。</span></div>
-        <div><strong>无主格成功率</strong><span>基础公式为 0.93 − 0.12 ×（地形等级 − 1）。普通、复杂、高阻力地形会依次降低扩张成功率，最终概率限制在 12%～93%。</span></div>
-        <div><strong>翻色成功率</strong><span>攻击敌方格时：0.39 + 0.105 × 己方支援邻格 − 0.075 × 防守邻格 − 0.05 ×（地形等级 − 1）。终局超频再增加 7.5 个百分点。</span></div>
-        <div><strong>同格冲突</strong><span>若多个阵营在同一结算轮都成功指向同一个目标格，引擎使用种子随机流从成功者中选出唯一最终占领者，其余动作按失败处理。</span></div>
-        <div><strong>即时 reward</strong><span>成功动作的算法反馈值为 1 + 4 × 目标资源价值；若原本属于敌方，再加 0.5。失败为 −0.15。reward 用于部分算法学习或反馈，不直接加入 VP。</span></div>
-        <div><strong>重大事件</strong><span>约 33% 赛程触发资源潮汐，中央新增 12 个资源；约 62% 赛程中央区域随机生成高价值资源；约 82% 赛程进入终局超频。</span></div>
-        <div><strong>决策频率</strong><span>每个 Agent 约每 0.085 个模拟秒获得一次决策机会。界面速度 1×/2×/4×只改变模拟播放速度，不改变算法在相同模拟时间内的决策频率。</span></div>
-        <div><strong>可复现性</strong><span>地图、事件、冲突和 Agent 随机行为使用确定性种子随机流。同代码版本、同种子、同阵容、同时长与同出生轮换应得到相同结果。</span></div>
-        <div><strong>当前胜率</strong><span>实时排名中的“当前胜率”是局势估计值：综合已累计 VP、当前 VP/s、历史平均得分速度和剩余时间，再归一化为四方合计 100%。它用于观战，不参与结算，也不是大量历史对局统计胜率。</span></div>
-        <div><strong>出生轮换</strong><span>四方模式有四种出生轮换，可用同一地图让不同 Agent 依次处于四个角，降低固定出生位置造成的偏差。</span></div>
-        <div><strong>决胜</strong><span>时间归零后累计 VP 最高者获胜。终局领地最多、资源最多或翻色次数最多都不单独决定胜负。</span></div>
-      </div>
-    </details>
-  </main>
-
-  <div id="tournamentBackdrop" class="tour-backdrop" hidden></div>
-  <aside id="tournamentDrawer" class="tour-drawer" role="dialog" aria-modal="true" aria-hidden="true" aria-label="比赛赛程">
-    <header class="tour-drawer-header">
-      <div><p class="eyebrow">LEAGUE MANAGER</p><h2>比赛赛程</h2></div>
-      <button id="tournamentClose" type="button" aria-label="关闭比赛赛程">关闭</button>
-    </header>
-    <div id="tournamentContent" class="tour-content"></div>
-    <p id="tournamentStatus" class="tour-status" role="status"></p>
-  </aside>
-
-  <dialog id="resultDialog" class="result-dialog">
-    <div class="result-card">
-      <header class="result-header">
-        <div>
-          <p class="eyebrow">ROUND COMPLETE</p>
-          <h2 id="winnerTitle">回合结束</h2>
-          <p id="winnerSummary" class="result-summary"></p>
-        </div>
-        <button id="resultExportBtn" class="result-export" type="button" aria-label="导出战报">导出战报</button>
-      </header>
-      <section class="result-section">
-        <div class="result-section-title"><span>FINAL STANDINGS</span><strong>最终排名</strong></div>
-        <div id="resultList" class="result-list"></div>
-      </section>
-      <section class="result-section">
-        <div class="result-section-title"><span>MATCH DIAGNOSIS</span><strong>胜因诊断</strong></div>
-        <section id="resultInsights" class="result-insights" aria-label="胜因分析"></section>
-      </section>
-      <section class="result-section">
-        <div class="result-section-title"><span>TRENDS</span><strong>对局走势</strong></div>
-        <section id="resultCharts" class="result-charts" aria-label="对局趋势"></section>
-      </section>
-      <footer class="button-row result-actions">
-        <button id="closeResultBtn">返回战场</button>
-        <button id="againBtn" class="primary">使用当前配置再来一局</button>
-      </footer>
-    </div>
-  </dialog>
-
-  <dialog id="exportDialog" class="export-dialog" aria-labelledby="exportTitle">
-    <form class="export-card">
-      <header class="export-header">
-        <div><p class="eyebrow">MATCH EXPORT</p><h2 id="exportTitle">导出战报</h2></div>
-        <button id="exportCloseBtn" type="button" aria-label="关闭导出">关闭</button>
-      </header>
-      <p id="exportInfo" class="export-info"></p>
-      <div class="export-formats">
-        <label class="export-format"><input type="radio" name="exportFormat" value="html" checked />
-          <span><strong>可视化战报 <small>推荐 · HTML</small></strong><em>排名、战场、曲线与阶段摘要。用浏览器打开，离线也能阅读。</em></span>
-        </label>
-        <label class="export-format"><input type="radio" name="exportFormat" value="markdown" />
-          <span><strong>精简摘要 <small>Markdown</small></strong><em>适合复制、做笔记或发给 AI 分析；保留关键数字和决策编号。</em></span>
-        </label>
-        <label class="export-format"><input type="radio" name="exportFormat" value="data" />
-          <span><strong>完整数据 <small>压缩 JSON</small></strong><em>保留全部逐秒快照与逐步决策，需要细查算法时再解压使用。</em></span>
-        </label>
-      </div>
-      <p id="exportDataFallback" class="export-note" hidden>当前浏览器不支持压缩，将下载保留全部记录的普通 JSON。</p>
-      <p class="export-note">战报与摘要会汇总全部动作，精选每个算法最多 6 条决策；完整记录始终可选。</p>
-      <footer class="export-footer"><p id="exportStatus" role="status" aria-live="polite"></p>
-        <button id="exportDownloadBtn" type="submit" class="primary">下载可视化战报</button>
-      </footer>
-    </form>
-  </dialog>
-
-  <script type="module" src="./app.js?v=20260928-export-v2"></script>
-</body>
+    <nav class="workspace-nav" aria-label="工作区">
+      <button data-route="arena">竞技场</button
+      ><button data-route="competition">赛事中心</button
+      ><button data-route="replay">回放分析</button
+      ><button data-route="experiment">策略实验室</button
+      ><button data-route="agents">算法图鉴</button>
+    </nav>
+    <main id="platform">
+      <section data-workspace="arena" id="arena"></section>
+      <section data-workspace="competition" id="competition" hidden></section>
+      <section data-workspace="replay" id="replay" hidden></section>
+      <section data-workspace="experiment" id="experiment" hidden></section>
+      <section data-workspace="agents" id="agents" hidden></section>
+    </main>
+    <footer>
+      <span>64 × 64 · 同步行动 · 公开信息 · 可复现种子</span
+      ><a href="https://github.com/yunnre060214-sudo/cyber-crickets"
+        >源码与规则</a
+      >
+    </footer>
+    <script type="module" src="./app.js?v=2.0.0"></script>
+  </body>
 </html>

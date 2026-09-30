@@ -1,24 +1,62 @@
-import test from 'node:test';
-import assert from 'node:assert/strict';
-import {createAgent} from '../agents.js';
-import {createRng} from '../rules.js';
+import test from "node:test";
+import assert from "node:assert/strict";
+import { createAgent } from "../agents.js";
+import { createRng } from "../rules.js";
 
-const options = Array.from({length: 40}, (_, n) => ({
-  from: 80, to: n + 100, dir: [1, 0], owner: -1, enemy: false,
-  ownN: 1 + n % 3, enemyN: n % 2, terrain: 1 + n % 3,
-  resource: n % 7 === 0 ? 3 : 0, distOwnCore: n,
-  distRivalCore: 40 - n, nearestResourceDist: n % 9,
-  resourcePull: n % 8, enemyPressure: n % 3 / 4
+const options = Array.from({ length: 40 }, (_, n) => ({
+  from: 80,
+  to: n + 100,
+  dir: [1, 0],
+  owner: -1,
+  enemy: false,
+  ownN: 1 + (n % 3),
+  enemyN: n % 2,
+  terrain: 1 + (n % 3),
+  resource: n % 7 === 0 ? 3 : 0,
+  distOwnCore: n,
+  distRivalCore: 40 - n,
+  nearestResourceDist: n % 9,
+  resourcePull: n % 8,
+  enemyPressure: (n % 3) / 4,
 }));
-const view = {id: 0, time: 1, progress: 0.2, share: 0.1, localPressure: 0, options, width: 64, height: 64};
+const view = {
+  id: 0,
+  time: 1,
+  progress: 0.2,
+  share: 0.1,
+  localPressure: 0,
+  options,
+  width: 64,
+  height: 64,
+};
 
-test('every strategy makes its random choices only through its injected seed stream', () => {
+test("every strategy makes its random choices only through its injected seed stream", () => {
   const original = Math.random;
-  Math.random = () => { throw new Error('global random used'); };
+  Math.random = () => {
+    throw new Error("global random used");
+  };
   try {
-    for (const type of ['bfs', 'dfs', 'greedy', 'random', 'aco', 'voronoi',
-      'potential', 'pid', 'qlearn', 'minimax', 'mcts', 'mst', 'runner', 'raider', 'turtle', 'denial', 'momentum', 'strongest']) {
-      const agent = createAgent(type, 0, 4096, createRng('agent:' + type));
+    for (const type of [
+      "bfs",
+      "dfs",
+      "greedy",
+      "random",
+      "aco",
+      "voronoi",
+      "potential",
+      "pid",
+      "qlearn",
+      "minimax",
+      "mcts",
+      "mst",
+      "runner",
+      "raider",
+      "turtle",
+      "denial",
+      "momentum",
+      "strongest",
+    ]) {
+      const agent = createAgent(type, 0, 4096, createRng("agent:" + type));
       assert.ok(agent.selectAction(view), type);
     }
   } finally {
@@ -26,216 +64,737 @@ test('every strategy makes its random choices only through its injected seed str
   }
 });
 
-test('Monte Carlo sampling is independent of elapsed wall-clock time', () => {
+test("Monte Carlo sampling is independent of elapsed wall-clock time", () => {
   const original = globalThis.performance;
-  Object.defineProperty(globalThis, 'performance', {configurable: true, value: {
-    now() { throw new Error('wall clock used in decision'); }
-  }});
+  Object.defineProperty(globalThis, "performance", {
+    configurable: true,
+    value: {
+      now() {
+        throw new Error("wall clock used in decision");
+      },
+    },
+  });
   try {
-    const a = createAgent('mcts', 0, 4096, createRng('same'));
-    const b = createAgent('mcts', 0, 4096, createRng('same'));
+    const a = createAgent("mcts", 0, 4096, createRng("same"));
+    const b = createAgent("mcts", 0, 4096, createRng("same"));
     assert.equal(a.selectAction(view)?.to, b.selectAction(view)?.to);
   } finally {
-    Object.defineProperty(globalThis, 'performance', {configurable: true, value: original});
+    Object.defineProperty(globalThis, "performance", {
+      configurable: true,
+      value: original,
+    });
   }
 });
 
-test('Q learning updates from reward and next state value', () => {
-  const agent = createAgent('qlearn', 0, 4096, createRng('q'));
+test("Q learning updates from reward and next state value", () => {
+  const agent = createAgent("qlearn", 0, 4096, createRng("q"));
   agent.eps = 0;
-  agent.q.SLN = {expand: 2, attack: 0, resource: 0, fortify: 0};
-  agent.selectAction({...view, options: options.map(o => ({...o, resource: 0}))});
-  agent.onResult({reward: 3, success: true, move: options[0]});
-  agent.q.LHR = {expand: 5, attack: 1, resource: 0, fortify: 0};
-  agent.selectAction({...view, share: .3, localPressure: .6, options});
+  agent.q.SLN = { expand: 2, attack: 0, resource: 0, fortify: 0 };
+  agent.selectAction({
+    ...view,
+    options: options.map((o) => ({ ...o, resource: 0 })),
+  });
+  agent.onResult({ reward: 3, success: true, move: options[0] });
+  agent.q.LHR = { expand: 5, attack: 1, resource: 0, fortify: 0 };
+  agent.selectAction({ ...view, share: 0.3, localPressure: 0.6, options });
   assert.ok(Math.abs(agent.q.SLN.expand - 2.972) < 1e-10);
 });
 
-test('new tactical strategies are deterministic for the same seed', () => {
-  for (const type of ['runner', 'raider', 'turtle', 'denial', 'momentum', 'strongest']) {
-    const a=createAgent(type,0,4096,createRng('new:'+type));
-    const b=createAgent(type,0,4096,createRng('new:'+type));
-    assert.equal(a.selectAction(view)?.to,b.selectAction(view)?.to,type);
+test("new tactical strategies are deterministic for the same seed", () => {
+  for (const type of [
+    "runner",
+    "raider",
+    "turtle",
+    "denial",
+    "momentum",
+    "strongest",
+  ]) {
+    const a = createAgent(type, 0, 4096, createRng("new:" + type));
+    const b = createAgent(type, 0, 4096, createRng("new:" + type));
+    assert.equal(a.selectAction(view)?.to, b.selectAction(view)?.to, type);
   }
 });
 
-
-test('strongest agent prefers a high-value resource when expected VP dominates', () => {
-  const agent=createAgent('strongest',0,4096,createRng('strongest-resource'));
-  const plain={...options[1],to:501,owner:-1,enemy:false,terrain:1,resource:0,ownN:2,enemyN:0,nearestResourceDist:5,resourcePull:2,enemyPressure:0};
-  const rich={...plain,to:502,resource:3,nearestResourceDist:0,resourcePull:12};
-  assert.equal(agent.selectAction({...view,options:[plain,rich]})?.to,502);
+test("strongest agent prefers a high-value resource when expected VP dominates", () => {
+  const agent = createAgent(
+    "strongest",
+    0,
+    4096,
+    createRng("strongest-resource"),
+  );
+  const plain = {
+    ...options[1],
+    to: 501,
+    owner: -1,
+    enemy: false,
+    terrain: 1,
+    resource: 0,
+    ownN: 2,
+    enemyN: 0,
+    nearestResourceDist: 5,
+    resourcePull: 2,
+    enemyPressure: 0,
+  };
+  const rich = {
+    ...plain,
+    to: 502,
+    resource: 3,
+    nearestResourceDist: 0,
+    resourcePull: 12,
+  };
+  assert.equal(
+    agent.selectAction({ ...view, options: [plain, rich] })?.to,
+    502,
+  );
 });
 
-test('strongest agent penalizes repeated failed attacks without using hidden state', () => {
-  const agent=createAgent('strongest',0,4096,createRng('strongest-failure'));
-  const a={...options[0],to:601,owner:1,enemy:true,terrain:1,resource:0,ownN:2,enemyN:1,nearestResourceDist:8,resourcePull:1,enemyPressure:.25};
-  const b={...a,to:602};
-  for(let i=0;i<5;i++)agent.onResult({success:false,reward:-.15,move:a});
-  assert.equal(agent.selectAction({...view,progress:.4,options:[a,b]})?.to,602);
+test("strongest agent penalizes repeated failed attacks without using hidden state", () => {
+  const agent = createAgent(
+    "strongest",
+    0,
+    4096,
+    createRng("strongest-failure"),
+  );
+  const a = {
+    ...options[0],
+    to: 601,
+    owner: 1,
+    enemy: true,
+    terrain: 1,
+    resource: 0,
+    ownN: 2,
+    enemyN: 1,
+    nearestResourceDist: 8,
+    resourcePull: 1,
+    enemyPressure: 0.25,
+  };
+  const b = { ...a, to: 602 };
+  for (let i = 0; i < 5; i++)
+    agent.onResult({ success: false, reward: -0.15, move: a });
+  assert.equal(
+    agent.selectAction({ ...view, progress: 0.4, options: [a, b] })?.to,
+    602,
+  );
 });
 
-
-test('strongest agent uses depth-2 continuation value when first-step values are similar', () => {
-  const agent=createAgent('strongest',0,4096,createRng('strongest-lookahead'));
-  const base={...options[1],owner:-1,enemy:false,terrain:1,resource:0,ownN:2,enemyN:0,nearestResourceDist:8,resourcePull:1,enemyPressure:0};
-  const dead={...base,to:701,continuations:[]};
-  const futureRich={...base,to:702,continuations:[
-    {...base,from:702,to:703,resource:3,nearestResourceDist:0,resourcePull:12,ownN:3},
-    {...base,from:702,to:704,resource:1,nearestResourceDist:1,resourcePull:6,ownN:2}
-  ]};
-  assert.equal(agent.selectAction({...view,options:[dead,futureRich]})?.to,702);
+test("strongest agent uses depth-2 continuation value when first-step values are similar", () => {
+  const agent = createAgent(
+    "strongest",
+    0,
+    4096,
+    createRng("strongest-lookahead"),
+  );
+  const base = {
+    ...options[1],
+    owner: -1,
+    enemy: false,
+    terrain: 1,
+    resource: 0,
+    ownN: 2,
+    enemyN: 0,
+    nearestResourceDist: 8,
+    resourcePull: 1,
+    enemyPressure: 0,
+  };
+  const dead = { ...base, to: 701, continuations: [] };
+  const futureRich = {
+    ...base,
+    to: 702,
+    continuations: [
+      {
+        ...base,
+        from: 702,
+        to: 703,
+        resource: 3,
+        nearestResourceDist: 0,
+        resourcePull: 12,
+        ownN: 3,
+      },
+      {
+        ...base,
+        from: 702,
+        to: 704,
+        resource: 1,
+        nearestResourceDist: 1,
+        resourcePull: 6,
+        ownN: 2,
+      },
+    ],
+  };
+  assert.equal(
+    agent.selectAction({ ...view, options: [dead, futureRich] })?.to,
+    702,
+  );
 });
 
-
-test('strongest opening values high-quality frontier branches instead of an eight-second resource-only rush', () => {
-  const agent=createAgent('strongest',0,4096,createRng('strongest-opening-v4'));
-  const compact={...options[1],to:901,owner:-1,enemy:false,terrain:1,resource:0,ownN:2,enemyN:0,distOwnCore:10,distRivalCore:40,nearestResourceDist:7,resourcePull:1.5,enemyPressure:0,continuations:[]};
-  const open={...compact,to:902,ownN:0,continuations:[
-    {"from":901,"to":903,"dir":[1,0],"owner":-1,"enemy":false,"terrain":1,"resource":0,"ownN":1,"enemyN":0,"distOwnCore":10,"distRivalCore":40,"nearestResourceDist":7,"resourcePull":1.5,"enemyPressure":0,"continuations":[]},
-    {"from":901,"to":904,"dir":[1,0],"owner":-1,"enemy":false,"terrain":1,"resource":0,"ownN":1,"enemyN":0,"distOwnCore":10,"distRivalCore":40,"nearestResourceDist":7,"resourcePull":1.5,"enemyPressure":0,"continuations":[]},
-    {"from":901,"to":905,"dir":[1,0],"owner":-1,"enemy":false,"terrain":1,"resource":0,"ownN":1,"enemyN":0,"distOwnCore":10,"distRivalCore":40,"nearestResourceDist":7,"resourcePull":1.5,"enemyPressure":0,"continuations":[]}
-  ]};
-  const openingView={...view,time:5,progress:.08,remaining:55,rank:2,scoreGap:2,leaderVpRate:1,vpRate:.8,leadMargin:0,options:[compact,open]};
-  assert.ok(agent.staticValue(open,openingView).utility>agent.staticValue(compact,openingView).utility);
-  assert.equal(agent.selectAction(openingView)?.to,902);
+test("strongest opening values high-quality frontier branches instead of an eight-second resource-only rush", () => {
+  const agent = createAgent(
+    "strongest",
+    0,
+    4096,
+    createRng("strongest-opening-v4"),
+  );
+  const compact = {
+    ...options[1],
+    to: 901,
+    owner: -1,
+    enemy: false,
+    terrain: 1,
+    resource: 0,
+    ownN: 2,
+    enemyN: 0,
+    distOwnCore: 10,
+    distRivalCore: 40,
+    nearestResourceDist: 7,
+    resourcePull: 1.5,
+    enemyPressure: 0,
+    continuations: [],
+  };
+  const open = {
+    ...compact,
+    to: 902,
+    ownN: 0,
+    continuations: [
+      {
+        from: 901,
+        to: 903,
+        dir: [1, 0],
+        owner: -1,
+        enemy: false,
+        terrain: 1,
+        resource: 0,
+        ownN: 1,
+        enemyN: 0,
+        distOwnCore: 10,
+        distRivalCore: 40,
+        nearestResourceDist: 7,
+        resourcePull: 1.5,
+        enemyPressure: 0,
+        continuations: [],
+      },
+      {
+        from: 901,
+        to: 904,
+        dir: [1, 0],
+        owner: -1,
+        enemy: false,
+        terrain: 1,
+        resource: 0,
+        ownN: 1,
+        enemyN: 0,
+        distOwnCore: 10,
+        distRivalCore: 40,
+        nearestResourceDist: 7,
+        resourcePull: 1.5,
+        enemyPressure: 0,
+        continuations: [],
+      },
+      {
+        from: 901,
+        to: 905,
+        dir: [1, 0],
+        owner: -1,
+        enemy: false,
+        terrain: 1,
+        resource: 0,
+        ownN: 1,
+        enemyN: 0,
+        distOwnCore: 10,
+        distRivalCore: 40,
+        nearestResourceDist: 7,
+        resourcePull: 1.5,
+        enemyPressure: 0,
+        continuations: [],
+      },
+    ],
+  };
+  const openingView = {
+    ...view,
+    time: 5,
+    progress: 0.08,
+    remaining: 55,
+    rank: 2,
+    scoreGap: 2,
+    leaderVpRate: 1,
+    vpRate: 0.8,
+    leadMargin: 0,
+    options: [compact, open],
+  };
+  assert.ok(
+    agent.staticValue(open, openingView).utility >
+      agent.staticValue(compact, openingView).utility,
+  );
+  assert.equal(agent.selectAction(openingView)?.to, 902);
 });
 
-test('strongest risk posture becomes more aggressive when trailing and more conservative with a lead cushion', () => {
-  const agent=createAgent('strongest',0,4096,createRng('strongest-posture'));
-  const trailing=agent.posture({...view,remaining:30,rank:3,scoreGap:36,leaderVpRate:1.5,vpRate:.8,leadMargin:0});
-  const leading=agent.posture({...view,remaining:30,rank:1,scoreGap:0,leaderVpRate:1.5,vpRate:1.5,leadMargin:36});
-  assert.ok(trailing.catchup>0);
-  assert.ok(leading.cushion>0);
-  assert.ok(trailing.risk>leading.risk);
+test("strongest risk posture becomes more aggressive when trailing and more conservative with a lead cushion", () => {
+  const agent = createAgent(
+    "strongest",
+    0,
+    4096,
+    createRng("strongest-posture"),
+  );
+  const trailing = agent.posture({
+    ...view,
+    remaining: 30,
+    rank: 3,
+    scoreGap: 36,
+    leaderVpRate: 1.5,
+    vpRate: 0.8,
+    leadMargin: 0,
+  });
+  const leading = agent.posture({
+    ...view,
+    remaining: 30,
+    rank: 1,
+    scoreGap: 0,
+    leaderVpRate: 1.5,
+    vpRate: 1.5,
+    leadMargin: 36,
+  });
+  assert.ok(trailing.catchup > 0);
+  assert.ok(leading.cushion > 0);
+  assert.ok(trailing.risk > leading.risk);
 });
 
+test("strongest enters stop-loss mode after territory collapse under heavy pressure", () => {
+  const agent = createAgent(
+    "strongest",
+    0,
+    4096,
+    createRng("strongest-collapse-v5"),
+  );
+  const base = {
+    ...options[1],
+    owner: -1,
+    enemy: false,
+    terrain: 1,
+    resource: 0,
+    ownN: 2,
+    enemyN: 0,
+    nearestResourceDist: 6,
+    resourcePull: 1.5,
+    enemyPressure: 0.1,
+    continuations: [],
+  };
+  agent.selectAction({
+    ...view,
+    progress: 0.45,
+    remaining: 220,
+    rank: 1,
+    scoreGap: 0,
+    leadMargin: 28,
+    leaderVpRate: 2.6,
+    vpRate: 2.7,
+    leaderShare: 0.29,
+    share: 0.3,
+    localPressure: 0.22,
+    options: [base],
+  });
 
-test('strongest enters stop-loss mode after territory collapse under heavy pressure', () => {
-  const agent=createAgent('strongest',0,4096,createRng('strongest-collapse-v5'));
-  const base={...options[1],owner:-1,enemy:false,terrain:1,resource:0,ownN:2,enemyN:0,
-    nearestResourceDist:6,resourcePull:1.5,enemyPressure:.1,continuations:[]};
-  agent.selectAction({...view,progress:.45,remaining:220,rank:1,scoreGap:0,leadMargin:28,
-    leaderVpRate:2.6,vpRate:2.7,leaderShare:.29,share:.30,localPressure:.22,options:[base]});
-
-  const safe={...base,to:1001,owner:-1,enemy:false,resource:0,ownN:3,enemyN:0,
-    nearestResourceDist:5,resourcePull:2,enemyPressure:.05};
-  const raid={...base,to:1002,owner:2,enemy:true,resource:3,ownN:1,enemyN:3,
-    nearestResourceDist:0,resourcePull:12,enemyPressure:.75};
-  const crisis={...view,progress:.59,remaining:164,rank:2,scoreGap:4,leadMargin:0,
-    leaderVpRate:2.9,vpRate:1.75,leaderShare:.27,share:.12,localPressure:.82,options:[safe,raid]};
-  const move=agent.selectAction(crisis);
-  assert.equal(agent.posture(crisis).mode,'fortify');
-  assert.equal(move?.to,1001);
-  assert.match(agent.thought,/止损/);
+  const safe = {
+    ...base,
+    to: 1001,
+    owner: -1,
+    enemy: false,
+    resource: 0,
+    ownN: 3,
+    enemyN: 0,
+    nearestResourceDist: 5,
+    resourcePull: 2,
+    enemyPressure: 0.05,
+  };
+  const raid = {
+    ...base,
+    to: 1002,
+    owner: 2,
+    enemy: true,
+    resource: 3,
+    ownN: 1,
+    enemyN: 3,
+    nearestResourceDist: 0,
+    resourcePull: 12,
+    enemyPressure: 0.75,
+  };
+  const crisis = {
+    ...view,
+    progress: 0.59,
+    remaining: 164,
+    rank: 2,
+    scoreGap: 4,
+    leadMargin: 0,
+    leaderVpRate: 2.9,
+    vpRate: 1.75,
+    leaderShare: 0.27,
+    share: 0.12,
+    localPressure: 0.82,
+    options: [safe, raid],
+  };
+  const move = agent.selectAction(crisis);
+  assert.equal(agent.posture(crisis).mode, "fortify");
+  assert.equal(move?.to, 1001);
+  assert.match(agent.thought, /止损/);
 });
 
-test('strongest treats final overclock as extra exposure risk when already surrounded', () => {
-  const agent=createAgent('strongest',0,4096,createRng('strongest-final-defense-v5'));
-  const base={...options[1],owner:-1,enemy:false,terrain:1,resource:0,ownN:2,enemyN:0,
-    nearestResourceDist:5,resourcePull:2,enemyPressure:.1,continuations:[]};
-  agent.selectAction({...view,progress:.7,remaining:120,rank:1,scoreGap:0,leadMargin:18,
-    leaderVpRate:2.5,vpRate:2.55,leaderShare:.25,share:.27,localPressure:.3,options:[base]});
+test("strongest treats final overclock as extra exposure risk when already surrounded", () => {
+  const agent = createAgent(
+    "strongest",
+    0,
+    4096,
+    createRng("strongest-final-defense-v5"),
+  );
+  const base = {
+    ...options[1],
+    owner: -1,
+    enemy: false,
+    terrain: 1,
+    resource: 0,
+    ownN: 2,
+    enemyN: 0,
+    nearestResourceDist: 5,
+    resourcePull: 2,
+    enemyPressure: 0.1,
+    continuations: [],
+  };
+  agent.selectAction({
+    ...view,
+    progress: 0.7,
+    remaining: 120,
+    rank: 1,
+    scoreGap: 0,
+    leadMargin: 18,
+    leaderVpRate: 2.5,
+    vpRate: 2.55,
+    leaderShare: 0.25,
+    share: 0.27,
+    localPressure: 0.3,
+    options: [base],
+  });
 
-  const compact={...base,to:1101,owner:-1,enemy:false,ownN:3,enemyN:0,enemyPressure:.05};
-  const exposed={...base,to:1102,owner:1,enemy:true,resource:3,ownN:1,enemyN:3,
-    nearestResourceDist:0,resourcePull:12,enemyPressure:.75};
-  const finalView={...view,progress:.9,remaining:40,rank:3,scoreGap:16,leadMargin:0,
-    leaderVpRate:3.0,vpRate:1.4,leaderShare:.31,share:.09,localPressure:.88,options:[compact,exposed]};
-  const move=agent.selectAction(finalView);
-  assert.equal(agent.posture(finalView).mode,'fortify');
-  assert.equal(move?.to,1101);
-  assert.ok(agent.opponentRisk(exposed,finalView)>agent.opponentRisk({...exposed,enemyPressure:.2},finalView));
+  const compact = {
+    ...base,
+    to: 1101,
+    owner: -1,
+    enemy: false,
+    ownN: 3,
+    enemyN: 0,
+    enemyPressure: 0.05,
+  };
+  const exposed = {
+    ...base,
+    to: 1102,
+    owner: 1,
+    enemy: true,
+    resource: 3,
+    ownN: 1,
+    enemyN: 3,
+    nearestResourceDist: 0,
+    resourcePull: 12,
+    enemyPressure: 0.75,
+  };
+  const finalView = {
+    ...view,
+    progress: 0.9,
+    remaining: 40,
+    rank: 3,
+    scoreGap: 16,
+    leadMargin: 0,
+    leaderVpRate: 3.0,
+    vpRate: 1.4,
+    leaderShare: 0.31,
+    share: 0.09,
+    localPressure: 0.88,
+    options: [compact, exposed],
+  };
+  const move = agent.selectAction(finalView);
+  assert.equal(agent.posture(finalView).mode, "fortify");
+  assert.equal(move?.to, 1101);
+  assert.ok(
+    agent.opponentRisk(exposed, finalView) >
+      agent.opponentRisk({ ...exposed, enemyPressure: 0.2 }, finalView),
+  );
 });
 
-test('strongest uses the rule probability even after an unrelated run of successful moves', () => {
-  const agent=createAgent('strongest',0,4096,createRng('exact-chance'));
-  const target={...options[0],owner:1,enemy:true,terrain:1,ownN:1,enemyN:3};
+test("strongest uses the rule probability even after an unrelated run of successful moves", () => {
+  const agent = createAgent("strongest", 0, 4096, createRng("exact-chance"));
+  const target = {
+    ...options[0],
+    owner: 1,
+    enemy: true,
+    terrain: 1,
+    ownN: 1,
+    enemyN: 3,
+  };
   // .39 + .105 - 3*.075 = .27; overclock adds .075.
-  assert.ok(Math.abs(agent.estimatedChance(target,false)-.27)<1e-12);
-  for(let i=0;i<20;i++)agent.onResult({move:{...target,to:1500+i},success:true});
-  assert.ok(Math.abs(agent.estimatedChance(target,false)-.27)<1e-12);
-  assert.ok(Math.abs(agent.estimatedChance(target,true)-.345)<1e-12);
-  assert.equal(agent.estimatedChance({...target,owner:-1,enemy:false,terrain:1},true),.93);
+  assert.ok(Math.abs(agent.estimatedChance(target, false) - 0.27) < 1e-12);
+  for (let i = 0; i < 20; i++)
+    agent.onResult({ move: { ...target, to: 1500 + i }, success: true });
+  assert.ok(Math.abs(agent.estimatedChance(target, false) - 0.27) < 1e-12);
+  assert.ok(Math.abs(agent.estimatedChance(target, true) - 0.345) < 1e-12);
+  assert.equal(
+    agent.estimatedChance(
+      { ...target, owner: -1, enemy: false, terrain: 1 },
+      true,
+    ),
+    0.93,
+  );
 });
 
-test('strongest sees a projected overtake while it still holds the score lead', () => {
-  const agent=createAgent('strongest',0,4096,createRng('overtake-warning'));
-  const leading={...view,progress:.55,remaining:180,rank:1,score:200,scoreGap:0,
-    leadMargin:20,vpRate:2,leaderVpRate:2,share:.25,leaderShare:.25,
-    opponents:[{id:1,score:180,vpRate:3,territory:1300,resources:12},
-      {id:2,score:170,vpRate:1.5,territory:600,resources:8}]};
+test("strongest sees a projected overtake while it still holds the score lead", () => {
+  const agent = createAgent(
+    "strongest",
+    0,
+    4096,
+    createRng("overtake-warning"),
+  );
+  const leading = {
+    ...view,
+    progress: 0.55,
+    remaining: 180,
+    rank: 1,
+    score: 200,
+    scoreGap: 0,
+    leadMargin: 20,
+    vpRate: 2,
+    leaderVpRate: 2,
+    share: 0.25,
+    leaderShare: 0.25,
+    opponents: [
+      { id: 1, score: 180, vpRate: 3, territory: 1300, resources: 12 },
+      { id: 2, score: 170, vpRate: 1.5, territory: 600, resources: 8 },
+    ],
+  };
   agent.observe(leading);
-  const posture=agent.posture(leading);
-  assert.ok(posture.productionDeficit>.3);
-  assert.equal(posture.mode,'control');
+  const posture = agent.posture(leading);
+  assert.ok(posture.productionDeficit > 0.3);
+  assert.equal(posture.mode, "control");
 });
 
-test('multiple legal sources for one target do not alter strongest target selection or random budget', () => {
-  const a=createAgent('strongest',0,4096,createRng('deduplicate-targets'));
-  const b=createAgent('strongest',0,4096,createRng('deduplicate-targets'));
-  const target={...options[1],to:1701,owner:-1,enemy:false,terrain:1,resource:0,
-    ownN:3,enemyN:0,enemyPressure:0,continuations:[]};
-  const other={...target,to:1702,ownN:1};
-  const complete={...view,remaining:40,rank:2,score:30,scoreGap:3,leadMargin:0,
-    vpRate:.8,leaderVpRate:1,leaderShare:.12};
-  const unique=a.selectAction({...complete,options:[target,other]});
-  const repeated=b.selectAction({...complete,options:[target,{...target,from:79},
-    {...target,from:81},{...target,from:16},other]});
-  assert.equal(unique.to,repeated.to);
-  assert.equal(a.rng.next(),b.rng.next());
+test("multiple legal sources for one target do not alter strongest target selection or random budget", () => {
+  const a = createAgent("strongest", 0, 4096, createRng("deduplicate-targets"));
+  const b = createAgent("strongest", 0, 4096, createRng("deduplicate-targets"));
+  const target = {
+    ...options[1],
+    to: 1701,
+    owner: -1,
+    enemy: false,
+    terrain: 1,
+    resource: 0,
+    ownN: 3,
+    enemyN: 0,
+    enemyPressure: 0,
+    continuations: [],
+  };
+  const other = { ...target, to: 1702, ownN: 1 };
+  const complete = {
+    ...view,
+    remaining: 40,
+    rank: 2,
+    score: 30,
+    scoreGap: 3,
+    leadMargin: 0,
+    vpRate: 0.8,
+    leaderVpRate: 1,
+    leaderShare: 0.12,
+  };
+  const unique = a.selectAction({ ...complete, options: [target, other] });
+  const repeated = b.selectAction({
+    ...complete,
+    options: [
+      target,
+      { ...target, from: 79 },
+      { ...target, from: 81 },
+      { ...target, from: 16 },
+      other,
+    ],
+  });
+  assert.equal(unique.to, repeated.to);
+  assert.equal(a.rng.next(), b.rng.next());
 });
 
-test('strongest countercaptures a bridge that shields a threatened friendly resource', () => {
-  const agent=createAgent('strongest',0,4096,createRng('protect-income'));
-  const plain={...options[1],to:1801,owner:1,enemy:true,terrain:1,resource:0,
-    ownN:3,enemyN:1,nearestResourceDist:8,resourcePull:1,enemyPressure:.25,
-    protectedResourceValue:0,continuations:[]};
-  const shield={...plain,to:1802,ownN:2,protectedResourceValue:3};
-  const situation={...view,progress:.6,remaining:160,rank:1,score:200,scoreGap:0,
-    leadMargin:25,vpRate:2.5,leaderVpRate:2.5,resourceTotal:90,
-    options:[plain,shield]};
-  assert.equal(agent.selectAction(situation)?.to,1802);
+test("strongest countercaptures a bridge that shields a threatened friendly resource", () => {
+  const agent = createAgent("strongest", 0, 4096, createRng("protect-income"));
+  const plain = {
+    ...options[1],
+    to: 1801,
+    owner: 1,
+    enemy: true,
+    terrain: 1,
+    resource: 0,
+    ownN: 3,
+    enemyN: 1,
+    nearestResourceDist: 8,
+    resourcePull: 1,
+    enemyPressure: 0.25,
+    protectedResourceValue: 0,
+    continuations: [],
+  };
+  const shield = { ...plain, to: 1802, ownN: 2, protectedResourceValue: 3 };
+  const situation = {
+    ...view,
+    progress: 0.6,
+    remaining: 160,
+    rank: 1,
+    score: 200,
+    scoreGap: 0,
+    leadMargin: 25,
+    vpRate: 2.5,
+    leaderVpRate: 2.5,
+    resourceTotal: 90,
+    options: [plain, shield],
+  };
+  assert.equal(agent.selectAction(situation)?.to, 1802);
 });
 
-test('strongest changes a risky resource raid when the resource denominator dilutes its VP value', () => {
-  const safe={...options[1],to:1901,owner:-1,enemy:false,terrain:1,resource:0,
-    ownN:3,enemyN:0,nearestResourceDist:7,resourcePull:1,enemyPressure:0,continuations:[]};
-  const raid={...safe,to:1902,owner:1,enemy:true,resource:3,ownN:1,enemyN:3,
-    nearestResourceDist:0,resourcePull:12,enemyPressure:.75};
-  const situation={...view,progress:.55,remaining:180,rank:2,score:150,scoreGap:10,
-    vpRate:2,leaderVpRate:2.2,leaderShare:.25,localPressure:.3,options:[safe,raid]};
-  const scarce=createAgent('strongest',0,4096,createRng('vp-denominator'));
-  const abundant=createAgent('strongest',0,4096,createRng('vp-denominator'));
-  assert.equal(scarce.selectAction({...situation,resourceTotal:10})?.to,1902);
-  assert.equal(abundant.selectAction({...situation,resourceTotal:1000})?.to,1901);
+test("strongest changes a risky resource raid when the resource denominator dilutes its VP value", () => {
+  const safe = {
+    ...options[1],
+    to: 1901,
+    owner: -1,
+    enemy: false,
+    terrain: 1,
+    resource: 0,
+    ownN: 3,
+    enemyN: 0,
+    nearestResourceDist: 7,
+    resourcePull: 1,
+    enemyPressure: 0,
+    continuations: [],
+  };
+  const raid = {
+    ...safe,
+    to: 1902,
+    owner: 1,
+    enemy: true,
+    resource: 3,
+    ownN: 1,
+    enemyN: 3,
+    nearestResourceDist: 0,
+    resourcePull: 12,
+    enemyPressure: 0.75,
+  };
+  const situation = {
+    ...view,
+    progress: 0.55,
+    remaining: 180,
+    rank: 2,
+    score: 150,
+    scoreGap: 10,
+    vpRate: 2,
+    leaderVpRate: 2.2,
+    leaderShare: 0.25,
+    localPressure: 0.3,
+    options: [safe, raid],
+  };
+  const scarce = createAgent("strongest", 0, 4096, createRng("vp-denominator"));
+  const abundant = createAgent(
+    "strongest",
+    0,
+    4096,
+    createRng("vp-denominator"),
+  );
+  assert.equal(
+    scarce.selectAction({ ...situation, resourceTotal: 10 })?.to,
+    1902,
+  );
+  assert.equal(
+    abundant.selectAction({ ...situation, resourceTotal: 1000 })?.to,
+    1901,
+  );
 });
 
-test('strongest fills a hole in its fighting line before opening an isolated resource foothold', () => {
-  const agent=createAgent('strongest',0,4096,createRng('compact-contact'));
-  const hole={...options[1],to:2001,owner:-1,enemy:false,terrain:1,resource:0,
-    ownN:4,enemyN:0,nearestResourceDist:7,resourcePull:1,enemyPressure:0,continuations:[]};
-  const exposed={...hole,to:2002,resource:1,ownN:1,enemyN:2,
-    nearestResourceDist:0,resourcePull:12,enemyPressure:.5};
-  const situation={...view,progress:.55,remaining:180,rank:2,score:150,scoreGap:10,
-    vpRate:2,leaderVpRate:2.2,leaderShare:.22,share:.20,resourceTotal:90,
-    localPressure:.5,options:[hole,exposed]};
-  assert.equal(agent.selectAction(situation)?.to,2001);
+test("strongest fills a hole in its fighting line before opening an isolated resource foothold", () => {
+  const agent = createAgent("strongest", 0, 4096, createRng("compact-contact"));
+  const hole = {
+    ...options[1],
+    to: 2001,
+    owner: -1,
+    enemy: false,
+    terrain: 1,
+    resource: 0,
+    ownN: 4,
+    enemyN: 0,
+    nearestResourceDist: 7,
+    resourcePull: 1,
+    enemyPressure: 0,
+    continuations: [],
+  };
+  const exposed = {
+    ...hole,
+    to: 2002,
+    resource: 1,
+    ownN: 1,
+    enemyN: 2,
+    nearestResourceDist: 0,
+    resourcePull: 12,
+    enemyPressure: 0.5,
+  };
+  const situation = {
+    ...view,
+    progress: 0.55,
+    remaining: 180,
+    rank: 2,
+    score: 150,
+    scoreGap: 10,
+    vpRate: 2,
+    leaderVpRate: 2.2,
+    leaderShare: 0.22,
+    share: 0.2,
+    resourceTotal: 90,
+    localPressure: 0.5,
+    options: [hole, exposed],
+  };
+  assert.equal(agent.selectAction(situation)?.to, 2001);
 });
 
-test('strongest invests more in an open frontier when hundreds of seconds remain', () => {
-  const base={...options[1],owner:-1,enemy:false,terrain:1,resource:0,ownN:1,
-    enemyN:0,distOwnCore:10,distRivalCore:40,nearestResourceDist:99,
-    resourcePull:0,enemyPressure:0,continuations:[]};
-  const frontier={...base,to:2101,continuations:[
-    {...base,from:2101,to:2102},{...base,from:2101,to:2103},{...base,from:2101,to:2104}
-  ]};
-  const nearResource={...base,to:2105,ownN:2,nearestResourceDist:2,resourcePull:4};
-  const situation={...view,progress:.25,rank:1,score:100,scoreGap:0,leadMargin:0,
-    vpRate:1,leaderVpRate:1,leaderShare:.15,share:.15,resourceTotal:90,
-    options:[frontier,nearResource]};
-  const short=createAgent('strongest',0,4096,createRng('time-horizon'));
-  const long=createAgent('strongest',0,4096,createRng('time-horizon'));
-  assert.equal(short.selectAction({...situation,remaining:30})?.to,2105);
-  assert.equal(long.selectAction({...situation,remaining:300})?.to,2101);
+test("strongest invests more in an open frontier when hundreds of seconds remain", () => {
+  const base = {
+    ...options[1],
+    owner: -1,
+    enemy: false,
+    terrain: 1,
+    resource: 0,
+    ownN: 1,
+    enemyN: 0,
+    distOwnCore: 10,
+    distRivalCore: 40,
+    nearestResourceDist: 99,
+    resourcePull: 0,
+    enemyPressure: 0,
+    continuations: [],
+  };
+  const frontier = {
+    ...base,
+    to: 2101,
+    continuations: [
+      { ...base, from: 2101, to: 2102 },
+      { ...base, from: 2101, to: 2103 },
+      { ...base, from: 2101, to: 2104 },
+    ],
+  };
+  const nearResource = {
+    ...base,
+    to: 2105,
+    ownN: 2,
+    nearestResourceDist: 2,
+    resourcePull: 4,
+  };
+  const situation = {
+    ...view,
+    progress: 0.25,
+    rank: 1,
+    score: 100,
+    scoreGap: 0,
+    leadMargin: 0,
+    vpRate: 1,
+    leaderVpRate: 1,
+    leaderShare: 0.15,
+    share: 0.15,
+    resourceTotal: 90,
+    options: [frontier, nearResource],
+  };
+  const short = createAgent("strongest", 0, 4096, createRng("time-horizon"));
+  const long = createAgent("strongest", 0, 4096, createRng("time-horizon"));
+  assert.equal(short.selectAction({ ...situation, remaining: 30 })?.to, 2105);
+  assert.equal(long.selectAction({ ...situation, remaining: 300 })?.to, 2101);
 });

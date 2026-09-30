@@ -1,0 +1,273 @@
+import { Match } from "./v1/match.js";
+import { encode, decode, seal, verify, canonicalHash } from "../engine/hash.js";
+const worldKeys = [
+  "time",
+  "finished",
+  "flags",
+  "timeline",
+  "nextSnapshot",
+  "decisionLog",
+  "eventLog",
+  "owner",
+  "terrain",
+  "resources",
+  "core",
+  "resourceCells",
+  "resourceTotal",
+];
+const agentKeys = [
+  "lastDir",
+  "thought",
+  "lastChoice",
+  "pheromone",
+  "evaporateAt",
+  "integral",
+  "prev",
+  "alpha",
+  "gamma",
+  "eps",
+  "lastState",
+  "lastMacro",
+  "pending",
+  "q",
+  "recentTargets",
+  "recentCursor",
+  "failures",
+  "peakShare",
+  "lastShare",
+  "shareLossEMA",
+  "pressureEMA",
+  "rateDeficitEMA",
+  "strategyState",
+];
+const teamKeys = [
+  "id",
+  "strategy",
+  "score",
+  "captures",
+  "resources",
+  "territory",
+  "nextDecision",
+  "lastMove",
+];
+function wrap(rng) {
+  let count = 0;
+  const next = rng.next.bind(rng);
+  rng.next = () => {
+    count++;
+    return next();
+  };
+  return {
+    rng,
+    get count() {
+      return count;
+    },
+  };
+}
+function pick(o, keys) {
+  return Object.fromEntries(
+    keys.filter((k) => Object.hasOwn(o, k)).map((k) => [k, o[k]]),
+  );
+}
+export class LegacyMatchAdapter {
+  constructor(config) {
+    this.config = structuredClone(config);
+    this.rawConfig = config.entrants
+      ? {
+          seed: config.seed,
+          rotation: config.rotation,
+          duration: config.durationMs / 1000,
+          strategies: config.entrants.map((e) => e.strategyId),
+          agentKeys: config.entrants.map((e) => e.participantId),
+        }
+      : config;
+    this.rawMatch = new Match(this.rawConfig);
+    this.tickMs = 35;
+    this.tick = 0;
+    this.ledger = [];
+    this.streams = [
+      wrap(this.rawMatch.rng),
+      ...this.rawMatch.teams.map((t) => wrap(t.agent.rng)),
+    ];
+    this.initialBoard = this.board();
+  }
+  board() {
+    const m = this.rawMatch;
+    return {
+      width: 64,
+      height: 64,
+      owner: m.owner.slice(),
+      terrain: m.terrain.slice(),
+      resources: m.resources.slice(),
+      core: m.core.slice(),
+      blocked: new Uint8Array(4096),
+      spawns: structuredClone(m.spawns),
+      playableCellCount: 4096,
+    };
+  }
+  getInitialBoard() {
+    return structuredClone(this.initialBoard);
+  }
+  getSnapshot() {
+    const m = this.rawMatch;
+    return {
+      config: this.config,
+      matchId: canonicalHash(this.config),
+      tick: this.tick,
+      timeMs: m.time * 1000,
+      finished: m.finished,
+      boardRevision: this.tick,
+      board: this.board(),
+      teams: m.teams.map((t) => ({
+        participantId:
+          this.config.entrants?.[t.id]?.participantId ?? String(t.id),
+        strategyId: t.strategy,
+        strategyVersion: "1.0.0",
+        seat: t.id,
+        score: t.score,
+        territory: t.territory,
+        resources: t.resources,
+        captures: t.captures,
+        vpRate:
+          (6.5 * t.territory) / 4096 +
+          (m.resourceTotal ? (3.5 * t.resources) / m.resourceTotal : 0),
+        thought: t.agent.thought,
+        budgetUsed: 0,
+        thinkMs: t.thinkMs,
+        lastMove: t.lastMove,
+      })),
+      events: structuredClone(m.eventLog),
+      publicDecisionTrace: [],
+    };
+  }
+  advance(count) {
+    if (!Number.isSafeInteger(count) || count < 0)
+      throw Error("INVALID_TICK_COUNT");
+    const records = [];
+    for (let n = 0; n < count && !this.rawMatch.finished; n++) {
+      const m = this.rawMatch,
+        owners = m.owner.slice(),
+        res = m.resources.slice(),
+        scores = m.teams.map((t) => t.score),
+        start = m.time,
+        log = m.decisionLog.length;
+      const events = m.step(0.035);
+      this.tick++;
+      const ownershipChanges = [],
+        resourceChanges = [];
+      for (let i = 0; i < 4096; i++) {
+        if (owners[i] !== m.owner[i])
+          ownershipChanges.push({
+            index: i,
+            previousOwner: owners[i],
+            owner: m.owner[i],
+          });
+        if (res[i] !== m.resources[i])
+          resourceChanges.push({
+            index: i,
+            previousValue: res[i],
+            value: m.resources[i],
+          });
+      }
+      const record = {
+        seq: this.ledger.length,
+        tick: this.tick,
+        timeMs: m.time * 1000,
+        elapsedMs: (m.time - start) * 1000,
+        ownershipChanges,
+        resourceChanges,
+        scoreDeltas: m.teams.map((t, i) => ({
+          participantId: this.config.entrants?.[i]?.participantId ?? String(i),
+          areaVP: ((m.time - start) * 6.5 * t.territory) / 4096,
+          resourceVP:
+            t.score - scores[i] - ((m.time - start) * 6.5 * t.territory) / 4096,
+        })),
+        proposals: [],
+        results: structuredClone(
+          m.decisionLog.slice(log).map(({ thinkMs, ...d }) => d),
+        ),
+        events,
+      };
+      this.ledger.push(record);
+      records.push(record);
+    }
+    return records;
+  }
+  captureCheckpoint() {
+    const m = this.rawMatch;
+    return seal({
+      schemaVersion: 3,
+      kind: "classic",
+      config: this.config,
+      tick: this.tick,
+      world: encode({
+        ...pick(m, worldKeys),
+        decisionLog: m.decisionLog.map(({ thinkMs, ...d }) => d),
+      }),
+      teams: m.teams.map((t) => ({
+        data: encode(pick(t, teamKeys)),
+        agent: encode(pick(t.agent, agentKeys)),
+      })),
+      rngCounts: this.streams.map((s) => s.count),
+      ledger: structuredClone(this.ledger),
+      initialBoard: encode(this.initialBoard),
+    });
+  }
+  restore(checkpoint) {
+    verify(checkpoint);
+    if (
+      checkpoint.kind !== "classic" ||
+      canonicalHash(checkpoint.config) !== canonicalHash(this.config)
+    )
+      throw Error("CHECKPOINT_CONFIG_MISMATCH");
+    const fresh = new LegacyMatchAdapter(this.config);
+    Object.assign(this, fresh);
+    for (let i = 0; i < this.streams.length; i++)
+      for (let k = 0; k < checkpoint.rngCounts[i]; k++)
+        this.streams[i].rng.next();
+    const world = decode(checkpoint.world);
+    for (const key of worldKeys) this.rawMatch[key] = world[key];
+    checkpoint.teams.forEach((s, i) => {
+      Object.assign(this.rawMatch.teams[i], decode(s.data));
+      Object.assign(this.rawMatch.teams[i].agent, decode(s.agent));
+    });
+    this.tick = checkpoint.tick;
+    this.ledger = structuredClone(checkpoint.ledger);
+    this.initialBoard = decode(checkpoint.initialBoard);
+  }
+  readLedger(cursor = 0) {
+    return {
+      records: structuredClone(this.ledger.slice(cursor)),
+      nextCursor: this.ledger.length,
+    };
+  }
+  getResult() {
+    if (!this.rawMatch.finished) throw Error("MATCH_NOT_FINISHED");
+    const s = this.getSnapshot();
+    return seal({
+      config: this.config,
+      finished: true,
+      timeMs: s.timeMs,
+      board: s.board,
+      teams: s.teams.map(({ thinkMs, ...t }) => t),
+      events: s.events,
+      ledger: this.readLedger().records,
+    });
+  }
+  getObservations() {
+    return this.rawMatch.teams.map((t) => {
+      const decisions = this.rawMatch.decisionLog.filter(
+        (d) => d.teamId === t.id && Number.isFinite(d.thinkMs),
+      );
+      return {
+        participantId:
+          this.config.entrants?.[t.id]?.participantId ?? String(t.id),
+        samples: decisions.length,
+        meanThinkMs: decisions.length
+          ? decisions.reduce((n, d) => n + d.thinkMs, 0) / decisions.length
+          : null,
+        meanBudgetUsed: 0,
+      };
+    });
+  }
+}

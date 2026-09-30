@@ -1,42 +1,69 @@
-name: Deploy to GitHub Pages
-
+name: Deploy Pages
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   workflow_dispatch:
-
 permissions:
   contents: read
   pages: write
   id-token: write
-
+concurrency:
+  group: pages
+  cancel-in-progress: true
 jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+      - run: npm run verify:dist
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: dist
   deploy:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
+    needs: build
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - uses: actions/deploy-pages@v4
+        id: deployment
+  live-acceptance:
+    needs: deploy
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
         with:
           node-version: '24'
-
-      - name: Test rules and agents
-        run: npm test
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload static site
-        uses: actions/upload-pages-artifact@v4
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - uses: actions/cache@v4
         with:
-          path: .
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          path: ~/.cache/ms-playwright
+          key: playwright-ubuntu24-1.62.1
+      - run: npx playwright install --with-deps chromium webkit
+      - run: sudo apt-get install -y openbox
+      - run: xvfb-run -a -s '-screen 0 1920x1200x24' sh -c 'openbox >/tmp/openbox.log 2>&1 & npm run test:browser'
+        env:
+          PLAYWRIGHT_BASE_URL: https://yunnre060214-sudo.github.io/cyber-crickets/
+          EXPECTED_DEPLOY_SHA: ${{ github.sha }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: live-browser-acceptance
+          path: |
+            playwright-report
+            test-results
+          retention-days: 7

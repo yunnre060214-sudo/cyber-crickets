@@ -1,11 +1,5 @@
-/* UI stylesheet entrypoint. Import order preserves the pre-refactor cascade. */
-@import url('./css/components.css?v=20260928-ui-refactor-v1');
-@import url('./css/mobile-base.css?v=20260928-ui-refactor-v1');
-@import url('./css/match.css?v=20260928-ui-refactor-v1');
-@import url('./css/layout.css?v=20260928-ui-refactor-v1');
-@import url('./css/tournament.css?v=20260928-ui-refactor-v1');
-@import url('./css/responsive.css?v=20260928-ui-refactor-v1');
-@import url('./css/match-report.css?v=20260928-ui-refactor-v1');
-@import url('./css/mobile.css?v=20260928-ui-refactor-v1');
-@import url('./css/settings.css?v=20260928-ui-refactor-v1');
-@import url('./css/export.css?v=20260928-export-v2');
+@import './css/tokens.css';
+@import './css/base.css';
+@import './css/layout.css';
+@import './css/arena.css';
+@import './css/mobile.css';

@@ -1,0 +1,15 @@
+:root {
+  color-scheme: light;
+  --page: #f5f4ef;
+  --surface: #fff;
+  --ink: #252d30;
+  --muted: #697478;
+  --line: #d8ddda;
+  --soft: #edf0eb;
+  --accent: #247858;
+  --red: #b54b49;
+  --blue: #3473b2;
+  --gold: #9a7729;
+  --mono: ui-monospace, SFMono-Regular, Consolas, monospace;
+  --sans: Inter, Arial, "PingFang TC", "Microsoft JhengHei", sans-serif;
+}
