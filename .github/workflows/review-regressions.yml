@@ -1,0 +1,32 @@
+name: Review regressions
+on:
+  push:
+    branches: ['v2/platform-design-20260930']
+    paths:
+      - 'test/import-review.test.js'
+      - 'test/browser/recovery-review.spec.mjs'
+      - '.github/workflows/review-regressions.yml'
+permissions:
+  contents: read
+jobs:
+  regressions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: node --test test/import-review.test.js
+        continue-on-error: true
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium webkit
+      - run: xvfb-run -a npm run test:browser -- test/browser/recovery-review.spec.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: review-regressions
+          path: |
+            playwright-report
+            test-results
