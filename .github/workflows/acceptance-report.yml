@@ -1,0 +1,37 @@
+name: Freeze v2 acceptance
+on:
+  workflow_dispatch:
+  push:
+    branches: ['v2/platform-design-20260930']
+    paths: ['.github/workflows/acceptance-report.yml']
+permissions:
+  contents: read
+jobs:
+  acceptance:
+    if: github.ref == 'refs/heads/v2/platform-design-20260930'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run acceptance
+      - name: Preserve the measured reports on the tested branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docs/benchmarks/v2-acceptance.json docs/benchmarks/v2-acceptance.md
+          git commit -m 'test: record 148 actual games after final review fixes'
+          git push origin HEAD:refs/heads/v2/platform-design-20260930
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: frozen-acceptance-report
+          path: docs/benchmarks/v2-acceptance.*

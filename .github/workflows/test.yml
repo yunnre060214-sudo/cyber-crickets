@@ -21,6 +21,10 @@ jobs:
       - run: npm test
       - run: npm run build
       - run: npm run verify:dist
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-ubuntu24-1.62.1
       - run: npx playwright install --with-deps chromium webkit
       - run: sudo apt-get install -y openbox
       - run: xvfb-run -a -s '-screen 0 1920x1200x24' sh -c 'openbox >/tmp/openbox.log 2>&1 & npm run test:browser'
