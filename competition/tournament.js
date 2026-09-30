@@ -223,12 +223,27 @@ export class Tournament {
     });
   }
   static fromJSON(data) {
-    if (data.schemaVersion !== 3 || !Array.isArray(data.rounds))
+    if (data?.schemaVersion !== 3 || !Array.isArray(data.rounds) || !data.rounds.length)
       throw Error("INVALID_TOURNAMENT_SCHEMA");
     const t = new Tournament(data.config);
-    t.rounds = structuredClone(data.rounds);
-    t.groups = structuredClone(data.groups ?? t.groups);
-    t.status = data.status;
+    for (let ri=0; ri<data.rounds.length; ri++) {
+      const saved=data.rounds[ri], round=t.rounds[ri];
+      if(!round||!Array.isArray(saved.fixtures)||saved.fixtures.length!==round.fixtures.length||
+        typeof saved.completed!=="boolean") throw Error("INVALID_TOURNAMENT_STATE");
+      for(let fi=0;fi<saved.fixtures.length;fi++){
+        const f=saved.fixtures[fi], expected=round.fixtures[fi];
+        if(typeof f.extraMap!=="boolean")throw Error("INVALID_TOURNAMENT_STATE");
+        expected.extraMap=f.extraMap;
+        const {result,...shape}=f;
+        if(canonicalHash(shape)!==canonicalHash(Object.fromEntries(Object.entries(expected).filter(([k])=>k!=="result"))))throw Error("INVALID_TOURNAMENT_STATE");
+        if(result) {
+          if(t.rounds.find(r=>!r.completed)!==round)throw Error("INVALID_TOURNAMENT_ORDER");
+          t.applyFixtureResult(f.id,result);
+        }
+      }
+      if(saved.completed!==round.completed)throw Error("INVALID_TOURNAMENT_STATE");
+    }
+    if(canonicalHash(t.toJSON())!==canonicalHash(data))throw Error("INVALID_TOURNAMENT_STATE");
     return t;
   }
 }

@@ -1,3 +1,5 @@
+import { ClassicTournamentAdapter } from "../competition/legacy.js";
+import { Tournament } from "../competition/tournament.js";
 import { seal, encode } from "../engine/hash.js";
 import { escape } from "./v3.js";
 export async function createJobExport(id, store, format = "data") {
@@ -10,7 +12,8 @@ export async function createJobExport(id, store, format = "data") {
       replay: await store.getPackage(item.result.replayId),
     });
   const checkpoints = [];
-  const jobs = record.state.orderedTasks ?? [];
+  const tournament = record.type === "competition" ? (record.state.legacy ? new ClassicTournamentAdapter(record.state.rawLegacy) : Tournament.fromJSON(record.state)) : null;
+  const jobs = record.state.orderedTasks ?? tournament?.nextJobs() ?? [];
   for (const job of jobs) {
     const cp = await store.getJobCheckpoint(id, job.jobId);
     if (cp && !items.some((i) => i.jobId === job.jobId))
@@ -19,7 +22,7 @@ export async function createJobExport(id, store, format = "data") {
   const pkg = seal({
     format: "cyber-crickets." + record.type,
     formatVersion: 3,
-    config: record.state.config ?? record.state.rawLegacy?.config,
+    config: tournament?.config ?? record.state.config,
     state: record.state,
     sourceHash: record.sourceHash ?? "development",
     results,

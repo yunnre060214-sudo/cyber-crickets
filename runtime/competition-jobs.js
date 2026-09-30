@@ -4,10 +4,10 @@ import { aggregateFixture, fixtureJobs } from "../competition/fixture.js";
 import { createWorkerJobQueue } from "./worker-job-queue.js";
 import { resultReplay, compactResult } from "./result-replay.js";
 const model = (r) =>
-  r.rawLegacy
-    ? new ClassicTournamentAdapter(r.rawLegacy)
-    : r.state?.legacy
-      ? new ClassicTournamentAdapter(r.state.rawLegacy)
+  r.state?.legacy
+    ? new ClassicTournamentAdapter(r.state.rawLegacy)
+    : r.rawLegacy
+      ? new ClassicTournamentAdapter(r.rawLegacy)
       : Tournament.fromJSON(r.state);
 export function createCompetitionController({ store, queue } = {}) {
   const listeners = new Set(),
