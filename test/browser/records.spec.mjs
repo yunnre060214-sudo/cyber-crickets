@@ -20,8 +20,13 @@ test("save, refresh, resume, seek and actual downloadable import", async ({
   ).toBeDisabled();
   await expect.poll(() => persisted(page, async (s) => (await s.list({ type: "match" })).items[0]?.index.finished)).toBe(true);
   await nav(page, "replay");
-  await page.locator("#replay .record-row button").first().click();
+  const completedRow = page.locator("#replay .record-row").filter({
+    hasText: "10.0s · 已结束",
+  }).first();
+  await expect(completedRow).toBeVisible();
+  await completedRow.getByRole("button", { name: "打开", exact: true }).click();
   const slider = page.getByLabel("回放时间");
+  await expect(slider).toHaveAttribute("max", "10000");
   await slider.fill("5000");
   await slider.dispatchEvent("input");
   await expect(page.locator("#replay .tag")).toHaveText("5.00 秒");
