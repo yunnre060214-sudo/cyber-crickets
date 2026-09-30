@@ -94,44 +94,101 @@ test("two actual IndexedDB connections reject stale revisions and deduplicate re
   await other.close();
 });
 test("hidden page pauses and requires an explicit return", async ({
-  page,
-  context,
   browserName,
+  baseURL,
 }) => {
   test.skip(
     browserName === "webkit",
-    "WebKit headless visibility does not follow tab focus; Chromium verifies actual visibility events.",
+    "WebKit has no native focus-control API here; Chromium tests real window visibility.",
   );
-  await page.goto(arenaURL.replace("speed=20", "speed=1"));
-  await page.getByRole("button", { name: "开始新局", exact: true }).click();
-  await expect(page.locator("#arena .metrics")).toContainText("1.");
-  const other = await context.newPage();
-  await other.goto("about:blank");
-  // Playwright enables focus emulation by default, which forces visible state.
-  // Disable that override to test the browser's actual tab visibility events.
-  const session = await context.newCDPSession(page);
-  await session.send("Emulation.setFocusEmulationEnabled", { enabled: false });
-  const { windowId } = await session.send("Browser.getWindowForTarget");
-  await session.send("Browser.setWindowBounds", {
-    windowId,
-    bounds: { windowState: "minimized" },
+  const { chromium } = await import("@playwright/test");
+  const { spawn } = await import("node:child_process");
+  const { mkdtemp, readFile, rm } = await import("node:fs/promises");
+  const { tmpdir } = await import("node:os");
+  const { join } = await import("node:path");
+  const { once } = await import("node:events");
+  const profile = await mkdtemp(join(tmpdir(), "cc-visibility-"));
+  const chrome = spawn(
+    chromium.executablePath(),
+    [
+      "--no-sandbox",
+      "--no-first-run",
+      "--no-default-browser-check",
+      "--remote-debugging-port=0",
+      "--user-data-dir=" + profile,
+      "about:blank",
+    ],
+    { stdio: ["ignore", "ignore", "pipe"] },
+  );
+  let browser,
+    processError,
+    stderr = "";
+  chrome.on("error", (error) => {
+    processError = error;
   });
-  await other.bringToFront();
-  await expect
-    .poll(() => page.evaluate(() => document.visibilityState))
-    .toBe("hidden");
-  await expect(page.locator("#arena .tag").first()).toHaveText("后台已暂停");
-  const before = await page.locator("#arena .metrics").textContent();
-  await page.waitForTimeout(200);
-  await session.send("Browser.setWindowBounds", {
-    windowId,
-    bounds: { windowState: "normal" },
+  chrome.stderr.on("data", (data) => {
+    stderr = (stderr + data).slice(-10000);
   });
-  await page.bringToFront();
-  expect(await page.locator("#arena .metrics").textContent()).toBe(before);
-  await expect(
-    page.getByRole("button", { name: "继续", exact: true }),
-  ).toBeEnabled();
-  await other.close();
-  await session.detach();
+  try {
+    let port;
+    await expect
+      .poll(
+        async () => {
+          if (processError) throw processError;
+          try {
+            port = (
+              await readFile(join(profile, "DevToolsActivePort"), "utf8")
+            ).split("\n")[0];
+            return Boolean(port);
+          } catch {
+            return false;
+          }
+        },
+        { message: "Chromium CDP endpoint: " + stderr },
+      )
+      .toBe(true);
+    // Official noDefaults option avoids Playwright's per-session forced-visible override.
+    browser = await chromium.connectOverCDP("http://127.0.0.1:" + port, {
+      noDefaults: true,
+    });
+    const context = browser.contexts()[0],
+      page = context.pages()[0];
+    const errors = [];
+    page.on("pageerror", (error) => errors.push(error.message));
+    await page.goto(
+      new URL(arenaURL.replace("speed=20", "speed=1"), baseURL).href,
+    );
+    await page.getByRole("button", { name: "开始新局", exact: true }).click();
+    await expect(page.locator("#arena .metrics")).toContainText("1.");
+    const session = await context.newCDPSession(page);
+    const { windowId } = await session.send("Browser.getWindowForTarget");
+    await session.send("Browser.setWindowBounds", {
+      windowId,
+      bounds: { windowState: "minimized" },
+    });
+    await expect
+      .poll(() => page.evaluate(() => document.visibilityState))
+      .toBe("hidden");
+    await expect(page.locator("#arena .tag").first()).toHaveText("后台已暂停");
+    const before = await page.locator("#arena .metrics").textContent();
+    await page.waitForTimeout(200);
+    await session.send("Browser.setWindowBounds", {
+      windowId,
+      bounds: { windowState: "normal" },
+    });
+    await page.bringToFront();
+    expect(await page.locator("#arena .metrics").textContent()).toBe(before);
+    await expect(
+      page.getByRole("button", { name: "继续", exact: true }),
+    ).toBeEnabled();
+    expect(errors).toEqual([]);
+  } finally {
+    await browser?.close();
+    if (chrome.exitCode === null && chrome.signalCode === null) {
+      const exited = once(chrome, "exit");
+      chrome.kill("SIGKILL");
+      await exited;
+    }
+    await rm(profile, { recursive: true, force: true });
+  }
 });

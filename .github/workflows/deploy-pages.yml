@@ -36,3 +36,30 @@ jobs:
     steps:
       - uses: actions/deploy-pages@v4
         id: deployment
+  live-acceptance:
+    needs: deploy
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium webkit
+      - run: sudo apt-get install -y openbox
+      - run: xvfb-run -a -s '-screen 0 1920x1200x24' sh -c 'openbox >/tmp/openbox.log 2>&1 & npm run test:browser'
+        env:
+          PLAYWRIGHT_BASE_URL: https://yunnre060214-sudo.github.io/cyber-crickets/
+          EXPECTED_DEPLOY_SHA: ${{ github.sha }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: live-browser-acceptance
+          path: |
+            playwright-report
+            test-results
+          retention-days: 7

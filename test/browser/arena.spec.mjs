@@ -4,8 +4,10 @@ test("an old pending capture cannot be saved under a newly started match", async
 }) => {
   await page.goto(arenaURL);
   const ids = await page.evaluate(async () => {
-    const info = await (await fetch("/build-info.json")).json(),
-      base = "/assets/" + info.buildHash + "/";
+    const info = await (
+        await fetch(new URL("build-info.json", location.href))
+      ).json(),
+      base = new URL("assets/" + info.buildHash + "/", location.href).href;
     const { createArena } = await import(base + "ui/arena.js"),
       { ArenaStore } = await import(base + "ui/store.js"),
       { createMatch } = await import(base + "engine/factory.js");

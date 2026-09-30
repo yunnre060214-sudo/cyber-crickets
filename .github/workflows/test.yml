@@ -23,7 +23,7 @@ jobs:
       - run: npm run verify:dist
       - run: npx playwright install --with-deps chromium webkit
       - run: sudo apt-get install -y openbox
-      - run: xvfb-run -a sh -c 'openbox >/tmp/openbox.log 2>&1 & npm run test:browser'
+      - run: xvfb-run -a -s '-screen 0 1920x1200x24' sh -c 'openbox >/tmp/openbox.log 2>&1 & npm run test:browser'
       - uses: actions/upload-artifact@v4
         if: always()
         with:
