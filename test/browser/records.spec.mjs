@@ -107,7 +107,14 @@ test("hidden page pauses and requires an explicit return", async ({
   await expect(page.locator("#arena .metrics")).toContainText("1.");
   const other = await context.newPage();
   await other.goto("about:blank");
+  // Playwright enables focus emulation by default, which forces visible state.
+  // Disable that override to test the browser's actual tab visibility events.
+  const session = await context.newCDPSession(page);
+  await session.send("Emulation.setFocusEmulationEnabled", { enabled: false });
   await other.bringToFront();
+  await expect
+    .poll(() => page.evaluate(() => document.visibilityState))
+    .toBe("hidden");
   await expect(page.locator("#arena .tag").first()).toHaveText("后台已暂停");
   const before = await page.locator("#arena .metrics").textContent();
   await page.waitForTimeout(200);
@@ -117,4 +124,5 @@ test("hidden page pauses and requires an explicit return", async ({
     page.getByRole("button", { name: "继续", exact: true }),
   ).toBeEnabled();
   await other.close();
+  await session.detach();
 });

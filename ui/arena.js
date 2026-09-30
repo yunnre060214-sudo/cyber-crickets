@@ -11,7 +11,8 @@ export function createArena({
   let client,
     speed = initialSpeed,
     renderer = null,
-    latestSavedTime = 0;
+    latestSavedTime = 0,
+    generation = 0;
   const name = h("span", { className: "tag" }, "就绪"),
     message = h("p", { className: "status", role: "status" }),
     clock = h(
@@ -30,6 +31,8 @@ export function createArena({
     trace = h("div", { className: "trace" }),
     feed = h("div", { className: "event-feed" }),
     config = h("div", { className: "arena-config", hidden: true }),
+    settingsBody = h("div", {}),
+    scheduleLabel = h("span", {}),
     samples = [];
   const toggle = button(
       "比赛设置",
@@ -48,29 +51,52 @@ export function createArena({
   config.id = "arena-settings";
   config.append(
     h("div", { className: "panel-head" }, h("h2", {}, "下一局设置"), close),
-    createMatchSettings({
-      store,
-      onChange: () => status(message, "设置已修改，下一局生效"),
-    }),
+    settingsBody,
   );
+  const refreshSettings = () =>
+    settingsBody.replaceChildren(
+      createMatchSettings({
+        store,
+        onChange: () => status(message, "设置已修改，下一局生效"),
+      }),
+    );
+  const updateSchedule = () =>
+    (scheduleLabel.textContent =
+      store.activeConfig.mode === "classic"
+        ? "35 ms 原步进 · 85 ms 决策门槛"
+        : "20 ms tick · 100 ms 同步决策");
+  refreshSettings();
+  updateSchedule();
   async function run(fresh = false, checkpoint = null) {
+    const epoch = ++generation;
     try {
       if (fresh) store.edit({ seed: crypto.randomUUID().slice(0, 8) });
-      if (client) await client.dispose();
+      if (client) {
+        const retiring = client;
+        client = null;
+        await retiring.dispose();
+      }
+      if (epoch !== generation) return;
       store.activate();
+      refreshSettings();
+      updateSchedule();
       samples.length = 0;
       latestSavedTime = 0;
       client = clientFactory(store.activeConfig, { checkpoint });
-      client.subscribe(async (m) => {
+      const source = client;
+      const current = () => source === client && epoch === generation;
+      source.subscribe(async (m) => {
+        if (!current()) return;
         if (m.type === "snapshot") {
           store.snapshot = m.payload;
           draw(m.payload);
           if (m.payload.timeMs - latestSavedTime >= 5000) {
             latestSavedTime = m.payload.timeMs;
             try {
-              await onCapture(await client.capture(), client.matchId, false);
+              const capture = await source.capture();
+              if (current()) await onCapture(capture, source.matchId, false);
             } catch (e) {
-              status(message, "保存失败：" + e.message, true);
+              if (current()) status(message, "保存失败：" + e.message, true);
             }
           }
         }
@@ -80,16 +106,22 @@ export function createArena({
           pause.textContent = "已结束";
           pause.disabled = true;
           try {
-            await onCapture(await client.capture(), client.matchId, true);
-            status(message, "比赛已结算");
+            const capture = await source.capture();
+            if (current()) {
+              await onCapture(capture, source.matchId, true);
+              status(message, "比赛已结算");
+            }
           } catch (e) {
-            status(message, "比赛已结算，保存失败：" + e.message, true);
+            if (current())
+              status(message, "比赛已结算，保存失败：" + e.message, true);
           }
         }
         if (m.type === "error") status(message, m.payload.code, true);
       });
-      await client.setSpeed(speed);
-      await client.start();
+      await source.setSpeed(speed);
+      if (!current()) return;
+      await source.start();
+      if (!current()) return;
       store.status = "running";
       name.textContent = "运行中";
       pause.disabled = false;
@@ -101,7 +133,29 @@ export function createArena({
         location.pathname + encodeMatchQuery(store.activeConfig, speed),
       );
     } catch (e) {
-      status(message, e.message, true);
+      if (epoch === generation) status(message, e.message, true);
+    }
+  }
+  async function pauseRun(background = false) {
+    const source = client;
+    if (!source) return;
+    try {
+      await source.pause();
+      const capture = await source.capture();
+      if (source !== client) return;
+      const finished = capture.snapshot.finished;
+      store.status = finished ? "finished" : "paused";
+      name.textContent = finished
+        ? "已结算"
+        : background
+          ? "后台已暂停"
+          : "已暂停";
+      pause.textContent = finished ? "已结束" : "继续";
+      pause.disabled = finished;
+      await onCapture(capture, source.matchId, finished);
+    } catch (e) {
+      if (source === client)
+        status(message, "暂停或保存失败：" + e.message, true);
     }
   }
   const pause = button(
@@ -109,12 +163,11 @@ export function createArena({
     async () => {
       if (!client) return;
       if (store.status === "running") {
-        await client.pause();
-        store.status = "paused";
-        name.textContent = "已暂停";
-        pause.textContent = "继续";
+        await pauseRun();
       } else if (store.status === "paused") {
-        await client.resume();
+        const source = client;
+        await source.resume();
+        if (source !== client) return;
         store.status = "running";
         name.textContent = "运行中";
         pause.textContent = "暂停";
@@ -184,12 +237,14 @@ export function createArena({
             }
           }),
           button("保存 / 导出", async () => {
-            if (client)
+            const source = client;
+            if (source)
               try {
+                const capture = await source.capture();
                 await onCapture(
-                  await client.capture(),
-                  client.matchId,
-                  store.status === "finished",
+                  capture,
+                  source.matchId,
+                  capture.snapshot.finished,
                   true,
                 );
               } catch (e) {
@@ -199,13 +254,7 @@ export function createArena({
         ),
       ),
       config,
-      h(
-        "div",
-        { className: "metrics" },
-        clock,
-        seed,
-        h("span", {}, "20 ms tick · 100 ms 同步决策"),
-      ),
+      h("div", { className: "metrics" }, clock, seed, scheduleLabel),
       h(
         "div",
         { className: "arena-grid" },
@@ -284,10 +333,7 @@ export function createArena({
   }
   document.addEventListener("visibilitychange", async () => {
     if (document.hidden && store.status === "running") {
-      await client?.pause();
-      store.status = "paused";
-      name.textContent = "后台已暂停";
-      pause.textContent = "继续";
+      await pauseRun(true);
     }
   });
   return {
