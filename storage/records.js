@@ -172,6 +172,57 @@ export function createRecordStore({ backend }) {
         },
       );
     },
+    async putJobPackage(record, pkg) {
+      return backend.transaction(
+        ["records", "checkpoints", "taskResults"],
+        "readwrite",
+        async (tx) => {
+          const old = await tx.get("records", record.id);
+          if (old) return old;
+          for (const item of pkg.results) {
+            const replayId = record.id + ":match:" + item.jobId;
+            await tx.put("checkpoints", { id: replayId, package: item.replay });
+            await tx.put("records", {
+              id: replayId,
+              type: "match",
+              schemaVersion: 3,
+              revision: 1,
+              updatedAt: Date.now(),
+              index: {
+                name: item.result.config.seed,
+                seed: item.result.config.seed,
+                timeMs: item.result.timeMs,
+                finished: true,
+              },
+              payloadRefs: { package: replayId },
+            });
+            await tx.put("taskResults", {
+              id: taskKey(record.id, item.jobId),
+              recordId: record.id,
+              jobId: item.jobId,
+              result: { ...item.result, replayId },
+            });
+          }
+          for (const saved of pkg.checkpoints ?? [])
+            await tx.put("checkpoints", {
+              id: taskKey(record.id, saved.jobId),
+              checkpoint: saved.checkpoint,
+            });
+          const next = {
+            ...record,
+            state: pkg.state,
+            sourceHash: pkg.sourceHash,
+            revision: 1,
+            updatedAt: Date.now(),
+            index: { ...record.index, completedTasks: pkg.results.length },
+            payloadRefs: { package: record.id },
+          };
+          await tx.put("checkpoints", { id: record.id, package: pkg });
+          await tx.put("records", next);
+          return next;
+        },
+      );
+    },
     getPackage: (id) =>
       backend.transaction(
         ["checkpoints"],

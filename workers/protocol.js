@@ -14,6 +14,7 @@ export function validateMessage(m) {
       "dispose",
       "enqueue",
       "cancel",
+      "resultAck",
     ].includes(m.type)
   )
     throw Error("INVALID_WORKER_MESSAGE");

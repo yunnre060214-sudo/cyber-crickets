@@ -67,4 +67,12 @@ test("canonical hash is deterministic, handles typed arrays and rejects cycles",
   x.x = x;
   assert.throws(() => canonicalSerialize(x));
   assert.match(canonicalHash({ a: 1 }), /^[a-f0-9]{16}$/);
+  for (const [input, expected] of [
+    ["", "07cc7607b4949e25"],
+    [{}, "08f44b07b5901a25"],
+    [{ a: 1 }, "9c3e82dd6fcae8b1"],
+    [new Int8Array([-1, 2]), "c87e6fc1eda2f2e1"],
+    ["漢字", "988bf4a6ea301c50"],
+  ])
+    assert.equal(canonicalHash(input), expected);
 });

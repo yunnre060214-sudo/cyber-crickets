@@ -65,10 +65,17 @@ export const canonicalSerialize = (data) =>
       : v,
   );
 export function canonicalHash(data) {
-  let h = 14695981039346656037n;
-  for (const b of new TextEncoder().encode(canonicalSerialize(data)))
-    h = BigInt.asUintN(64, (h ^ BigInt(b)) * 1099511628211n);
-  return h.toString(16).padStart(16, "0");
+  // FNV-1a 64-bit multiplication using two exact 32-bit limbs. The largest
+  // intermediate is under 2^53; this preserves every existing archive hash.
+  let high = 0xcbf29ce4,
+    low = 0x84222325;
+  for (const byte of new TextEncoder().encode(canonicalSerialize(data))) {
+    low = (low ^ byte) >>> 0;
+    const product = low * 435;
+    high = (high * 435 + Math.floor(product / 4294967296) + (low << 8)) >>> 0;
+    low = product >>> 0;
+  }
+  return high.toString(16).padStart(8, "0") + low.toString(16).padStart(8, "0");
 }
 export function seal(data) {
   return { ...data, integrityHash: canonicalHash(data) };

@@ -6,7 +6,12 @@ import { renderArenaScoreboard } from "./scoreboard.js";
 import { renderDecisionTrace } from "./decision-trace.js";
 import { createMatchExport, saveMatchExport } from "../export/download.js";
 import { importPackage } from "../export/import.js";
-export function createReplayWorkspace({ root, store, onResume = () => {} }) {
+export function createReplayWorkspace({
+  root,
+  store,
+  onResume = () => {},
+  onImportJob = () => {},
+}) {
   let current,
     player,
     timer = null;
@@ -22,7 +27,8 @@ export function createReplayWorkspace({ root, store, onResume = () => {} }) {
           const r = await importPackage(e.target.files[0], {
             store: await store,
           });
-          await open(r.package);
+          if (r.type === "match") await open(r.package);
+          else await onImportJob(r.type, r.id);
           await refresh();
           status(
             message,

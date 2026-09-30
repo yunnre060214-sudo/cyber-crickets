@@ -2,6 +2,9 @@ import { decode, encode, verify, seal, canonicalHash } from "../engine/hash.js";
 import { decodeBoard } from "../replay/codec.js";
 import { createMatchConfig } from "../engine/config.js";
 import { validateCheckpoint } from "../replay/checkpoint.js";
+import { planExperiment } from "../analysis/experiment.js";
+import { Tournament } from "../competition/tournament.js";
+import { fixtureJobs } from "../competition/fixture.js";
 export const INPUT_LIMITS = {
   compressed: 32 * 1024 * 1024,
   expanded: 128 * 1024 * 1024,
@@ -146,16 +149,68 @@ export async function importPackage(file, { store } = {}) {
     pkg = decode(raw);
     verify(pkg);
     type = raw.format.split(".").at(-1);
-    if (!pkg.config || !Array.isArray(pkg.results))
+    if (!pkg.config || !pkg.state || !Array.isArray(pkg.results))
       throw Error("INVALID_JOB_PACKAGE");
+    const tasks =
+      type === "experiment"
+        ? planExperiment(pkg.config).orderedTasks
+        : Tournament.fromJSON(pkg.state).rounds.flatMap((r) =>
+            r.fixtures.flatMap((f) => fixtureJobs(f, pkg.config)),
+          );
+    if (canonicalHash(pkg.state.config) !== canonicalHash(pkg.config))
+      throw Error("JOB_CONFIG_MISMATCH");
+    if (
+      type === "experiment" &&
+      canonicalHash(planExperiment(pkg.config)) !== canonicalHash(pkg.state)
+    )
+      throw Error("INVALID_EXPERIMENT_PLAN");
+    const expected = new Map(tasks.map((j) => [j.jobId, j])),
+      seen = new Set();
     for (const r of pkg.results) {
-      if (r.replay) validateReplayPackage(r.replay);
+      const job = expected.get(r.jobId);
+      if (
+        !job ||
+        seen.has(r.jobId) ||
+        !r.result?.finished ||
+        canonicalHash(r.result.config) !== canonicalHash(job.config) ||
+        !r.replay
+      )
+        throw Error("INVALID_JOB_RESULT");
+      seen.add(r.jobId);
+      validateReplayPackage(r.replay);
+      if (
+        !r.replay.summary.finished ||
+        canonicalHash(r.replay.config) !== canonicalHash(job.config) ||
+        r.result.teams?.length !== job.config.teamCount ||
+        r.result.teams.some(
+          (t) =>
+            !Number.isFinite(t.score) ||
+            !job.config.entrants.some(
+              (e) =>
+                e.participantId === t.participantId &&
+                e.strategyId === t.strategyId,
+            ),
+        )
+      )
+        throw Error("INVALID_JOB_RESULT");
     }
-    resume = false;
+    for (const saved of pkg.checkpoints ?? []) {
+      const job = expected.get(saved.jobId);
+      if (!job || seen.has(saved.jobId)) throw Error("INVALID_JOB_CHECKPOINT");
+      validateCheckpoint(saved.checkpoint);
+      if (canonicalHash(saved.checkpoint.config) !== canonicalHash(job.config))
+        throw Error("JOB_CONFIG_MISMATCH");
+    }
+    resume =
+      type === "experiment"
+        ? seen.size < tasks.length
+        : pkg.state.status !== "completed";
   } else throw Error("UNSUPPORTED_FORMAT");
   const id = "import:" + canonicalHash(pkg);
-  if (store)
-    await store.putPackage(
+  if (store) {
+    const write = type === "match" ? store.putPackage : store.putJobPackage;
+    await write.call(
+      store,
       {
         id,
         type,
@@ -167,11 +222,12 @@ export async function importPackage(file, { store } = {}) {
             raw.metadata?.seed ??
             file.name,
           archive,
-          finished: pkg.summary?.finished ?? true,
+          finished: pkg.summary?.finished ?? !resume,
         },
         payloadRefs: [],
       },
       pkg,
     );
+  }
   return { id, package: pkg, resume, archive, type };
 }

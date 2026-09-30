@@ -9,6 +9,13 @@ export async function createJobExport(id, store, format = "data") {
       ...item,
       replay: await store.getPackage(item.result.replayId),
     });
+  const checkpoints = [];
+  const jobs = record.state.orderedTasks ?? [];
+  for (const job of jobs) {
+    const cp = await store.getJobCheckpoint(id, job.jobId);
+    if (cp && !items.some((i) => i.jobId === job.jobId))
+      checkpoints.push({ jobId: job.jobId, checkpoint: cp });
+  }
   const pkg = seal({
     format: "cyber-crickets." + record.type,
     formatVersion: 3,
@@ -16,6 +23,7 @@ export async function createJobExport(id, store, format = "data") {
     state: record.state,
     sourceHash: record.sourceHash ?? "development",
     results,
+    checkpoints,
   });
   const title = record.index.name,
     stem =

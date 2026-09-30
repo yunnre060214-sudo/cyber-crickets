@@ -16,12 +16,14 @@ export class JobQueue {
     this.disposed = false;
   }
   enqueue(jobs) {
-    for (const j of jobs)
-      if (!this.jobs.has(j.jobId))
+    for (const j of jobs) {
+      const existing = this.jobs.get(j.jobId);
+      if (!existing || existing.status === "cancelled")
         this.jobs.set(j.jobId, {
           ...j,
           status: j.status === "completed" ? "completed" : "pending",
         });
+    }
     this.pump();
   }
   pause() {

@@ -60,6 +60,9 @@ export function bootstrap() {
       await arena.resume(cp);
       router.navigate("arena");
     },
+    onImportJob: async (type, id) => {
+      await (type === "experiment" ? experiment : competition).open(id);
+    },
   });
   const onOpenReplay = async (id) => {
       await replay.open(id);
@@ -69,6 +72,7 @@ export function bootstrap() {
       root: document.querySelector("#competition"),
       controller: createCompetitionController({ store: recordStore }),
       onOpenReplay,
+      store: recordStore,
     }),
     experiment = createExperimentWorkspace({
       root: document.querySelector("#experiment"),

@@ -1,6 +1,8 @@
 import { h, button, label, select, status } from "./dom.js";
 import { AGENT_REGISTRY } from "../agents/registry.js";
 import { FORMAT_NAMES } from "../competition/formats.js";
+import { createJobExport } from "../export/jobs.js";
+import { saveMatchExport } from "../export/download.js";
 export function estimateTournamentGames({
   format,
   entrantCount: n,
@@ -17,7 +19,12 @@ export function estimateTournamentGames({
   }[format];
   return fixtures * mapCount * 2;
 }
-export function createCompetitionWorkspace({ root, controller, onOpenReplay }) {
+export function createCompetitionWorkspace({
+  root,
+  controller,
+  onOpenReplay,
+  store,
+}) {
   let active = null,
     config = {
       name: "算法公开赛",
@@ -434,6 +441,26 @@ export function createCompetitionWorkspace({ root, controller, onOpenReplay }) {
               ),
             ),
           ),
+        ),
+      ),
+      h(
+        "div",
+        { className: "controls", style: "margin-top:16px" },
+        [
+          ["html", "HTML 报告"],
+          ["markdown", "Markdown"],
+          ["data", "完整赛事包"],
+        ].map(([format, text]) =>
+          button(text, async () => {
+            try {
+              saveMatchExport(
+                await createJobExport(active, await store, format),
+              );
+              status(message, "已导出 " + text);
+            } catch (e) {
+              status(message, e.message, true);
+            }
+          }),
         ),
       ),
     );

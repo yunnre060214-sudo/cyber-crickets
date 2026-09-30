@@ -32,6 +32,7 @@ export async function executeMatchJob(
   return match.getResult();
 }
 export function createQueueWorkerService({ emit, schedule, now }) {
+  const acknowledgements = new Map();
   const q = new JobQueue({
     execute: (j, c) => executeMatchJob(j, c, { schedule, now }),
     onProgress: (jobs, j, progress) =>
@@ -43,12 +44,15 @@ export function createQueueWorkerService({ emit, schedule, now }) {
         payload: { jobs: jobs.map(({ result, ...x }) => x), progress },
       }),
     onResult: (j, result) =>
-      emit({
-        protocolVersion: 1,
-        requestId: "event",
-        jobId: j.jobId,
-        type: "result",
-        payload: result,
+      new Promise((resolve, reject) => {
+        acknowledgements.set(j.jobId, { resolve, reject });
+        emit({
+          protocolVersion: 1,
+          requestId: "event",
+          jobId: j.jobId,
+          type: "result",
+          payload: result,
+        });
       }),
   });
   return {
@@ -59,8 +63,20 @@ export function createQueueWorkerService({ emit, schedule, now }) {
       else if (m.type === "resume" || m.type === "start") q.resume();
       else if (m.type === "cancel") q.cancel(m.jobId);
       else if (m.type === "dispose") q.dispose();
+      else if (m.type === "resultAck") {
+        const ack = acknowledgements.get(m.jobId);
+        if (ack) {
+          acknowledgements.delete(m.jobId);
+          m.payload?.error ? ack.reject(Error(m.payload.error)) : ack.resolve();
+        }
+      }
     },
-    dispose: () => q.dispose(),
+    dispose: () => {
+      q.dispose();
+      for (const ack of acknowledgements.values())
+        ack.reject(Error("QUEUE_DISPOSED"));
+      acknowledgements.clear();
+    },
   };
 }
 if (

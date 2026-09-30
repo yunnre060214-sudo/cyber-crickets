@@ -14,8 +14,8 @@ export function createWorkerJobQueue(callbacks) {
       enqueue(list) {
         const fresh = [];
         for (const j of list)
-          if (!jobs.has(j.jobId)) {
-            jobs.set(j.jobId, j);
+          if (!jobs.has(j.jobId) || jobs.get(j.jobId).status === "cancelled") {
+            jobs.set(j.jobId, { ...j, status: "pending" });
             fresh.push(j);
           }
         send("enqueue", { jobs: fresh });
@@ -27,6 +27,8 @@ export function createWorkerJobQueue(callbacks) {
         send("resume");
       },
       cancel(jobId) {
+        const job = jobs.get(jobId);
+        if (job && job.status !== "completed") job.status = "cancelled";
         send("cancel", {}, jobId);
       },
       dispose() {
@@ -54,9 +56,12 @@ export function createWorkerJobQueue(callbacks) {
         try {
           await q.onResult?.(job, m.payload);
           job.status = "completed";
+          send("resultAck", {}, m.jobId);
         } catch (err) {
           job.delivered = false;
+          job.status = "pending";
           q.pause();
+          send("resultAck", { error: err.message }, m.jobId);
           q.onProgress?.([...jobs.values()], job, { error: err.message });
         }
       }

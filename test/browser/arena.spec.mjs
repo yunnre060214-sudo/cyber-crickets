@@ -1,0 +1,58 @@
+import { test, expect, arenaURL, nav } from "./helpers.mjs";
+for (const [width, height] of [
+  [360, 800],
+  [390, 844],
+  [768, 1024],
+  [1440, 1000],
+]) {
+  test(`settings and workspaces fit ${width}x${height}`, async ({ page }) => {
+    await page.setViewportSize({ width, height });
+    await page.goto(arenaURL);
+    await page.getByRole("button", { name: "比赛设置", exact: true }).click();
+    const close = page.getByRole("button", { name: "收起设置", exact: true });
+    if (width <= 390) {
+      const box = await close.boundingBox();
+      expect(box.height).toBeGreaterThanOrEqual(44);
+      expect(box.width).toBeGreaterThanOrEqual(44);
+    }
+    await close.click();
+    await expect(page.locator("#arena-settings")).toBeHidden();
+    for (const route of [
+      "arena",
+      "competition",
+      "replay",
+      "experiment",
+      "agents",
+    ]) {
+      await nav(page, route);
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= innerWidth,
+        ),
+      ).toBe(true);
+    }
+  });
+}
+test("real worker finishes, pauses without advancing and respects next-game settings", async ({
+  page,
+}) => {
+  await page.goto(arenaURL.replace("speed=20", "speed=1"));
+  await page.getByRole("button", { name: "开始新局", exact: true }).click();
+  await expect(page.locator("#arena .metrics")).toContainText("1.");
+  await page.getByRole("button", { name: "暂停", exact: true }).click();
+  const before = await page.locator("#arena .metrics").textContent();
+  await page.waitForTimeout(250);
+  expect(await page.locator("#arena .metrics").textContent()).toBe(before);
+  await page.getByRole("button", { name: "比赛设置", exact: true }).click();
+  await page.locator('[name="seed"]').fill("next-only");
+  await page.locator('[name="seed"]').blur();
+  expect(await page.locator("#arena .metrics").textContent()).toBe(before);
+  await page.getByRole("button", { name: "收起设置", exact: true }).click();
+  await page.getByRole("button", { name: "继续", exact: true }).click();
+  await page.locator('[name="speed"]').fill("20");
+  await page.locator('[name="speed"]').blur();
+  await expect(
+    page.getByRole("button", { name: "已结束", exact: true }),
+  ).toBeDisabled();
+  await expect(page.locator("#arena .metrics")).toContainText("10.0 / 10");
+});
