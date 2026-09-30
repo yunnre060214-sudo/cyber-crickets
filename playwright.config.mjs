@@ -3,11 +3,11 @@ export default defineConfig({
   testDir: "./test/browser",
   timeout: 120000,
   expect: { timeout: 60000 },
-  workers: 2,
+  workers: 1,
   retries: 0,
   reporter: [["list"], ["html", { open: "never" }]],
   use: {
-    headless: false,
+    headless: true,
     baseURL: process.env.PLAYWRIGHT_BASE_URL ?? "http://127.0.0.1:4173",
     trace: "retain-on-failure",
     screenshot: "only-on-failure",

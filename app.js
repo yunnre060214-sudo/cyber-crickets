@@ -1,3 +1,4 @@
+import { buildReplayPackage } from "./replay/ledger.js";
 import { decodeMatchQuery, createRouter } from "./ui/router.js";
 import { ArenaStore } from "./ui/store.js";
 import { createArena } from "./ui/arena.js";
@@ -41,12 +42,18 @@ export function bootstrap() {
       saving = saving
         .catch(() => {})
         .then(async () => {
-          const records = await recordStore;
-          await records.saveMatch(capture, id);
+          let saveError;
+          try {
+            const records = await recordStore;
+            await records.saveMatch(capture, id);
+          } catch (error) {
+            saveError = error;
+          }
           if (explicit) {
-            await replay.open(id);
+            await replay.open(saveError ? buildReplayPackage(capture) : id, { saveError });
             router.navigate("replay");
           }
+          if (saveError) throw saveError;
           if (finished) await replay.refresh();
         });
       return saving;

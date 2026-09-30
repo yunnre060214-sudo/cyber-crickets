@@ -14,10 +14,14 @@ export function createReplayWorkspace({
 }) {
   let current,
     player,
-    timer = null;
+    timer = null,
+    nextCursor = null,
+    listGeneration = 0;
   const records = h("div", { className: "record-list" }),
     detail = h("div", {}),
     message = h("p", { className: "status", role: "status" }),
+    saveWarning = h("p", { className: "status", role: "status" }),
+    more = button("加载更多", () => loadPage(nextCursor, listGeneration), { hidden: true }),
     input = h("input", {
       type: "file",
       accept: ".json,.gz,application/json,application/gzip",
@@ -63,52 +67,40 @@ export function createReplayWorkspace({
           h("h2", {}, "本地比赛"),
           button("刷新", refresh),
         ),
-        h("div", { className: "panel-body" }, input, records),
+        h("div", { className: "panel-body" }, input, records, more),
       ),
-      h("div", { className: "stack" }, detail, message),
+      h("div", { className: "stack" }, detail, saveWarning, message),
     ),
   );
   async function refresh() {
-    try {
-      const s = await store,
-        list = await s.list({ type: "match", limit: 30 });
-      records.replaceChildren(
-        ...list.items.map((r) =>
-          h(
-            "div",
-            { className: "record-row" },
-            h(
-              "div",
-              {},
-              h("strong", {}, r.index.name),
-              h(
-                "p",
-                { className: "muted" },
-                r.index.archive
-                  ? "旧版档案"
-                  : (r.index.timeMs / 1000).toFixed(1) +
-                      "s · " +
-                      (r.index.finished ? "已结束" : "可继续"),
-              ),
-            ),
-            button("打开", () => open(r.id)),
-          ),
-        ),
-      );
-      if (!list.items.length)
-        records.replaceChildren(
-          h(
-            "p",
-            { className: "muted", style: "margin-top:12px" },
-            "比赛每 5 模拟秒自动保存；也可导入数据文件。",
-          ),
-        );
-    } catch (e) {
-      status(message, "读取失败：" + e.message, true);
-    }
+    const generation = ++listGeneration;
+    nextCursor = null;
+    more.hidden = true;
+    return loadPage(undefined, generation);
   }
-  async function open(value) {
+  async function loadPage(cursor, generation) {
+    more.disabled = true;
+    try {
+      const s = await store, list = await s.list({type:"match",limit:30,cursor});
+      if(generation!==listGeneration)return;
+      const rows=list.items.map(r=>h("div",{className:"record-row"},
+        h("div",{},h("strong",{},r.index.name),
+          h("p",{className:"muted"},r.index.archive?"旧版档案":
+            (r.index.timeMs/1000).toFixed(1)+"s · "+(r.index.finished?"已结束":"可继续"))),
+        button("打开",()=>open(r.id)),
+      ));
+      if(cursor)records.append(...rows);else records.replaceChildren(...rows);
+      nextCursor=list.nextCursor;
+      more.hidden=!nextCursor;
+      if(!cursor&&!list.items.length)records.replaceChildren(
+        h("p",{className:"muted",style:"margin-top:12px"},"比赛每 5 模拟秒自动保存；也可导入数据文件。"));
+    }catch(e){if(generation===listGeneration)status(message,"读取失败："+e.message,true);}
+    finally{if(generation===listGeneration)more.disabled=false;}
+  }
+  async function open(value, {saveError} = {}) {
     clearInterval(timer);
+    timer = null;
+    status(saveWarning, saveError ? "未保存："+saveError.message+"。当前捕获仍可下载，请导出后再刷新。" : "", !!saveError);
     try {
       if (typeof value === "string") {
         const s = await store;
