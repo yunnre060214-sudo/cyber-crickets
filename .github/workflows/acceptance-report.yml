@@ -35,3 +35,4 @@ jobs:
         with:
           name: frozen-acceptance-report
           path: docs/benchmarks/v2-acceptance.*
+# Final freeze includes the independent save-failure alert semantics.

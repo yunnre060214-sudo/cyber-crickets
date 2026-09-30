@@ -20,7 +20,7 @@ export function createReplayWorkspace({
   const records = h("div", { className: "record-list" }),
     detail = h("div", {}),
     message = h("p", { className: "status", role: "status" }),
-    saveWarning = h("p", { className: "status", role: "status" }),
+    saveWarning = h("p", { className: "status", role: "alert", hidden: true }),
     more = button("加载更多", () => loadPage(nextCursor, listGeneration), { hidden: true }),
     input = h("input", {
       type: "file",
@@ -100,6 +100,7 @@ export function createReplayWorkspace({
   async function open(value, {saveError} = {}) {
     clearInterval(timer);
     timer = null;
+    saveWarning.hidden = !saveError;
     status(saveWarning, saveError ? "未保存："+saveError.message+"。当前捕获仍可下载，请导出后再刷新。" : "", !!saveError);
     try {
       if (typeof value === "string") {

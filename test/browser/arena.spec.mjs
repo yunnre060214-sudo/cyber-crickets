@@ -95,6 +95,7 @@ test("real worker finishes, pauses without advancing and respects next-game sett
   await page.getByRole("button", { name: "开始新局", exact: true }).click();
   await expect(page.locator("#arena .metrics")).toContainText("1.");
   await page.getByRole("button", { name: "暂停", exact: true }).click();
+  await expect(page.getByRole("button", { name: "继续", exact: true })).toBeEnabled();
   const before = await page.locator("#arena .metrics").textContent();
   await page.waitForTimeout(250);
   expect(await page.locator("#arena .metrics").textContent()).toBe(before);

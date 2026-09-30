@@ -18,6 +18,7 @@ test("save, refresh, resume, seek and actual downloadable import", async ({
   await expect(
     page.getByRole("button", { name: "已结束", exact: true }),
   ).toBeDisabled();
+  await expect.poll(() => persisted(page, async (s) => (await s.list({ type: "match" })).items[0]?.index.finished)).toBe(true);
   await nav(page, "replay");
   await page.locator("#replay .record-row button").first().click();
   const slider = page.getByLabel("回放时间");
@@ -96,10 +97,11 @@ test("two actual IndexedDB connections reject stale revisions and deduplicate re
 test("hidden page pauses and requires an explicit return", async ({
   browserName,
   baseURL,
+  isMobile,
 }) => {
   test.skip(
-    browserName === "webkit",
-    "WebKit has no native focus-control API here; Chromium tests real window visibility.",
+    browserName === "webkit" || isMobile,
+    "Desktop Chromium tests native window visibility; the other projects test mobile and WebKit flows.",
   );
   const { chromium } = await import("@playwright/test");
   const { spawn } = await import("node:child_process");
