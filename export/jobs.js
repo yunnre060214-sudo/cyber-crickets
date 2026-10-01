@@ -1,5 +1,6 @@
 import { ClassicTournamentAdapter } from "../competition/legacy.js";
 import { Tournament } from "../competition/tournament.js";
+import { fixtureReasonLabel } from "../competition/reasons.js";
 import { seal, encode } from "../engine/hash.js";
 import { escape } from "./v3.js";
 export async function createJobExport(id, store, format = "data") {
@@ -12,7 +13,7 @@ export async function createJobExport(id, store, format = "data") {
       replay: await store.getPackage(item.result.replayId),
     });
   const checkpoints = [];
-  const tournament = record.type === "competition" ? (record.state.legacy ? new ClassicTournamentAdapter(record.state.rawLegacy) : Tournament.fromJSON(record.state)) : null;
+  const tournament = record.type === "competition" ? (record.state.legacy ? ClassicTournamentAdapter.fromJSON(record.state) : Tournament.fromJSON(record.state)) : null;
   const jobs = record.state.orderedTasks ?? tournament?.nextJobs() ?? [];
   for (const job of jobs) {
     const cp = await store.getJobCheckpoint(id, job.jobId);
@@ -23,7 +24,7 @@ export async function createJobExport(id, store, format = "data") {
     format: "cyber-crickets." + record.type,
     formatVersion: 3,
     config: tournament?.config ?? record.state.config,
-    state: record.state,
+    state: tournament?.toJSON() ?? record.state,
     sourceHash: record.sourceHash ?? "development",
     results,
     checkpoints,
@@ -51,6 +52,14 @@ export async function createJobExport(id, store, format = "data") {
       } catch {}
     return { filename: stem + ".json", label: "完整数据", blob: raw };
   }
+  const fixtureSummary = tournament
+    ? "\n\n对阵决胜依据：\n\n" + tournament.rounds.flatMap(r => r.fixtures)
+        .filter(f => f.result)
+        .map(f => "- " + f.id + " · " + f.entrants.join(" / ") + "：" +
+          (f.result.winner === null ? "平局" : "胜者 " + f.result.winner) +
+          "；决胜依据：" + fixtureReasonLabel(f))
+        .join("\n")
+    : "";
   const rows = results.map((r) => ({ jobId: r.jobId, teams: r.result.teams })),
     text =
       "# " +
@@ -77,6 +86,7 @@ export async function createJobExport(id, store, format = "data") {
               .join(" / "),
         )
         .join("\n") +
+      fixtureSummary +
       "\n\n源码摘要：" +
       pkg.sourceHash +
       "\n积分与 reward 分开，胜率是本实验样本统计。\n";

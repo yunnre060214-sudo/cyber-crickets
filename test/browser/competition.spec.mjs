@@ -1,7 +1,7 @@
 import { test, expect, arenaURL, nav, edit, persisted } from "./helpers.mjs";
 test("real tournament persists legs and resumes after refresh without double scoring", async ({
   page,
-}) => {
+}, info) => {
   await page.goto(arenaURL);
   await nav(page, "competition");
   await edit(page, "competition-duration", "10");
@@ -36,6 +36,37 @@ test("real tournament persists legs and resumes after refresh without double sco
   );
   expect(data.r.index.completedTasks).toBe(data.results.length);
   expect(data.results.length).toBeGreaterThanOrEqual(8);
+  const fixtures = data.r.state.rounds.flatMap((r) => r.fixtures);
+  expect(Object.keys(data.r.state.fixtureReasons).sort()).toEqual(
+    fixtures.map((f) => f.id).sort(),
+  );
+  await expect(page.locator("#competition [data-fixture-reason]")).toHaveCount(
+    fixtures.length,
+  );
+  await page.reload();
+  await nav(page, "competition");
+  await page.locator("#competition .record-list button").first().click();
+  await expect(page.locator("#competition [data-fixture-reason]")).toHaveCount(
+    fixtures.length,
+  );
+  for (const name of ["HTML 报告", "Markdown", "完整赛事包"]) {
+    const [download] = await Promise.all([
+      page.waitForEvent("download"),
+      page.getByRole("button", { name, exact: true }).click(),
+    ]);
+    const path = info.outputPath(download.suggestedFilename());
+    await download.saveAs(path);
+    expect(await download.failure()).toBeNull();
+    const { readFile } = await import("node:fs/promises");
+    const bytes = await readFile(path);
+    if (name === "完整赛事包") {
+      const { gunzipSync } = await import("node:zlib");
+      const pkg = JSON.parse(
+        path.endsWith(".gz") ? gunzipSync(bytes).toString() : bytes.toString(),
+      );
+      expect(pkg.state.fixtureReasons).toEqual(data.r.state.fixtureReasons);
+    } else expect(bytes.toString()).toContain("决胜依据");
+  }
   await page
     .getByRole("button", { name: /图 1 \/ 局 1/ })
     .first()

@@ -3,6 +3,7 @@ import { standingsFor } from "./standings.js";
 import { fixtureJobs } from "./fixture.js";
 import { createMatchConfig } from "../engine/config.js";
 import { canonicalHash } from "../engine/hash.js";
+import { fixtureReasons, validateFixtureReasons, withoutFixtureReasons } from "./reasons.js";
 export function validateTournamentConfig(input) {
   const c = {
     ...input,
@@ -220,6 +221,7 @@ export class Tournament {
       rounds: this.rounds,
       status: this.status,
       groups: this.groups,
+      fixtureReasons: fixtureReasons(this.rounds),
     });
   }
   static fromJSON(data) {
@@ -243,7 +245,8 @@ export class Tournament {
       }
       if(saved.completed!==round.completed)throw Error("INVALID_TOURNAMENT_STATE");
     }
-    if(canonicalHash(t.toJSON())!==canonicalHash(data))throw Error("INVALID_TOURNAMENT_STATE");
+    validateFixtureReasons(data, t.rounds);
+    if(canonicalHash(withoutFixtureReasons(t.toJSON()))!==canonicalHash(withoutFixtureReasons(data)))throw Error("INVALID_TOURNAMENT_STATE");
     return t;
   }
 }

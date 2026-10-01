@@ -5,7 +5,7 @@ import { createWorkerJobQueue } from "./worker-job-queue.js";
 import { resultReplay, compactResult } from "./result-replay.js";
 const model = (r) =>
   r.state?.legacy
-    ? new ClassicTournamentAdapter(r.state.rawLegacy)
+    ? ClassicTournamentAdapter.fromJSON(r.state)
     : r.rawLegacy
       ? new ClassicTournamentAdapter(r.rawLegacy)
       : Tournament.fromJSON(r.state);
