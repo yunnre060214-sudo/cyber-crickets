@@ -64,6 +64,7 @@ export function createCompetitionController({ store, queue } = {}) {
         return {
           record: saved,
           tournament: t,
+          results,
           completed: new Set(byId.keys()),
         };
       } catch (e) {

@@ -181,6 +181,18 @@ async function playedFixture() {
   return { s, id, fixtureId };
 }
 
+test("opening a saved tournament retains actual leg replay references without rerunning", async () => {
+  const { s, id } = await playedFixture();
+  const saved = await createCompetitionController({ store: s }).load(id);
+  assert.equal(saved.results?.length, 2);
+  assert.equal(new Set(saved.results.map((r) => r.jobId)).size, 2);
+  for (const item of saved.results) {
+    const replay = await s.getPackage(item.result.replayId);
+    assert.equal(replay.summary.finished, true);
+    assert.equal(replay.summary.timeMs, 10000);
+  }
+});
+
 test("controller saves actual reasons and all exports explain older records", async () => {
   const { s, id, fixtureId } = await playedFixture();
   const record = await s.get(id);
