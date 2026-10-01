@@ -5,7 +5,7 @@ import { createWorkerJobQueue } from "./worker-job-queue.js";
 import { resultReplay, compactResult } from "./result-replay.js";
 const model = (r) =>
   r.state?.legacy
-    ? new ClassicTournamentAdapter(r.state.rawLegacy)
+    ? ClassicTournamentAdapter.fromJSON(r.state)
     : r.rawLegacy
       ? new ClassicTournamentAdapter(r.rawLegacy)
       : Tournament.fromJSON(r.state);
@@ -64,6 +64,7 @@ export function createCompetitionController({ store, queue } = {}) {
         return {
           record: saved,
           tournament: t,
+          results,
           completed: new Set(byId.keys()),
         };
       } catch (e) {

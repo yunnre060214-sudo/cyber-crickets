@@ -1,6 +1,7 @@
 import { h, button, label, select, status } from "./dom.js";
 import { AGENT_REGISTRY } from "../agents/registry.js";
 import { FORMAT_NAMES } from "../competition/formats.js";
+import { fixtureReasonLabel } from "../competition/reasons.js";
 import { createJobExport } from "../export/jobs.js";
 import { saveMatchExport } from "../export/download.js";
 export function estimateTournamentGames({
@@ -355,7 +356,9 @@ export function createCompetitionWorkspace({
           ? "冠军：" + entrant(champion)
           : t.config.format === "groups"
             ? "各组按前二名排名，不设总冠军。"
-            : "淘汰同分先加赛一张换边地图，再比较翻色、领地和种子抽签。",
+            : record.state?.legacy
+              ? "经典历史淘汰同分依次比较翻色、领地和种子抽签。"
+              : "淘汰同分先加赛一张换边地图，再比较翻色、领地和种子抽签。",
       ),
       h("h2", {}, "积分榜"),
       h(
@@ -421,7 +424,12 @@ export function createCompetitionWorkspace({
                           .join(" : ") +
                         " · " +
                         (f.result.winner ? "胜者 " + f.result.winner : "平局")
-                    : "等待结算",
+                    : fixtureReasonLabel(f),
+                ),
+                f.result && h(
+                  "p",
+                  { className: "muted", "data-fixture-reason": f.id },
+                  "决胜依据：" + fixtureReasonLabel(f),
                 ),
               ),
               h(

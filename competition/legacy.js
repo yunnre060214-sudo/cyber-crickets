@@ -2,6 +2,7 @@ import { Tournament as LegacyTournament } from "../legacy/v1/tournament.js";
 import { createRng, deriveSeed } from "../legacy/v1/rules.js";
 import { createMatchConfig } from "../engine/config.js";
 import { canonicalHash } from "../engine/hash.js";
+import { fixtureReasons, validateFixtureReasons, withoutFixtureReasons } from "./reasons.js";
 function restoreLegacy(raw) {
   if(raw?.version!==1||!Array.isArray(raw.rounds)||!raw.rounds.length)throw Error("INVALID_LEGACY_TOURNAMENT");
   const t=new LegacyTournament(raw.config);
@@ -75,5 +76,12 @@ export class ClassicTournamentAdapter {
   }
   standings(g){return this.raw.standings(g);}
   champion(){return this.raw.champion();}
-  toJSON(){return {schemaVersion:3,legacy:true,rawLegacy:this.raw.toJSON()};}
+  toJSON(){return {schemaVersion:3,legacy:true,rawLegacy:this.raw.toJSON(),fixtureReasons:fixtureReasons(this.rounds)};}
+  static fromJSON(state){
+    if(state?.schemaVersion!==3||state.legacy!==true)throw Error("INVALID_LEGACY_TOURNAMENT");
+    const t=new ClassicTournamentAdapter(state.rawLegacy);
+    validateFixtureReasons(state,t.rounds);
+    if(canonicalHash(withoutFixtureReasons(t.toJSON()))!==canonicalHash(withoutFixtureReasons(state)))throw Error("INVALID_LEGACY_TOURNAMENT");
+    return t;
+  }
 }

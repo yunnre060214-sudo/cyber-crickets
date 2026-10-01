@@ -82,7 +82,7 @@ export async function importPackage(file,{store}={}) {
     stream=stream.pipeThrough(new DecompressionStream("gzip"));
   }
   const raw=JSON.parse(await readBounded(stream,INPUT_LIMITS.expanded));finiteTree(raw);
-  let pkg,resume=false,archive=false,type="match";
+  let pkg,normalizedState,resume=false,archive=false,type="match";
   if(raw.format==="cyber-crickets.match-log"&&raw.formatVersion===2) {
     const b=raw.snapshot?.map;
     if(!b||["owner","terrain","resources","core"].some(k=>!Array.isArray(b[k])||b[k].length!==4096)||
@@ -102,8 +102,7 @@ export async function importPackage(file,{store}={}) {
       tasks=plan.orderedTasks;
     }else{
       classic=pkg.state.legacy===true;
-      t=classic?new ClassicTournamentAdapter(pkg.state.rawLegacy):Tournament.fromJSON(pkg.state);
-      if(classic&&canonicalHash(t.toJSON())!==canonicalHash(pkg.state))throw Error("INVALID_LEGACY_TOURNAMENT");
+      t=classic?ClassicTournamentAdapter.fromJSON(pkg.state):Tournament.fromJSON(pkg.state);
       tasks=t.rounds.flatMap(r=>r.fixtures.flatMap(f=>classic?t.fixtureJobs(f):fixtureJobs(f,t.config)));
     }
     const expectedConfig=type==="experiment"?pkg.state.config:t.config;
@@ -124,10 +123,15 @@ export async function importPackage(file,{store}={}) {
       checkpointIds.add(saved.jobId);validateCheckpoint(saved.checkpoint);
       if(canonicalHash(saved.checkpoint.config)!==canonicalHash(job.config))throw Error("JOB_CONFIG_MISMATCH");
     }
-    if(type==="competition")validateCompetitionResults(t,pkg.results,classic);
+    if(type==="competition"){
+      validateCompetitionResults(t,pkg.results,classic);
+      normalizedState=t.toJSON();
+    }
     resume=type==="experiment"?seen.size<tasks.length:t.status!=="completed";
   }else throw Error("UNSUPPORTED_FORMAT");
   const id="import:"+canonicalHash(pkg);
+  // Keep an older file's duplicate identity, then seal the normalized snapshot.
+  if(normalizedState)pkg=seal({...verify(pkg),state:normalizedState});
   if(store){
     const write=type==="match"?store.putPackage:store.putJobPackage;
     await write.call(store,{id,type,schemaVersion:3,index:{
